@@ -1,0 +1,28 @@
+{
+  "name": "prismarine-viewer",
+  "version": "1.0.0",
+  "description": "Web based viewer",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint",
+    "lint": "standard",
+    "fix": "standard --fix"
+  },
+  "author": "PrismarineJS",
+  "license": "MIT",
+  "dependencies": {
+    "protodef": "^1.7.2",
+    "express": "^4.17.1",
+    "express-browserify": "^1.0.3",
+    "minecraft-assets": "^1.2.0",
+    "minecraft-data": "^2.54.0",
+    "prismarine-block": "^1.5.0",
+    "prismarine-chunk": "^1.16.0",
+    "socket.io": "^2.3.0",
+    "three": "^0.117.1"
+  },
+  "devDependencies": {
+    "standard": "^14.3.4",
+    "mineflayer": "^2.19.0"
+  }
+}
