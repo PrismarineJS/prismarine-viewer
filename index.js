@@ -19,22 +19,40 @@ module.exports = function (bot) {
 
     socket.emit('position', bot.entity.position)
 
-    const maxViewDistance = 64
+    const maxViewDistance = 32
     const x = Math.floor(bot.entity.position.x / 16) * 16
     const z = Math.floor(bot.entity.position.z / 16) * 16
 
     for (const coords in bot._columns) {
       const [cx, cz] = coords.split(',')
-      const dx = cx - x
-      const dz = cz - z
+      const dx = parseInt(cx, 10) - x
+      const dz = parseInt(cz, 10) - z
       if (dx * dx + dz * dz < maxViewDistance * maxViewDistance) {
         const chunk = bot._columns[coords].toJson()
         socket.emit('chunk', { coords, chunk })
       }
     }
 
-    socket.on('disconnect', () => {
+    function createEntity (e) {
+      socket.emit('entity', { id: e.id, type: e.type, pos: e.position })
+    }
 
+    function updateEntity (e) {
+      socket.emit('entity', { id: e.id, pos: e.position })
+    }
+
+    function removeEntity (e) {
+      socket.emit('entity', { id: e.id, delete: true })
+    }
+
+    bot.on('entitySpawn', createEntity)
+    bot.on('entityMoved', updateEntity)
+    bot.on('entityGone', removeEntity)
+
+    socket.on('disconnect', () => {
+      bot.removeListener('entitySpawn', createEntity)
+      bot.removeListener('entityMoved', updateEntity)
+      bot.removeListener('entityGone', removeEntity)
     })
   })
 

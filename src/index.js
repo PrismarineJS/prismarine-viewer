@@ -2,6 +2,7 @@
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 const { World } = require('./world')
+const { Entities } = require('./entities')
 
 const io = require('socket.io-client')
 const socket = io()
@@ -23,6 +24,7 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.z = 5
 
 const world = new World(scene)
+const entities = new Entities(scene)
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -47,10 +49,15 @@ socket.on('version', (version) => {
     controls.target.set(pos.x, pos.y, pos.z)
 
     const geometry = new THREE.BoxGeometry(0.6, 1.8, 0.6)
+    geometry.translate(0, 0.9, 0)
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
     const cube = new THREE.Mesh(geometry, material)
-    cube.position.set(pos.x, pos.y + 0.9, pos.z)
+    cube.position.set(pos.x, pos.y, pos.z)
     scene.add(cube)
+  })
+
+  socket.on('entity', (e) => {
+    entities.update(e)
   })
 
   socket.on('chunk', (data) => {
