@@ -17,8 +17,6 @@ module.exports = function (bot) {
   io.on('connection', (socket) => {
     socket.emit('version', bot.version)
 
-    socket.emit('position', bot.entity.position)
-
     const maxViewDistance = 32
     const x = Math.floor(bot.entity.position.x / 16) * 16
     const z = Math.floor(bot.entity.position.z / 16) * 16
@@ -33,6 +31,18 @@ module.exports = function (bot) {
       }
     }
 
+    botPosition()
+
+    for (const e in bot.entities) {
+      if (bot.entities[e] !== bot.entity) {
+        createEntity(bot.entities[e])
+      }
+    }
+
+    function botPosition () {
+      socket.emit('position', bot.entity.position)
+    }
+
     function createEntity (e) {
       socket.emit('entity', { id: e.id, type: e.type, pos: e.position })
     }
@@ -45,11 +55,13 @@ module.exports = function (bot) {
       socket.emit('entity', { id: e.id, delete: true })
     }
 
+    bot.on('move', botPosition)
     bot.on('entitySpawn', createEntity)
     bot.on('entityMoved', updateEntity)
     bot.on('entityGone', removeEntity)
 
     socket.on('disconnect', () => {
+      bot.removeListener('move', botPosition)
       bot.removeListener('entitySpawn', createEntity)
       bot.removeListener('entityMoved', updateEntity)
       bot.removeListener('entityGone', removeEntity)

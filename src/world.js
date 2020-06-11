@@ -128,7 +128,7 @@ function getSectionMesh (sx, sy, sz, world) {
   }
 
   const geometry = new THREE.BufferGeometry()
-  const material = new THREE.MeshLambertMaterial({ color: 'green' })
+  const material = new THREE.MeshLambertMaterial({ color: 'white' })
   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3))
   geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3))
   geometry.setIndex(indices)
