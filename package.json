@@ -17,7 +17,7 @@
     "minecraft-assets": "^1.2.0",
     "minecraft-data": "^2.54.0",
     "prismarine-block": "^1.5.0",
-    "prismarine-chunk": "^1.16.0",
+    "prismarine-chunk": "^1.17.0",
     "socket.io": "^2.3.0",
     "three": "^0.117.1"
   },
