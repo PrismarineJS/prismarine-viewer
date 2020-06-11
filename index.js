@@ -55,16 +55,23 @@ module.exports = function (bot) {
       socket.emit('entity', { id: e.id, delete: true })
     }
 
+    function blockUpdate (oldBlock, newBlock) {
+      const stateId = newBlock.stateId ? newBlock.stateId : ((newBlock.type << 4) | newBlock.metadata)
+      socket.emit('blockUpdate', { pos: oldBlock.position, stateId })
+    }
+
     bot.on('move', botPosition)
     bot.on('entitySpawn', createEntity)
     bot.on('entityMoved', updateEntity)
     bot.on('entityGone', removeEntity)
+    bot.on('blockUpdate', blockUpdate)
 
     socket.on('disconnect', () => {
       bot.removeListener('move', botPosition)
       bot.removeListener('entitySpawn', createEntity)
       bot.removeListener('entityMoved', updateEntity)
       bot.removeListener('entityGone', removeEntity)
+      bot.removeListener('blockUpdate', blockUpdate)
     })
   })
 

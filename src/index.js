@@ -3,6 +3,7 @@ global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 const { World } = require('./world')
 const { Entities } = require('./entities')
+const Vec3 = require('vec3').Vec3
 
 const io = require('socket.io-client')
 const socket = io()
@@ -64,5 +65,10 @@ socket.on('version', (version) => {
     console.log(data.coords)
     const [x, z] = data.coords.split(',')
     world.addColumn(parseInt(x, 10), parseInt(z, 10), chunk)
+  })
+
+  socket.on('blockUpdate', ({ pos, stateId }) => {
+    console.log(pos, stateId)
+    world.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
   })
 })

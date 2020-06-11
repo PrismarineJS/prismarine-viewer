@@ -142,14 +142,22 @@ class World {
     this.scene = scene
   }
 
+  setSectionDirty (pos) {
+    const x = Math.floor(pos.x / 16) * 16
+    const y = Math.floor(pos.y / 16) * 16
+    const z = Math.floor(pos.z / 16) * 16
+    const key = sectionKey(x, y, z)
+    const mesh = this.sectionMeshs[key]
+    if (mesh) {
+      this.scene.remove(mesh)
+      delete this.sectionMeshs[key]
+    }
+  }
+
   addColumn (x, z, chunk) {
     this.columns[columnKey(x, z)] = chunk
     for (let y = 0; y < 256; y += 16) {
-      const mesh = this.sectionMeshs[sectionKey(x, y, z)]
-      if (mesh) {
-        this.scene.remove(mesh)
-        delete this.sectionMeshs[sectionKey(x, y, z)]
-      }
+      this.setSectionDirty(new Vec3(x, y, z))
     }
   }
 
@@ -167,6 +175,25 @@ class World {
         }
       }
     }
+  }
+
+  setBlockStateId (pos, stateId) {
+    const loc = pos.floored()
+    const key = columnKey(Math.floor(loc.x / 16) * 16, Math.floor(loc.z / 16) * 16)
+
+    const column = this.columns[key]
+    // null column means chunk not loaded
+    if (!column) return
+
+    column.setBlockStateId(posInChunk(loc), stateId)
+
+    this.setSectionDirty(loc)
+    this.setSectionDirty(loc.offset(-16, 0, 0))
+    this.setSectionDirty(loc.offset(16, 0, 0))
+    this.setSectionDirty(loc.offset(0, -16, 0))
+    this.setSectionDirty(loc.offset(0, 16, 0))
+    this.setSectionDirty(loc.offset(0, 0, -16))
+    this.setSectionDirty(loc.offset(0, 0, 16))
   }
 
   getBlock (pos) {
