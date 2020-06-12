@@ -17,7 +17,7 @@ module.exports = function (bot) {
   io.on('connection', (socket) => {
     socket.emit('version', bot.version)
 
-    const maxViewDistance = 32
+    const maxViewDistance = 128
     const x = Math.floor(bot.entity.position.x / 16) * 16
     const z = Math.floor(bot.entity.position.z / 16) * 16
 

@@ -11,15 +11,12 @@ const socket = io()
 const scene = new THREE.Scene()
 scene.background = new THREE.Color('lightblue')
 
-function addLight (x, y, z) {
-  const color = 0xFFFFFF
-  const intensity = 1
-  const light = new THREE.DirectionalLight(color, intensity)
-  light.position.set(x, y, z)
-  scene.add(light)
-}
-addLight(-1, 2, 4)
-addLight(1, -1, -2)
+const ambientLight = new THREE.AmbientLight(0xcccccc)
+scene.add(ambientLight)
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2)
+directionalLight.position.set(1, 1, 0.5).normalize()
+scene.add(directionalLight)
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 camera.position.z = 5

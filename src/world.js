@@ -5,6 +5,8 @@ const Vec3 = require('vec3').Vec3
 const cubeFaces = [
   { // left
     dir: new Vec3(-1, 0, 0),
+    mask1: [1, 1, 0],
+    mask2: [1, 0, 1],
     corners: [
       [0, 1, 0],
       [0, 0, 0],
@@ -14,6 +16,8 @@ const cubeFaces = [
   },
   { // right
     dir: new Vec3(1, 0, 0),
+    mask1: [1, 1, 0],
+    mask2: [1, 0, 1],
     corners: [
       [1, 1, 1],
       [1, 0, 1],
@@ -23,6 +27,8 @@ const cubeFaces = [
   },
   { // bottom
     dir: new Vec3(0, -1, 0),
+    mask1: [1, 1, 0],
+    mask2: [0, 1, 1],
     corners: [
       [1, 0, 1],
       [0, 0, 1],
@@ -32,6 +38,8 @@ const cubeFaces = [
   },
   { // top
     dir: new Vec3(0, 1, 0),
+    mask1: [1, 1, 0],
+    mask2: [0, 1, 1],
     corners: [
       [0, 1, 1],
       [1, 1, 1],
@@ -41,6 +49,8 @@ const cubeFaces = [
   },
   { // back
     dir: new Vec3(0, 0, -1),
+    mask1: [1, 0, 1],
+    mask2: [0, 1, 1],
     corners: [
       [1, 0, 0],
       [0, 0, 0],
@@ -50,6 +60,8 @@ const cubeFaces = [
   },
   { // front
     dir: new Vec3(0, 0, 1),
+    mask1: [1, 0, 1],
+    mask2: [0, 1, 1],
     corners: [
       [0, 0, 1],
       [1, 0, 1],
@@ -84,6 +96,7 @@ function isCube (shapes) {
 function getSectionMesh (sx, sy, sz, world) {
   const positions = []
   const normals = []
+  const colors = []
   const indices = []
 
   const cursor = new Vec3(0, 0, 0)
@@ -93,18 +106,43 @@ function getSectionMesh (sx, sy, sz, world) {
         const block = world.getBlock(cursor)
         if (block && block.shapes.length > 0) {
           if (isCube(block.shapes)) {
-            for (const { dir, corners } of cubeFaces) {
+            for (const { dir, corners, mask1, mask2 } of cubeFaces) {
               const neighbor = world.getBlock(cursor.plus(dir))
               if (neighbor && !isCube(neighbor.shapes) && neighbor.position.y >= 0) {
                 const ndx = Math.floor(positions.length / 3)
+                const aos = []
                 for (const pos of corners) {
                   positions.push(pos[0] + cursor.x, pos[1] + cursor.y, pos[2] + cursor.z)
                   normals.push(dir.x, dir.y, dir.z)
+
+                  // Ambient occlusion
+                  const dx = pos[0] * 2 - 1
+                  const dy = pos[1] * 2 - 1
+                  const dz = pos[2] * 2 - 1
+                  const side1 = world.getBlock(cursor.offset(dx * mask1[0], dy * mask1[1], dz * mask1[2]))
+                  const side2 = world.getBlock(cursor.offset(dx * mask2[0], dy * mask2[1], dz * mask2[2]))
+                  const corner = world.getBlock(cursor.offset(dx, dy, dz))
+
+                  const side1Block = (side1 && isCube(side1.shapes)) ? 1 : 0
+                  const side2Block = (side2 && isCube(side2.shapes)) ? 1 : 0
+                  const cornerBlock = (corner && isCube(corner.shapes)) ? 1 : 0
+
+                  const ao = (side1Block && side2Block) ? 0 : (3 - (side1Block + side2Block + cornerBlock))
+                  aos.push(ao)
+
+                  colors.push(ao / 3, ao / 3, ao / 3)
                 }
-                indices.push(
-                  ndx, ndx + 1, ndx + 2,
-                  ndx + 2, ndx + 1, ndx + 3
-                )
+                if (aos[0] + aos[3] < aos[1] + aos[2]) {
+                  indices.push(
+                    ndx, ndx + 1, ndx + 2,
+                    ndx + 2, ndx + 1, ndx + 3
+                  )
+                } else {
+                  indices.push(
+                    ndx, ndx + 3, ndx + 2,
+                    ndx, ndx + 1, ndx + 3
+                  )
+                }
               }
             }
           } else {
@@ -114,6 +152,7 @@ function getSectionMesh (sx, sy, sz, world) {
                 for (const pos of corners) {
                   positions.push((pos[0] ? shape[3] : shape[0]) + cursor.x, (pos[1] ? shape[4] : shape[1]) + cursor.y, (pos[2] ? shape[5] : shape[2]) + cursor.z)
                   normals.push(dir.x, dir.y, dir.z)
+                  colors.push(1, 1, 1)
                 }
                 indices.push(
                   ndx, ndx + 1, ndx + 2,
@@ -128,9 +167,10 @@ function getSectionMesh (sx, sy, sz, world) {
   }
 
   const geometry = new THREE.BufferGeometry()
-  const material = new THREE.MeshLambertMaterial({ color: 'white' })
+  const material = new THREE.MeshLambertMaterial({ vertexColors: true })
   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3))
   geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3))
+  geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3))
   geometry.setIndex(indices)
   return new THREE.Mesh(geometry, material)
 }
