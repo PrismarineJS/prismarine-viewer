@@ -1,6 +1,4 @@
-module.exports = function (bot) {
-  const port = 3000
-
+module.exports = (bot, port = 3000) => {
   const path = require('path')
   const express = require('express')
   const expressBrowserify = require('express-browserify')
@@ -14,10 +12,30 @@ module.exports = function (bot) {
 
   app.get('/index.js', expressBrowserify('src/index.js'))
 
+  const sockets = []
+  const primitives = {}
+
+  bot.viewer = {}
+
+  bot.viewer.erase = (id) => {
+    delete primitives[id]
+    for (const socket of sockets) {
+      socket.emit('primitive', { id })
+    }
+  }
+
+  bot.viewer.drawLine = (id, points, color = 0xff0000) => {
+    primitives[id] = { type: 'line', id, points, color }
+    for (const socket of sockets) {
+      socket.emit('primitive', primitives[id])
+    }
+  }
+
   io.on('connection', (socket) => {
     socket.emit('version', bot.version)
+    sockets.push(socket)
 
-    const maxViewDistance = 128
+    const maxViewDistance = 64
     const x = Math.floor(bot.entity.position.x / 16) * 16
     const z = Math.floor(bot.entity.position.z / 16) * 16
 
@@ -37,6 +55,10 @@ module.exports = function (bot) {
       if (bot.entities[e] !== bot.entity) {
         createEntity(bot.entities[e])
       }
+    }
+
+    for (const id in primitives) {
+      socket.emit('primitive', primitives[id])
     }
 
     function botPosition () {
@@ -72,6 +94,7 @@ module.exports = function (bot) {
       bot.removeListener('entityMoved', updateEntity)
       bot.removeListener('entityGone', removeEntity)
       bot.removeListener('blockUpdate', blockUpdate)
+      sockets.splice(sockets.indexOf(socket), 1)
     })
   })
 

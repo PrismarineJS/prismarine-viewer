@@ -3,6 +3,7 @@ global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 const { World } = require('./world')
 const { Entities } = require('./entities')
+const { Primitives } = require('./primitives')
 const Vec3 = require('vec3').Vec3
 
 const io = require('socket.io-client')
@@ -23,6 +24,7 @@ camera.position.z = 5
 
 const world = new World(scene)
 const entities = new Entities(scene)
+const primitives = new Primitives(scene)
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -55,6 +57,10 @@ socket.on('version', (version) => {
 
   socket.on('entity', (e) => {
     entities.update(e)
+  })
+
+  socket.on('primitive', (p) => {
+    primitives.update(p)
   })
 
   socket.on('chunk', (data) => {
