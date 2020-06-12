@@ -1,4 +1,4 @@
-### Prismarine-Viewer
+# Prismarine-Viewer
 
 ## Example
 
@@ -28,10 +28,10 @@ bot.once('spawn', () => {
 
 All drawing function have a unique id that can be used to replace or erase the primitive.
 
-# bot.viewer.drawLine (id, points, color=0xff0000)
+### bot.viewer.drawLine (id, points, color=0xff0000)
 
 Draw a line passing through all the `points`.
 
-# bot.viewer.erase (id)
+### bot.viewer.erase (id)
 
 Remove the primitive with the given id from the display.
