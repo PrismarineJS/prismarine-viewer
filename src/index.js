@@ -44,15 +44,19 @@ socket.on('version', (version) => {
   console.log('Using version: ' + version)
   const Chunk = require('prismarine-chunk')(version)
 
-  const geometry = new THREE.BoxGeometry(0.6, 1.8, 0.6)
-  geometry.translate(0, 0.9, 0)
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-  const botMesh = new THREE.Mesh(geometry, material)
-  scene.add(botMesh)
-
-  socket.on('position', (pos) => {
+  let botMesh
+  socket.on('position', (pos, addMesh = true) => {
     controls.target.set(pos.x, pos.y, pos.z)
-    botMesh.position.set(pos.x, pos.y, pos.z)
+    if (addMesh) {
+      if (!botMesh) {
+        const geometry = new THREE.BoxGeometry(0.6, 1.8, 0.6)
+        geometry.translate(0, 0.9, 0)
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        botMesh = new THREE.Mesh(geometry, material)
+        scene.add(botMesh)
+      }
+      botMesh.position.set(pos.x, pos.y, pos.z)
+    }
   })
 
   socket.on('entity', (e) => {

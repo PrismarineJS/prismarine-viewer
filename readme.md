@@ -4,7 +4,7 @@
 
 ```js
 const mineflayer = require('mineflayer')
-const mineflayerViewer = require('prismarine-viewer')
+const mineflayerViewer = require('prismarine-viewer').mineflayer
 
 const bot = mineflayer.createBot({
   username: 'Bot'

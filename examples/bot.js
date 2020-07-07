@@ -1,5 +1,5 @@
 const mineflayer = require('mineflayer')
-const mineflayerViewer = require('../')
+const mineflayerViewer = require('../').mineflayer
 
 const bot = mineflayer.createBot({
   username: 'Bot'
