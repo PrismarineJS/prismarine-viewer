@@ -11,7 +11,7 @@
   "author": "PrismarineJS",
   "license": "MIT",
   "dependencies": {
-    "protodef": "^1.7.2",
+    "canvas": "^2.6.1",
     "express": "^4.17.1",
     "express-browserify": "^1.0.3",
     "minecraft-assets": "^1.2.0",
@@ -19,6 +19,7 @@
     "prismarine-block": "^1.5.0",
     "prismarine-chunk": "^1.17.0",
     "prismarine-world": "^2.2.0",
+    "protodef": "^1.7.2",
     "socket.io": "^2.3.0",
     "three": "^0.117.1",
     "vec3": "^0.1.5"

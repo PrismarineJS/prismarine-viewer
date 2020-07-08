@@ -15,7 +15,7 @@ scene.background = new THREE.Color('lightblue')
 const ambientLight = new THREE.AmbientLight(0xcccccc)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
 directionalLight.position.set(1, 1, 0.5).normalize()
 scene.add(directionalLight)
 

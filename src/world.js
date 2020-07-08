@@ -93,10 +93,24 @@ function isCube (shapes) {
   return shape[0] === 0 && shape[1] === 0 && shape[2] === 0 && shape[3] === 1 && shape[4] === 1 && shape[5] === 1
 }
 
+function addUvs (uvs, blockIndex, textureWidth) {
+  const tileS = 16 / textureWidth
+  const tileN = Math.floor(textureWidth / 16)
+  const x = (blockIndex % tileN) * tileS
+  const y = Math.floor(blockIndex / tileN) * tileS
+  uvs.push(x, y, x, y + tileS, x + tileS, y, x + tileS, y + tileS)
+}
+
 function getSectionMesh (sx, sy, sz, world) {
+  const texture = new THREE.TextureLoader().load('texture.png')
+  texture.magFilter = THREE.NearestFilter
+  texture.minFilter = THREE.NearestFilter
+  texture.flipY = false
+
   const positions = []
   const normals = []
   const colors = []
+  const uvs = []
   const indices = []
 
   const cursor = new Vec3(0, 0, 0)
@@ -132,6 +146,7 @@ function getSectionMesh (sx, sy, sz, world) {
 
                   colors.push(ao / 3, ao / 3, ao / 3)
                 }
+                addUvs(uvs, block.type, 400) // TODO: correct uvs
                 if (aos[0] + aos[3] < aos[1] + aos[2]) {
                   indices.push(
                     ndx, ndx + 1, ndx + 2,
@@ -154,6 +169,7 @@ function getSectionMesh (sx, sy, sz, world) {
                   normals.push(dir.x, dir.y, dir.z)
                   colors.push(1, 1, 1)
                 }
+                addUvs(uvs, block.type, 400) // TODO: correct uvs
                 indices.push(
                   ndx, ndx + 1, ndx + 2,
                   ndx + 2, ndx + 1, ndx + 3
@@ -167,10 +183,11 @@ function getSectionMesh (sx, sy, sz, world) {
   }
 
   const geometry = new THREE.BufferGeometry()
-  const material = new THREE.MeshLambertMaterial({ vertexColors: true })
+  const material = new THREE.MeshLambertMaterial({ map: texture, vertexColors: true })
   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3))
   geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3))
   geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3))
+  geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2))
   geometry.setIndex(indices)
   return new THREE.Mesh(geometry, material)
 }
