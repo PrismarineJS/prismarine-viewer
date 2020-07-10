@@ -101,12 +101,7 @@ function addUvs (uvs, blockIndex, textureWidth) {
   uvs.push(x, y, x, y + tileS, x + tileS, y, x + tileS, y + tileS)
 }
 
-function getSectionMesh (sx, sy, sz, world) {
-  const texture = new THREE.TextureLoader().load('texture.png')
-  texture.magFilter = THREE.NearestFilter
-  texture.minFilter = THREE.NearestFilter
-  texture.flipY = false
-
+function getSectionGeometry (sx, sy, sz, world) {
   const positions = []
   const normals = []
   const colors = []
@@ -183,13 +178,12 @@ function getSectionMesh (sx, sy, sz, world) {
   }
 
   const geometry = new THREE.BufferGeometry()
-  const material = new THREE.MeshLambertMaterial({ map: texture, vertexColors: true })
   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3))
   geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3))
   geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3))
   geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2))
   geometry.setIndex(indices)
-  return new THREE.Mesh(geometry, material)
+  return geometry
 }
 
 class World {
@@ -197,6 +191,12 @@ class World {
     this.columns = {}
     this.sectionMeshs = {}
     this.scene = scene
+
+    const texture = new THREE.TextureLoader().load('texture.png')
+    texture.magFilter = THREE.NearestFilter
+    texture.minFilter = THREE.NearestFilter
+    texture.flipY = false
+    this.material = new THREE.MeshLambertMaterial({ map: texture, vertexColors: true })
   }
 
   setSectionDirty (pos) {
@@ -226,7 +226,8 @@ class World {
       const chunk = this.columns[coords]
       for (let y = 0; y < 256; y += 16) {
         if (chunk.sections[Math.floor(y / 16)] && !this.sectionMeshs[sectionKey(x, y, z)]) {
-          const mesh = getSectionMesh(x, y, z, this)
+          const geometry = getSectionGeometry(x, y, z, this)
+          const mesh = new THREE.Mesh(geometry, this.material)
           this.sectionMeshs[sectionKey(x, y, z)] = mesh
           this.scene.add(mesh)
         }
