@@ -104,7 +104,7 @@ function renderElement (world, cursor, element, doAO, attr) {
     let tint = [1, 1, 1]
     if (eFace.tintindex !== undefined) {
       if (eFace.tintindex === 0) {
-        tint = [0.3, 1.0, 0.4] // TODO: correct tint for each block
+        tint = [0.568, 0.741, 0.349] // TODO: correct tint for each block
       }
     }
 
