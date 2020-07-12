@@ -1,5 +1,7 @@
 # prismarine-viewer
 
+Web based viewer for servers and bots
+
 [![NPM version](https://img.shields.io/npm/v/prismarine-viewer.svg)](http://npmjs.com/package/prismarine-viewer)
 [![Build Status](https://github.com/PrismarineJS/prismarine-viewer/workflows/CI/badge.svg)](https://github.com/PrismarineJS/prismarine-viewer/actions?query=workflow%3A%22CI%22)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-brightgreen.svg)](https://discord.gg/GsEFRM8)
