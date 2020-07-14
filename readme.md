@@ -27,7 +27,7 @@ const bot = mineflayer.createBot({
 })
 
 bot.once('spawn', () => {
-  mineflayerViewer(bot, 3000) // Start the viewing server on port 3000
+  mineflayerViewer(bot, { port: 3000 }) // Start the viewing server on port 3000
 
   // Draw the path followed by the bot
   const path = [bot.entity.position.clone()]
