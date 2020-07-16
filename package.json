@@ -4,7 +4,8 @@
   "description": "Web based viewer",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint",
+    "test": "jest --verbose --runInBand --forceExit",
+    "pretest": "npm run lint",
     "lint": "standard",
     "fix": "standard --fix"
   },
@@ -25,7 +26,11 @@
     "vec3": "^0.1.5"
   },
   "devDependencies": {
-    "standard": "^14.3.4",
-    "mineflayer": "^2.23.0"
+    "jest": "^26.1.0",
+    "jest-puppeteer": "^4.4.0",
+    "minecraft-wrap": "^1.2.3",
+    "mineflayer": "^2.23.0",
+    "puppeteer": "^5.1.0",
+    "standard": "^14.3.4"
   }
 }

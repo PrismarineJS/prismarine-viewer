@@ -14,7 +14,7 @@ function getEntityMesh (entity) {
     const cube = new THREE.Mesh(geometry, material)
     return cube
   }
-  console.log(entity.type)
+  // g(entity.type)
   const geometry = new THREE.BoxGeometry(1, 1, 1)
   geometry.translate(0, 0.5, 0)
   const material = new THREE.MeshBasicMaterial({ color: 0xff00ff })
