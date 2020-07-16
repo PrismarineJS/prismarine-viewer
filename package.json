@@ -4,7 +4,7 @@
   "description": "Web based viewer",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose",
+    "test": "jest --verbose --runInBand --forceExit",
     "pretest": "npm run lint",
     "lint": "standard",
     "fix": "standard --fix"
