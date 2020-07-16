@@ -10,6 +10,8 @@ Web based viewer for servers and bots
 
 [![Try it on gitpod](https://img.shields.io/badge/try-on%20gitpod-brightgreen.svg)](https://gitpod.io/#https://github.com/PrismarineJS/prismarine-viewer)
 
+[<img src="https://prismarine.js.org/prismarine-viewer/test_1.16.1.png" alt="viewer" width="300">](https://prismarine.js.org/prismarine-viewer/)
+
 ## Install
 
 ```bash
