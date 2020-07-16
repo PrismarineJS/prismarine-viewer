@@ -71,7 +71,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
       it('starts the viewer', function (done) {
         const mineflayer = require('mineflayer')
         const mineflayerViewer = require('../').mineflayer
-        setTimeout(() => done(new Error('too slow !!!')), 90000)
+        setTimeout(() => done(new Error('too slow !!!')), 120000)
 
         const bot = mineflayer.createBot({
           username: 'Bot',
@@ -94,10 +94,10 @@ supportedVersions.forEach(function (supportedVersion, i) {
             })
             setTimeout(() => {
               page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => done()).catch(err => done(err))
-            }, 30000)
+            }, 60000)
           }).catch(err => done(err))
         })
-      }, 90000)
+      }, 120000)
     })
   })
 })
