@@ -35,7 +35,6 @@ const controls = new THREE.OrbitControls(camera, renderer.domElement)
 function animate () {
   window.requestAnimationFrame(animate)
   controls.update()
-  world.update()
   renderer.render(scene, camera)
 }
 animate()

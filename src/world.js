@@ -17,8 +17,14 @@ class World {
     this.columns = {}
   }
 
-  addColumn (x, z, chunk) {
-    this.columns[columnKey(x, z)] = this.Chunk.fromJson(chunk)
+  addColumn (x, z, json) {
+    const chunk = this.Chunk.fromJson(json)
+    this.columns[columnKey(x, z)] = chunk
+    return chunk
+  }
+
+  getColumn (x, z) {
+    return this.columns[columnKey(x, z)]
   }
 
   setBlockStateId (pos, stateId) {

@@ -1,5 +1,3 @@
-/* global THREE */
-
 const Vec3 = require('vec3').Vec3
 
 const elemFaces = {
@@ -182,13 +180,12 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
     }
   }
 
-  const geometry = new THREE.BufferGeometry()
-  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(attr.positions), 3))
-  geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(attr.normals), 3))
-  geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(attr.colors), 3))
-  geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(attr.uvs), 2))
-  geometry.setIndex(attr.indices)
-  return geometry
+  attr.positions = new Float32Array(attr.positions)
+  attr.normals = new Float32Array(attr.normals)
+  attr.colors = new Float32Array(attr.colors)
+  attr.uvs = new Float32Array(attr.uvs)
+
+  return attr
 }
 
 function parseProperties (properties) {
