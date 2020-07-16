@@ -21,6 +21,7 @@ scene.add(directionalLight)
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 camera.position.z = 5
+let firstPositionUpdate = true
 
 const world = new WorldRenderer(scene)
 const entities = new Entities(scene)
@@ -42,10 +43,16 @@ animate()
 socket.on('version', (version) => {
   console.log('Using version: ' + version)
   world.setVersion(version)
+  firstPositionUpdate = true
 
   let botMesh
   socket.on('position', (pos, addMesh = true) => {
-    controls.target.set(pos.x, pos.y, pos.z)
+    if (firstPositionUpdate) {
+      controls.target.set(pos.x, pos.y, pos.z)
+      camera.position.set(pos.x, pos.y + 20, pos.z + 20)
+      controls.update()
+      firstPositionUpdate = false
+    }
     if (addMesh) {
       if (!botMesh) {
         const geometry = new THREE.BoxGeometry(0.6, 1.8, 0.6)
@@ -67,13 +74,11 @@ socket.on('version', (version) => {
   })
 
   socket.on('chunk', (data) => {
-    console.log(data.coords)
     const [x, z] = data.coords.split(',')
     world.addColumn(parseInt(x, 10), parseInt(z, 10), data.chunk)
   })
 
   socket.on('blockUpdate', ({ pos, stateId }) => {
-    console.log(pos, stateId)
     world.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
   })
 })
