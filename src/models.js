@@ -158,7 +158,7 @@ function renderElement (world, cursor, element, doAO, attr) {
   }
 }
 
-function getSectionGeometry (sx, sy, sz, world) {
+function getSectionGeometry (sx, sy, sz, world, blocksStates) {
   const attr = {
     positions: [],
     normals: [],
@@ -172,7 +172,7 @@ function getSectionGeometry (sx, sy, sz, world) {
     for (cursor.z = sz; cursor.z < sz + 16; cursor.z++) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
         const block = world.getBlock(cursor)
-        const variant = getModelVariant(block, world.blocksStates)
+        const variant = getModelVariant(block, blocksStates)
         if (!variant || !variant.model) continue
 
         for (const element of variant.model.elements) {

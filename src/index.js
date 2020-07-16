@@ -1,7 +1,7 @@
 /* global THREE */
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
-const { World } = require('./world')
+const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
 const Vec3 = require('vec3').Vec3
@@ -22,7 +22,7 @@ scene.add(directionalLight)
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 camera.position.z = 5
 
-const world = new World(scene)
+const world = new WorldRenderer(scene)
 const entities = new Entities(scene)
 const primitives = new Primitives(scene)
 
@@ -42,7 +42,7 @@ animate()
 
 socket.on('version', (version) => {
   console.log('Using version: ' + version)
-  const Chunk = require('prismarine-chunk')(version)
+  world.setVersion(version)
 
   let botMesh
   socket.on('position', (pos, addMesh = true) => {
@@ -68,10 +68,9 @@ socket.on('version', (version) => {
   })
 
   socket.on('chunk', (data) => {
-    const chunk = Chunk.fromJson(data.chunk)
     console.log(data.coords)
     const [x, z] = data.coords.split(',')
-    world.addColumn(parseInt(x, 10), parseInt(z, 10), chunk)
+    world.addColumn(parseInt(x, 10), parseInt(z, 10), data.chunk)
   })
 
   socket.on('blockUpdate', ({ pos, stateId }) => {
