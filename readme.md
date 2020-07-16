@@ -51,3 +51,7 @@ Draw a line passing through all the `points`.
 ### bot.viewer.erase (id)
 
 Remove the primitive with the given id from the display.
+
+## Tests
+
+`node_modules/.bin/jest -t "1.16.1"`
