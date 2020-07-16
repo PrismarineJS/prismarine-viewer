@@ -1,4 +1,5 @@
 /* eslint-env jest */
+/* global page */
 
 const supportedVersions = require('../').supportedVersions
 
@@ -79,9 +80,21 @@ supportedVersions.forEach(function (supportedVersion, i) {
 
         bot.once('spawn', () => {
           mineflayerViewer(bot, { port: 3000 })
-          done()
+
+          page.goto('http://localhost:3000').then(() => {
+            page.on('console', msg => console.log('PAGE LOG:', msg.text()))
+
+            page.on('error', err => {
+              done(err)
+            })
+
+            page.on('pageerror', pageerr => {
+              done(pageerr)
+            })
+            setTimeout(() => done(), 30000)
+          }).catch(err => done(err))
         })
-      }, 60000)
+      }, 90000)
     })
   })
 })
