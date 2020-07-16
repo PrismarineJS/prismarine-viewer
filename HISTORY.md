@@ -1,3 +1,11 @@
+### 1.1.0
+
+* Build mesh into a separate worker thread
+
+### 1.0.2
+
+* Use correct textures and models for most of the blocks
+
 ### 1.0.1
 
 * Fix import of src/index.js
