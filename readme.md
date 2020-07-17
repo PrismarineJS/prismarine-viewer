@@ -56,4 +56,4 @@ Remove the primitive with the given id from the display.
 
 ## Tests
 
-`node_modules/.bin/jest -t "1.16.1"`
+`node_modules/.bin/jest --verbose --runInBand --forceExit -t "1.16.1"`
