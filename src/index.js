@@ -48,6 +48,7 @@ socket.on('version', (version) => {
   let botMesh
   socket.on('position', (pos, addMesh = true) => {
     if (firstPositionUpdate) {
+      console.log('first position is ', pos)
       controls.target.set(pos.x, pos.y, pos.z)
       camera.position.set(pos.x, pos.y + 20, pos.z + 20)
       controls.update()
