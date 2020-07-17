@@ -49,7 +49,7 @@ socket.on('version', (version) => {
   socket.on('position', (pos, addMesh = true) => {
     if (firstPositionUpdate) {
       controls.target.set(pos.x, pos.y, pos.z)
-      camera.position.set(pos.x, pos.y + 50, pos.z + 20)
+      camera.position.set(pos.x, pos.y + 20, pos.z + 20)
       controls.update()
       firstPositionUpdate = false
     }
