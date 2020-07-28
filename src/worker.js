@@ -1,4 +1,4 @@
-/* global XMLHttpRequest postMessage self */
+/* global XMLHttpRequest postMessage self performance */
 
 const { Vec3 } = require('vec3')
 const { World } = require('./world')
@@ -51,7 +51,12 @@ self.onmessage = ({ data }) => {
   } else if (data.type === 'chunk') {
     world.addColumn(data.x, data.z, data.chunk)
     for (let y = 0; y < 256; y += 16) {
-      setSectionDirty(new Vec3(data.x, y, data.z))
+      const loc = new Vec3(data.x, y, data.z)
+      setSectionDirty(loc)
+      setSectionDirty(loc.offset(-16, 0, 0))
+      setSectionDirty(loc.offset(16, 0, 0))
+      setSectionDirty(loc.offset(0, 0, -16))
+      setSectionDirty(loc.offset(0, 0, 16))
     }
   } else if (data.type === 'unloadChunk') {
     world.removeColumn(data.x, data.z)
@@ -62,12 +67,12 @@ self.onmessage = ({ data }) => {
     const loc = new Vec3(data.pos.x, data.pos.y, data.pos.z).floored()
     world.setBlockStateId(loc, data.stateId)
     setSectionDirty(loc)
-    setSectionDirty(loc.offset(-16, 0, 0))
-    setSectionDirty(loc.offset(16, 0, 0))
-    setSectionDirty(loc.offset(0, -16, 0))
-    setSectionDirty(loc.offset(0, 16, 0))
-    setSectionDirty(loc.offset(0, 0, -16))
-    setSectionDirty(loc.offset(0, 0, 16))
+    if ((loc.x & 15) === 0) setSectionDirty(loc.offset(-16, 0, 0))
+    if ((loc.x & 15) === 15) setSectionDirty(loc.offset(16, 0, 0))
+    if ((loc.y & 15) === 0) setSectionDirty(loc.offset(0, -16, 0))
+    if ((loc.y & 15) === 15) setSectionDirty(loc.offset(0, 16, 0))
+    if ((loc.z & 15) === 0) setSectionDirty(loc.offset(0, 0, -16))
+    if ((loc.z & 15) === 15) setSectionDirty(loc.offset(0, 0, 16))
   }
 }
 
@@ -78,6 +83,7 @@ setInterval(() => {
   if (sections.length === 0) return
   console.log(sections.length + ' dirty sections')
 
+  const start = performance.now()
   for (const key of sections) {
     const [x, y, z] = key.split(',')
     delete dirtySections[key]
@@ -86,4 +92,6 @@ setInterval(() => {
 
     postMessage({ type: 'geometry', key, geometry })
   }
+  const time = performance.now() - start
+  console.log(`Processed ${sections.length} sections in ${time} ms (${time / sections.length} ms/section)`)
 }, 50)
