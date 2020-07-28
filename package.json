@@ -1,6 +1,6 @@
 {
   "name": "prismarine-viewer",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Web based viewer",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "jest": "^26.1.0",
     "jest-puppeteer": "^4.4.0",
     "minecraft-wrap": "^1.2.3",
-    "mineflayer": "^2.24.0",
+    "mineflayer": "^2.25.0",
     "puppeteer": "^5.1.0",
     "require-self": "^0.2.3",
     "standard": "^14.3.4"

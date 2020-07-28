@@ -1,3 +1,8 @@
+### 1.2.2
+
+* Fix changing dimensions (in mineflayer)
+* Improve examples
+
 ### 1.2.1
 
 * Protect diverse null/undefined values
