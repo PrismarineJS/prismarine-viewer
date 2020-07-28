@@ -23,6 +23,10 @@ class World {
     return chunk
   }
 
+  removeColumn (x, z) {
+    delete this.columns[columnKey(x, z)]
+  }
+
   getColumn (x, z) {
     return this.columns[columnKey(x, z)]
   }

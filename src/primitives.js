@@ -22,6 +22,13 @@ class Primitives {
     this.primitives = {}
   }
 
+  clear () {
+    for (const mesh of Object.values(this.primitives)) {
+      this.scene.remove(mesh)
+    }
+    this.primitives = {}
+  }
+
   update (primitive) {
     if (this.primitives[primitive.id]) {
       this.scene.remove(this.primitives[primitive.id])

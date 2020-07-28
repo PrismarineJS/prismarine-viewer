@@ -28,6 +28,13 @@ class Entities {
     this.entities = {}
   }
 
+  clear () {
+    for (const mesh of Object.values(this.entities)) {
+      this.scene.remove(mesh)
+    }
+    this.entities = {}
+  }
+
   update (entity) {
     if (!this.entities[entity.id]) {
       const mesh = getEntityMesh(entity)

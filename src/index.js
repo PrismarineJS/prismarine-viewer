@@ -43,12 +43,13 @@ animate()
 socket.on('version', (version) => {
   console.log('Using version: ' + version)
   world.setVersion(version)
+  entities.clear()
+  primitives.clear()
   firstPositionUpdate = true
 
   let botMesh
   socket.on('position', (pos, addMesh = true) => {
     if (pos.y > 0 && firstPositionUpdate) {
-      console.log('first position is ', pos.x, pos.y, pos.z)
       controls.target.set(pos.x, pos.y, pos.z)
       camera.position.set(pos.x, pos.y + 20, pos.z + 20)
       controls.update()
@@ -77,6 +78,10 @@ socket.on('version', (version) => {
   socket.on('chunk', (data) => {
     const [x, z] = data.coords.split(',')
     world.addColumn(parseInt(x, 10), parseInt(z, 10), data.chunk)
+  })
+
+  socket.on('unloadChunk', ({ x, z }) => {
+    world.removeColumn(x, z)
   })
 
   socket.on('blockUpdate', ({ pos, stateId }) => {

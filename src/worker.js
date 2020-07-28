@@ -33,14 +33,15 @@ function sectionKey (x, y, z) {
 
 const dirtySections = {}
 
-function setSectionDirty (pos) {
+function setSectionDirty (pos, value = true) {
   const x = Math.floor(pos.x / 16) * 16
   const y = Math.floor(pos.y / 16) * 16
   const z = Math.floor(pos.z / 16) * 16
   const chunk = world.getColumn(x, z)
   if (chunk && chunk.sections[Math.floor(y / 16)]) {
     const key = sectionKey(x, y, z)
-    dirtySections[key] = true
+    dirtySections[key] = value
+    if (!dirtySections[key]) delete dirtySections[key]
   }
 }
 
@@ -51,6 +52,11 @@ self.onmessage = ({ data }) => {
     world.addColumn(data.x, data.z, data.chunk)
     for (let y = 0; y < 256; y += 16) {
       setSectionDirty(new Vec3(data.x, y, data.z))
+    }
+  } else if (data.type === 'unloadChunk') {
+    world.removeColumn(data.x, data.z)
+    for (let y = 0; y < 256; y += 16) {
+      setSectionDirty(new Vec3(data.x, y, data.z), false)
     }
   } else if (data.type === 'blockUpdate') {
     const loc = new Vec3(data.pos.x, data.pos.y, data.pos.z).floored()
