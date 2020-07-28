@@ -85,12 +85,16 @@ setInterval(() => {
 
   const start = performance.now()
   for (const key of sections) {
-    const [x, y, z] = key.split(',')
-    delete dirtySections[key]
-
-    const geometry = getSectionGeometry(parseInt(x, 10), parseInt(y, 10), parseInt(z, 10), world, blocksStates)
-
-    postMessage({ type: 'geometry', key, geometry })
+    let [x, y, z] = key.split(',')
+    x = parseInt(x, 10)
+    y = parseInt(y, 10)
+    z = parseInt(z, 10)
+    const chunk = world.getColumn(x, z)
+    if (chunk && chunk.sections[Math.floor(y / 16)]) {
+      delete dirtySections[key]
+      const geometry = getSectionGeometry(x, y, z, world, blocksStates)
+      postMessage({ type: 'geometry', key, geometry })
+    }
   }
   const time = performance.now() - start
   console.log(`Processed ${sections.length} sections in ${time} ms (${time / sections.length} ms/section)`)

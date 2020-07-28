@@ -1,3 +1,7 @@
+### 1.2.0
+
+* Dynamic loading/unloading of chunks
+
 ### 1.1.0
 
 * Build mesh into a separate worker thread
