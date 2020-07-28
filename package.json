@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --verbose --runInBand --forceExit",
-    "pretest": "npm run lint",
+    "pretest": "npm run lint && require-self",
     "lint": "standard",
+    "prepare": "npm install require-self && require-self",
     "fix": "standard --fix"
   },
   "author": "PrismarineJS",
@@ -31,6 +32,7 @@
     "minecraft-wrap": "^1.2.3",
     "mineflayer": "^2.24.0",
     "puppeteer": "^5.1.0",
+    "require-self": "^0.2.3",
     "standard": "^14.3.4"
   }
 }

@@ -1,6 +1,5 @@
+const standaloneViewer = require('prismarine-viewer').standalone
 const { Vec3 } = require('vec3')
-
-const standaloneViewer = require('../').standalone
 
 // Create a flat world with only 1 layer of stone at y=0
 function worldGenerator (x, y, z) {
