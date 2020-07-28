@@ -1,3 +1,7 @@
+### 1.2.1
+
+* Protect diverse null/undefined values
+
 ### 1.2.0
 
 * Dynamic loading/unloading of chunks
