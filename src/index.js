@@ -31,11 +31,11 @@ const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement)
+let controls = new THREE.OrbitControls(camera, renderer.domElement)
 
 function animate () {
   window.requestAnimationFrame(animate)
-  controls.update()
+  if (controls) controls.update()
   renderer.render(scene, camera)
 }
 animate()
@@ -48,7 +48,17 @@ socket.on('version', (version) => {
   firstPositionUpdate = true
 
   let botMesh
-  socket.on('position', (pos, addMesh = true) => {
+  socket.on('position', ({ pos, addMesh, yaw, pitch }) => {
+    if (yaw !== undefined && pitch !== undefined) {
+      if (controls) {
+        controls.dispose()
+        controls = null
+      }
+      camera.position.set(pos.x, pos.y + 1.6, pos.z)
+      camera.rotation.x = camera.rotation.x * 0.9 + pitch * 0.1
+      camera.rotation.y = camera.rotation.y * 0.9 + yaw * 0.1
+      return
+    }
     if (pos.y > 0 && firstPositionUpdate) {
       controls.target.set(pos.x, pos.y, pos.z)
       camera.position.set(pos.x, pos.y + 20, pos.z + 20)
