@@ -30,6 +30,7 @@ class WorldRenderer {
         geometry.setIndex(data.geometry.indices)
 
         mesh = new THREE.Mesh(geometry, this.material)
+        mesh.position.set(data.geometry.sx, data.geometry.sy, data.geometry.sz)
         this.sectionMeshs[data.key] = mesh
         this.scene.add(mesh)
       }

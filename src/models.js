@@ -75,6 +75,45 @@ function isCube (shapes) {
   return shape[0] === 0 && shape[1] === 0 && shape[2] === 0 && shape[3] === 1 && shape[4] === 1 && shape[5] === 1
 }
 
+function renderLiquid (world, cursor, texture, type, water, attr) {
+  for (const face in elemFaces) {
+    const { dir, corners } = elemFaces[face]
+
+    const neighbor = world.getBlock(cursor.plus(dir))
+    if (!neighbor || neighbor.type === type || isCube(neighbor.shapes) || (neighbor.transparent && neighbor.type !== 0) ||
+        neighbor.position.y < 0) continue
+
+    let tint = [1, 1, 1]
+    if (water) {
+      tint = [0.247, 0.463, 0.894] // TODO: correct tint for the biome
+    }
+
+    const u = texture.u
+    const v = texture.v
+    const su = texture.su
+    const sv = texture.sv
+
+    const ndx = Math.floor(attr.positions.length / 3)
+
+    for (const pos of corners) {
+      attr.positions.push(
+        (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
+        (pos[1] ? 1 : 0) + (cursor.y & 15) - 8,
+        (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
+      attr.normals.push(dir.x, dir.y, dir.z)
+
+      attr.uvs.push(pos[3] * su + u, pos[4] * sv + v)
+
+      attr.colors.push(tint[0], tint[1], tint[2])
+    }
+
+    attr.indices.push(
+      ndx, ndx + 1, ndx + 2,
+      ndx + 2, ndx + 1, ndx + 3
+    )
+  }
+}
+
 function renderElement (world, cursor, element, doAO, attr) {
   for (const face in element.faces) {
     const eFace = element.faces[face]
@@ -112,7 +151,10 @@ function renderElement (world, cursor, element, doAO, attr) {
 
     const aos = []
     for (const pos of corners) {
-      attr.positions.push((pos[0] ? maxx : minx) + cursor.x, (pos[1] ? maxy : miny) + cursor.y, (pos[2] ? maxz : minz) + cursor.z)
+      attr.positions.push(
+        (pos[0] ? maxx : minx) + (cursor.x & 15) - 8,
+        (pos[1] ? maxy : miny) + (cursor.y & 15) - 8,
+        (pos[2] ? maxz : minz) + (cursor.z & 15) - 8)
       attr.normals.push(dir.x, dir.y, dir.z)
 
       const baseu = (pos[3] - 0.5) * uvcs - (pos[4] - 0.5) * uvsn + 0.5
@@ -158,6 +200,9 @@ function renderElement (world, cursor, element, doAO, attr) {
 
 function getSectionGeometry (sx, sy, sz, world, blocksStates) {
   const attr = {
+    sx: sx + 8,
+    sy: sy + 8,
+    sz: sz + 8,
     positions: [],
     normals: [],
     colors: [],
@@ -173,8 +218,14 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
         const variant = getModelVariant(block, blocksStates)
         if (!variant || !variant.model) continue
 
-        for (const element of variant.model.elements) {
-          renderElement(world, cursor, element, variant.model.ao, attr)
+        if (block.name === 'water') {
+          renderLiquid(world, cursor, variant.model.textures.particle, block.type, true, attr)
+        } else if (block.name === 'lava') {
+          renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
+        } else {
+          for (const element of variant.model.elements) {
+            renderElement(world, cursor, element, variant.model.ao, attr)
+          }
         }
       }
     }
