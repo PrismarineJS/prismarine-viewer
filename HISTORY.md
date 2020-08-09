@@ -1,3 +1,10 @@
+### 1.3.0
+
+* stop using bot._columns
+* first person vision
+* Basic liquids implementation
+* Fixed canvas CSS
+
 ### 1.2.2
 
 * Fix changing dimensions (in mineflayer)
