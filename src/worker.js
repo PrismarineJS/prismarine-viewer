@@ -48,31 +48,16 @@ function setSectionDirty (pos, value = true) {
 self.onmessage = ({ data }) => {
   if (data.type === 'version') {
     world = new World(data.version)
+  } else if (data.type === 'dirty') {
+    const loc = new Vec3(data.x, data.y, data.z)
+    setSectionDirty(loc, data.value)
   } else if (data.type === 'chunk') {
     world.addColumn(data.x, data.z, data.chunk)
-    for (let y = 0; y < 256; y += 16) {
-      const loc = new Vec3(data.x, y, data.z)
-      setSectionDirty(loc)
-      setSectionDirty(loc.offset(-16, 0, 0))
-      setSectionDirty(loc.offset(16, 0, 0))
-      setSectionDirty(loc.offset(0, 0, -16))
-      setSectionDirty(loc.offset(0, 0, 16))
-    }
   } else if (data.type === 'unloadChunk') {
     world.removeColumn(data.x, data.z)
-    for (let y = 0; y < 256; y += 16) {
-      setSectionDirty(new Vec3(data.x, y, data.z), false)
-    }
   } else if (data.type === 'blockUpdate') {
     const loc = new Vec3(data.pos.x, data.pos.y, data.pos.z).floored()
     world.setBlockStateId(loc, data.stateId)
-    setSectionDirty(loc)
-    if ((loc.x & 15) === 0) setSectionDirty(loc.offset(-16, 0, 0))
-    if ((loc.x & 15) === 15) setSectionDirty(loc.offset(16, 0, 0))
-    if ((loc.y & 15) === 0) setSectionDirty(loc.offset(0, -16, 0))
-    if ((loc.y & 15) === 15) setSectionDirty(loc.offset(0, 16, 0))
-    if ((loc.z & 15) === 0) setSectionDirty(loc.offset(0, 0, -16))
-    if ((loc.z & 15) === 15) setSectionDirty(loc.offset(0, 0, 16))
   }
 }
 
