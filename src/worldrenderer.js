@@ -2,6 +2,10 @@
 
 const Vec3 = require('vec3').Vec3
 
+function mod (x, n) {
+  return ((x % n) + n) % n
+}
+
 class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
@@ -14,11 +18,7 @@ class WorldRenderer {
     texture.flipY = false
     this.material = new THREE.MeshLambertMaterial({ map: texture, vertexColors: true, transparent: true, alphaTest: 0.1 })
 
-    this.startTime = 0
-    this.dispatchedSections = 0
-
     this.workers = []
-    this.nextWorker = 0
     for (let i = 0; i < numWorkers; i++) {
       const worker = new Worker('worker.js')
       worker.onmessage = ({ data }) => {
@@ -101,9 +101,8 @@ class WorldRenderer {
     // Dispatch sections to workers based on position
     // This guarantees uniformity accross workers and that a given section
     // is always dispatched to the same worker
-    const hash = ((pos.x + pos.y + pos.z) / 16) % this.workers.length
+    const hash = mod(Math.floor(pos.x / 16) + Math.floor(pos.y / 16) + Math.floor(pos.z / 16), this.workers.length)
     this.workers[hash].postMessage({ type: 'dirty', x: pos.x, y: pos.y, z: pos.z, value })
-    this.nextWorker = (this.nextWorker + 1) % this.workers.length
   }
 }
 
