@@ -1,3 +1,7 @@
+### 1.4.0
+
+* Use more than 1 worker thread for mesh generation
+
 ### 1.3.0
 
 * stop using bot._columns
