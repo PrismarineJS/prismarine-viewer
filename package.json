@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.6.1",
+    "compression": "^1.7.4",
     "express": "^4.17.1",
     "express-browserify": "^1.0.3",
     "minecraft-assets": "^1.3.1",
