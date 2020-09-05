@@ -69,18 +69,12 @@ const elemFaces = {
   }
 }
 
-function isCube (shapes) {
-  if (!shapes || shapes.length !== 1) return false
-  const shape = shapes[0]
-  return shape[0] === 0 && shape[1] === 0 && shape[2] === 0 && shape[3] === 1 && shape[4] === 1 && shape[5] === 1
-}
-
 function renderLiquid (world, cursor, texture, type, water, attr) {
   for (const face in elemFaces) {
     const { dir, corners } = elemFaces[face]
 
     const neighbor = world.getBlock(cursor.plus(dir))
-    if (!neighbor || neighbor.type === type || isCube(neighbor.shapes) || (neighbor.transparent && neighbor.type !== 0) ||
+    if (!neighbor || neighbor.type === type || neighbor.isCube || (neighbor.transparent && neighbor.type !== 0) ||
         neighbor.position.y < 0) continue
 
     let tint = [1, 1, 1]
@@ -121,7 +115,7 @@ function renderElement (world, cursor, element, doAO, attr) {
 
     if (eFace.cullface) {
       const neighbor = world.getBlock(cursor.plus(dir))
-      if (!neighbor || !(neighbor.transparent || !isCube(neighbor.shapes)) || neighbor.position.y < 0) continue
+      if (!neighbor || !(neighbor.transparent || !neighbor.isCube) || neighbor.position.y < 0) continue
     }
 
     const minx = element.from[0] / 16
@@ -170,9 +164,9 @@ function renderElement (world, cursor, element, doAO, attr) {
         const side2 = world.getBlock(cursor.offset(dx * mask2[0], dy * mask2[1], dz * mask2[2]))
         const corner = world.getBlock(cursor.offset(dx, dy, dz))
 
-        const side1Block = (side1 && isCube(side1.shapes)) ? 1 : 0
-        const side2Block = (side2 && isCube(side2.shapes)) ? 1 : 0
-        const cornerBlock = (corner && isCube(corner.shapes)) ? 1 : 0
+        const side1Block = (side1 && side1.isCube) ? 1 : 0
+        const side2Block = (side2 && side2.isCube) ? 1 : 0
+        const cornerBlock = (corner && corner.isCube) ? 1 : 0
 
         // TODO: correctly interpolate ao light based on pos (evaluate once for each corner of the block)
 
@@ -215,7 +209,10 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
     for (cursor.z = sz; cursor.z < sz + 16; cursor.z++) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
         const block = world.getBlock(cursor)
-        const variant = getModelVariant(block, blocksStates)
+        if (block.variant === undefined) {
+          block.variant = getModelVariant(block, blocksStates)
+        }
+        const variant = block.variant
         if (!variant || !variant.model) continue
 
         if (block.name === 'water') {

@@ -11,10 +11,17 @@ function posInChunk (pos) {
   return pos
 }
 
+function isCube (shapes) {
+  if (!shapes || shapes.length !== 1) return false
+  const shape = shapes[0]
+  return shape[0] === 0 && shape[1] === 0 && shape[2] === 0 && shape[3] === 1 && shape[4] === 1 && shape[5] === 1
+}
+
 class World {
   constructor (version) {
     this.Chunk = Chunks(version)
     this.columns = {}
+    this.blockCache = {}
   }
 
   addColumn (x, z, json) {
@@ -51,7 +58,16 @@ class World {
     if (!column) return null
 
     const loc = pos.floored()
-    const block = column.getBlock(posInChunk(loc))
+    const locInChunk = posInChunk(loc)
+    const stateId = column.getBlockStateId(locInChunk)
+
+    if (!this.blockCache[stateId]) {
+      const b = column.getBlock(locInChunk)
+      b.isCube = isCube(b.shapes)
+      this.blockCache[stateId] = b
+    }
+
+    const block = this.blockCache[stateId]
     block.position = loc
     return block
   }
