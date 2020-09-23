@@ -1,3 +1,8 @@
+### 1.5.0
+
+* Cache blocks for a 30% performance increase
+* Enable compression
+
 ### 1.4.0
 
 * Use more than 1 worker thread for mesh generation
