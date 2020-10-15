@@ -173,7 +173,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
     if (eFace.cullface) {
       const neighbor = world.getBlock(cursor.plus(dir))
       if (!neighbor) continue
-      if (neighbor.type === block.type) continue
+      if (neighbor.type === block.type && block.isCube) continue
       if (neighbor.position.y < 0) continue
     }
 
