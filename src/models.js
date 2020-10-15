@@ -108,7 +108,64 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
   }
 }
 
-function renderElement (world, cursor, element, doAO, attr) {
+function vecadd3 (a, b) {
+  if (!b)
+    return a
+  return a.map((v, i) => v + b[i])
+}
+
+function mateye3 () {
+  return [
+    [1,0,0],
+    [0,1,0],
+    [0,0,1]
+  ]
+}
+
+function vecsub3 (a, b) {
+  if (!b)
+    return a
+  return a.map((v, i) => v - b[i])
+}
+
+function matmul3 (matrix, vector) {
+  if (!matrix)
+    return vector
+  
+  const result = [0,0,0]
+  for (let i = 0; i < 3; ++i)
+    for (let j = 0; j < 3; ++j)
+      result[i] += matrix[i][j] * vector[j]
+  return result
+}
+
+function buildRotationMatrix (axis, degree) {
+  const radians = degree / 180 * Math.PI
+  const cos = Math.cos(radians)
+  const sin = Math.sin(radians)
+
+  const axis0 = { 'x': 0, 'y': 1, 'z': 2 }[axis]
+  const axis1 = (axis0 + 1) % 3
+  const axis2 = (axis0 + 2) % 3
+
+  const matrix = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+
+  matrix[axis0][axis0] = 1
+  matrix[axis1][axis1] = cos
+  matrix[axis1][axis2] = -sin
+  matrix[axis2][axis1] = +sin
+  matrix[axis2][axis2] = cos
+
+  return matrix
+}
+
+function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift) {
+  if (globalShift)
+    console.log(globalShift)
   for (const face in element.faces) {
     const eFace = element.faces[face]
     const { dir, corners, mask1, mask2 } = elemFaces[face]
@@ -118,12 +175,12 @@ function renderElement (world, cursor, element, doAO, attr) {
       if (!neighbor || !(neighbor.transparent || !neighbor.isCube) || neighbor.position.y < 0) continue
     }
 
-    const minx = element.from[0] / 16
-    const miny = element.from[1] / 16
-    const minz = element.from[2] / 16
-    const maxx = element.to[0] / 16
-    const maxy = element.to[1] / 16
-    const maxz = element.to[2] / 16
+    const minx = element.from[0]
+    const miny = element.from[1]
+    const minz = element.from[2]
+    const maxx = element.to[0]
+    const maxy = element.to[1]
+    const maxz = element.to[2]
 
     const u = eFace.texture.u
     const v = eFace.texture.v
@@ -138,17 +195,48 @@ function renderElement (world, cursor, element, doAO, attr) {
         tint = [0.568, 0.741, 0.349] // TODO: correct tint for each block
       }
     }
+
     // UV rotation
     const r = eFace.rotation || 0
     const uvcs = Math.cos(r * Math.PI / 180)
     const uvsn = -Math.sin(r * Math.PI / 180)
 
+    let localMatrix = null
+    let localShift = null
+
+    if (element.rotation) {
+      localMatrix = buildRotationMatrix(
+        element.rotation.axis,
+        element.rotation.angle
+      )
+
+      localShift = vecsub3(
+        element.rotation.origin,
+        matmul3(
+          localMatrix,
+          element.rotation.origin
+        )
+      )
+    }
+
     const aos = []
     for (const pos of corners) {
+      let vertex = [
+        (pos[0] ? maxx : minx),
+        (pos[1] ? maxy : miny),
+        (pos[2] ? maxz : minz)
+      ]
+
+      vertex = vecadd3(matmul3(localMatrix, vertex), localShift)
+      vertex = vecadd3(matmul3(globalMatrix, vertex), globalShift)
+      vertex = vertex.map(v => v / 16)
+
       attr.positions.push(
-        (pos[0] ? maxx : minx) + (cursor.x & 15) - 8,
-        (pos[1] ? maxy : miny) + (cursor.y & 15) - 8,
-        (pos[2] ? maxz : minz) + (cursor.z & 15) - 8)
+        vertex[0] + (cursor.x & 15) - 8,
+        vertex[1] + (cursor.y & 15) - 8,
+        vertex[2] + (cursor.z & 15) - 8,
+      )
+      
       attr.normals.push(dir.x, dir.y, dir.z)
 
       const baseu = (pos[3] - 0.5) * uvcs - (pos[4] - 0.5) * uvsn + 0.5
@@ -220,8 +308,23 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
         } else if (block.name === 'lava') {
           renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
         } else {
+          const state = blocksStates[block.name]
+          let globalMatrix = null
+          let globalShift = null
+
+          for (let axis of ['x', 'y', 'z']) {
+            if (axis in variant) {
+              if (globalMatrix)
+                console.warn('oh no')
+              // TODO: matrices should be concatenated (multiplied)
+              globalMatrix = buildRotationMatrix(axis, -variant[axis])
+              globalShift = [8, 8, 8]
+              globalShift = vecsub3(globalShift, matmul3(globalMatrix, globalShift))
+            }
+          }
+
           for (const element of variant.model.elements) {
-            renderElement(world, cursor, element, variant.model.ao, attr)
+            renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift)
           }
         }
       }
