@@ -74,8 +74,10 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
     const { dir, corners } = elemFaces[face]
 
     const neighbor = world.getBlock(cursor.plus(dir))
-    if (!neighbor || neighbor.type === type || neighbor.isCube || (neighbor.transparent && neighbor.type !== 0) ||
-        neighbor.position.y < 0) continue
+    if (!neighbor) continue
+    if (neighbor.type === type) continue
+    if (neighbor.isCube || neighbor.transparent && neighbor.type !== 0) continue
+    if (neighbor.position.y < 0) continue
 
     let tint = [1, 1, 1]
     if (water) {
@@ -91,9 +93,9 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
 
     for (const pos of corners) {
       attr.positions.push(
-        (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
-        (pos[1] ? 1 : 0) + (cursor.y & 15) - 8,
-        (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
+        (pos[0] ? 1     : 0) + (cursor.x & 15) - 8,
+        (pos[1] ? 14/16 : 0) + (cursor.y & 15) - 8,
+        (pos[2] ? 1     : 0) + (cursor.z & 15) - 8)
       attr.normals.push(dir.x, dir.y, dir.z)
 
       attr.uvs.push(pos[3] * su + u, pos[4] * sv + v)
