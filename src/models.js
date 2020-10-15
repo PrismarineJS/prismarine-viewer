@@ -6,10 +6,10 @@ const elemFaces = {
     mask1: [1, 1, 0],
     mask2: [0, 1, 1],
     corners: [
-      [0, 1, 0, 0, 0],
-      [1, 1, 0, 1, 0],
       [0, 1, 1, 0, 1],
-      [1, 1, 1, 1, 1]
+      [1, 1, 1, 1, 1],
+      [0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0]
     ]
   },
   down: {
@@ -17,10 +17,10 @@ const elemFaces = {
     mask1: [1, 1, 0],
     mask2: [0, 1, 1],
     corners: [
-      [0, 0, 1, 1, 1],
       [1, 0, 1, 0, 1],
-      [0, 0, 0, 1, 0],
-      [1, 0, 0, 0, 0]
+      [0, 0, 1, 1, 1],
+      [1, 0, 0, 0, 0],
+      [0, 0, 0, 1, 0]
     ]
   },
   east: {
@@ -29,8 +29,8 @@ const elemFaces = {
     mask2: [1, 0, 1],
     corners: [
       [1, 1, 1, 0, 0],
-      [1, 1, 0, 1, 0],
       [1, 0, 1, 0, 1],
+      [1, 1, 0, 1, 0],
       [1, 0, 0, 1, 1]
     ]
   },
@@ -40,8 +40,8 @@ const elemFaces = {
     mask2: [1, 0, 1],
     corners: [
       [0, 1, 0, 0, 0],
-      [0, 1, 1, 1, 0],
       [0, 0, 0, 0, 1],
+      [0, 1, 1, 1, 0],
       [0, 0, 1, 1, 1]
     ]
   },
@@ -50,10 +50,10 @@ const elemFaces = {
     mask1: [1, 0, 1],
     mask2: [0, 1, 1],
     corners: [
-      [1, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0],
       [1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1]
+      [0, 0, 0, 1, 1],
+      [1, 1, 0, 0, 0],
+      [0, 1, 0, 1, 0]
     ]
   },
   south: {
@@ -61,10 +61,10 @@ const elemFaces = {
     mask1: [1, 0, 1],
     mask2: [0, 1, 1],
     corners: [
-      [0, 1, 1, 0, 0],
-      [1, 1, 1, 1, 0],
       [0, 0, 1, 0, 1],
-      [1, 0, 1, 1, 1]
+      [1, 0, 1, 1, 1],
+      [0, 1, 1, 0, 0],
+      [1, 1, 1, 1, 0]
     ]
   }
 }
@@ -164,8 +164,6 @@ function buildRotationMatrix (axis, degree) {
 }
 
 function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift) {
-  if (globalShift)
-    console.log(globalShift)
   for (const face in element.faces) {
     const eFace = element.faces[face]
     const { dir, corners, mask1, mask2 } = elemFaces[face]
@@ -298,33 +296,35 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
         const block = world.getBlock(cursor)
         if (block.variant === undefined) {
-          block.variant = getModelVariant(block, blocksStates)
+          block.variant = getModelVariants(block, blocksStates)
         }
-        const variant = block.variant
-        if (!variant || !variant.model) continue
 
-        if (block.name === 'water') {
-          renderLiquid(world, cursor, variant.model.textures.particle, block.type, true, attr)
-        } else if (block.name === 'lava') {
-          renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
-        } else {
-          const state = blocksStates[block.name]
-          let globalMatrix = null
-          let globalShift = null
+        for (const variant of block.variant) {
+          if (!variant || !variant.model) continue
 
-          for (let axis of ['x', 'y', 'z']) {
-            if (axis in variant) {
-              if (globalMatrix)
-                console.warn('oh no')
-              // TODO: matrices should be concatenated (multiplied)
-              globalMatrix = buildRotationMatrix(axis, -variant[axis])
-              globalShift = [8, 8, 8]
-              globalShift = vecsub3(globalShift, matmul3(globalMatrix, globalShift))
+          if (block.name === 'water') {
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, true, attr)
+          } else if (block.name === 'lava') {
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
+          } else {
+            const state = blocksStates[block.name]
+            let globalMatrix = null
+            let globalShift = null
+
+            for (let axis of ['x', 'y', 'z']) {
+              if (axis in variant) {
+                if (globalMatrix)
+                  console.warn('oh no')
+                // TODO: matrices should be concatenated (multiplied)
+                globalMatrix = buildRotationMatrix(axis, -variant[axis])
+                globalShift = [8, 8, 8]
+                globalShift = vecsub3(globalShift, matmul3(globalMatrix, globalShift))
+              }
             }
-          }
 
-          for (const element of variant.model.elements) {
-            renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift)
+            for (const element of variant.model.elements) {
+              renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift)
+            }
           }
         }
       }
@@ -340,6 +340,9 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
 }
 
 function parseProperties (properties) {
+  if (typeof properties === 'object')
+    return properties
+  
   const json = {}
   for (const prop of properties.split(',')) {
     const [key, value] = prop.split('=')
@@ -349,6 +352,9 @@ function parseProperties (properties) {
 }
 
 function matchProperties (block, properties) {
+  if (!properties)
+    return true
+  
   properties = parseProperties(properties)
   const blockProps = block.getProperties()
   for (const prop in blockProps) {
@@ -359,23 +365,30 @@ function matchProperties (block, properties) {
   return true
 }
 
-function getModelVariant (block, blockStates) {
+function getModelVariants (block, blockStates) {
   const state = blockStates[block.name]
-  if (!state) return null
+  if (!state) return []
   if (state.variants) {
     for (const [properties, variant] of Object.entries(state.variants)) {
       if (!matchProperties(block, properties)) continue
-      if (variant instanceof Array) return variant[0] // TODO: random
-      return variant
+      if (variant instanceof Array) return [ variant[0] ]
+      return [ variant ]
     }
   }
   if (state.multipart) {
-    for (const variant of state.multipart) { // TODO: match properties
-      if (variant.apply instanceof Array) return variant.apply[0] // TODO: random
-      return variant.apply
+    const parts = state.multipart.filter(multipart => matchProperties(block, multipart.when))
+    let variants = []
+    for (let part of parts) {
+      if (part.apply instanceof Array)
+        variants = [ ...variants, ...part.apply ]
+      else
+        variants = [ ...variants, part.apply ]
     }
+
+    return variants
   }
-  return null
+
+  return []
 }
 
 module.exports = { getSectionGeometry }
