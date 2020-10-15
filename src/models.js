@@ -163,14 +163,17 @@ function buildRotationMatrix (axis, degree) {
   return matrix
 }
 
-function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift) {
+function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift, block) {
   for (const face in element.faces) {
     const eFace = element.faces[face]
     const { dir, corners, mask1, mask2 } = elemFaces[face]
 
     if (eFace.cullface) {
       const neighbor = world.getBlock(cursor.plus(dir))
-      if (!neighbor || !(neighbor.transparent || !neighbor.isCube) || neighbor.position.y < 0) continue
+      if (!neighbor) continue
+      if (neighbor.type === block.type && neighbor.stateId === block.stateId) continue
+      if (!(neighbor.transparent || !neighbor.isCube)) continue
+      if (neighbor.position.y < 0) continue
     }
 
     const minx = element.from[0]
@@ -323,7 +326,7 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
             }
 
             for (const element of variant.model.elements) {
-              renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift)
+              renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift, block)
             }
           }
         }
