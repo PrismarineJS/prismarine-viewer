@@ -76,7 +76,7 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
     const neighbor = world.getBlock(cursor.plus(dir))
     if (!neighbor) continue
     if (neighbor.type === type) continue
-    if (neighbor.isCube || neighbor.transparent && neighbor.type !== 0) continue
+    if (neighbor.isCube || (neighbor.transparent && neighbor.type !== 0)) continue
     if (neighbor.position.y < 0) continue
 
     let tint = [1, 1, 1]
@@ -93,9 +93,9 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
 
     for (const pos of corners) {
       attr.positions.push(
-        (pos[0] ? 1     : 0) + (cursor.x & 15) - 8,
-        (pos[1] ? 14/16 : 0) + (cursor.y & 15) - 8,
-        (pos[2] ? 1     : 0) + (cursor.z & 15) - 8)
+        (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
+        (pos[1] ? 14 / 16 : 0) + (cursor.y & 15) - 8,
+        (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
       attr.normals.push(dir.x, dir.y, dir.z)
 
       attr.uvs.push(pos[3] * su + u, pos[4] * sv + v)
@@ -111,33 +111,22 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
 }
 
 function vecadd3 (a, b) {
-  if (!b)
-    return a
+  if (!b) { return a }
   return a.map((v, i) => v + b[i])
 }
 
-function mateye3 () {
-  return [
-    [1,0,0],
-    [0,1,0],
-    [0,0,1]
-  ]
-}
-
 function vecsub3 (a, b) {
-  if (!b)
-    return a
+  if (!b) { return a }
   return a.map((v, i) => v - b[i])
 }
 
 function matmul3 (matrix, vector) {
-  if (!matrix)
-    return vector
-  
-  const result = [0,0,0]
-  for (let i = 0; i < 3; ++i)
-    for (let j = 0; j < 3; ++j)
-      result[i] += matrix[i][j] * vector[j]
+  if (!matrix) { return vector }
+
+  const result = [0, 0, 0]
+  for (let i = 0; i < 3; ++i) {
+    for (let j = 0; j < 3; ++j) { result[i] += matrix[i][j] * vector[j] }
+  }
   return result
 }
 
@@ -146,7 +135,7 @@ function buildRotationMatrix (axis, degree) {
   const cos = Math.cos(radians)
   const sin = Math.sin(radians)
 
-  const axis0 = { 'x': 0, 'y': 1, 'z': 2 }[axis]
+  const axis0 = { x: 0, y: 1, z: 2 }[axis]
   const axis1 = (axis0 + 1) % 3
   const axis2 = (axis0 + 2) % 3
 
@@ -236,9 +225,9 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
       attr.positions.push(
         vertex[0] + (cursor.x & 15) - 8,
         vertex[1] + (cursor.y & 15) - 8,
-        vertex[2] + (cursor.z & 15) - 8,
+        vertex[2] + (cursor.z & 15) - 8
       )
-      
+
       attr.normals.push(dir.x, dir.y, dir.z)
 
       const baseu = (pos[3] - 0.5) * uvcs - (pos[4] - 0.5) * uvsn + 0.5
@@ -311,14 +300,12 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
           } else if (block.name === 'lava') {
             renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
           } else {
-            const state = blocksStates[block.name]
             let globalMatrix = null
             let globalShift = null
 
-            for (let axis of ['x', 'y', 'z']) {
+            for (const axis of ['x', 'y', 'z']) {
               if (axis in variant) {
-                if (globalMatrix)
-                  console.warn('oh no')
+                if (globalMatrix) { console.warn('oh no') }
                 // TODO: matrices should be concatenated (multiplied)
                 globalMatrix = buildRotationMatrix(axis, -variant[axis])
                 globalShift = [8, 8, 8]
@@ -344,9 +331,8 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
 }
 
 function parseProperties (properties) {
-  if (typeof properties === 'object')
-    return properties
-  
+  if (typeof properties === 'object') { return properties }
+
   const json = {}
   for (const prop of properties.split(',')) {
     const [key, value] = prop.split('=')
@@ -356,9 +342,8 @@ function parseProperties (properties) {
 }
 
 function matchProperties (block, properties) {
-  if (!properties)
-    return true
-  
+  if (!properties) { return true }
+
   properties = parseProperties(properties)
   const blockProps = block.getProperties()
   for (const prop in blockProps) {
@@ -375,18 +360,19 @@ function getModelVariants (block, blockStates) {
   if (state.variants) {
     for (const [properties, variant] of Object.entries(state.variants)) {
       if (!matchProperties(block, properties)) continue
-      if (variant instanceof Array) return [ variant[0] ]
-      return [ variant ]
+      if (variant instanceof Array) return [variant[0]]
+      return [variant]
     }
   }
   if (state.multipart) {
     const parts = state.multipart.filter(multipart => matchProperties(block, multipart.when))
     let variants = []
-    for (let part of parts) {
-      if (part.apply instanceof Array)
-        variants = [ ...variants, ...part.apply ]
-      else
-        variants = [ ...variants, part.apply ]
+    for (const part of parts) {
+      if (part.apply instanceof Array) {
+        variants = [...variants, ...part.apply]
+      } else {
+        variants = [...variants, part.apply]
+      }
     }
 
     return variants
