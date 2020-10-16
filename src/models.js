@@ -70,6 +70,9 @@ const elemFaces = {
 }
 
 function renderLiquid (world, cursor, texture, type, water, attr) {
+  const blockAbove = world.getBlock(cursor.plus(new Vec3(0, 1, 0)))
+  const liquidHeight = (blockAbove.type === type ? 16 : 14) / 16
+
   for (const face in elemFaces) {
     const { dir, corners } = elemFaces[face]
 
@@ -94,7 +97,7 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
     for (const pos of corners) {
       attr.positions.push(
         (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
-        (pos[1] ? 14 / 16 : 0) + (cursor.y & 15) - 8,
+        (pos[1] ? liquidHeight : 0) + (cursor.y & 15) - 8,
         (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
       attr.normals.push(dir.x, dir.y, dir.z)
 
