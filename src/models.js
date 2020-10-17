@@ -2,7 +2,7 @@ const Vec3 = require('vec3').Vec3
 
 const elemFaces = {
   up: {
-    dir: new Vec3(0, 1, 0),
+    dir: [0, 1, 0],
     mask1: [1, 1, 0],
     mask2: [0, 1, 1],
     corners: [
@@ -13,7 +13,7 @@ const elemFaces = {
     ]
   },
   down: {
-    dir: new Vec3(0, -1, 0),
+    dir: [0, -1, 0],
     mask1: [1, 1, 0],
     mask2: [0, 1, 1],
     corners: [
@@ -24,7 +24,7 @@ const elemFaces = {
     ]
   },
   east: {
-    dir: new Vec3(1, 0, 0),
+    dir: [1, 0, 0],
     mask1: [1, 1, 0],
     mask2: [1, 0, 1],
     corners: [
@@ -35,7 +35,7 @@ const elemFaces = {
     ]
   },
   west: {
-    dir: new Vec3(-1, 0, 0),
+    dir: [-1, 0, 0],
     mask1: [1, 1, 0],
     mask2: [1, 0, 1],
     corners: [
@@ -46,7 +46,7 @@ const elemFaces = {
     ]
   },
   north: {
-    dir: new Vec3(0, 0, -1),
+    dir: [0, 0, -1],
     mask1: [1, 0, 1],
     mask2: [0, 1, 1],
     corners: [
@@ -57,7 +57,7 @@ const elemFaces = {
     ]
   },
   south: {
-    dir: new Vec3(0, 0, 1),
+    dir: [0, 0, 1],
     mask1: [1, 0, 1],
     mask2: [0, 1, 1],
     corners: [
@@ -162,7 +162,8 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
 
   for (const face in element.faces) {
     const eFace = element.faces[face]
-    const { dir, corners, mask1, mask2 } = elemFaces[face]
+    const { corners, mask1, mask2 } = elemFaces[face]
+    const dir = new Vec3(...matmul3(globalMatrix, elemFaces[face].dir))
 
     if (eFace.cullface) {
       const neighbor = world.getBlock(cursor.plus(dir))
@@ -245,9 +246,12 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
         const dx = pos[0] * 2 - 1
         const dy = pos[1] * 2 - 1
         const dz = pos[2] * 2 - 1
-        const side1 = world.getBlock(cursor.offset(dx * mask1[0], dy * mask1[1], dz * mask1[2]))
-        const side2 = world.getBlock(cursor.offset(dx * mask2[0], dy * mask2[1], dz * mask2[2]))
-        const corner = world.getBlock(cursor.offset(dx, dy, dz))
+        const cornerDir = matmul3(globalMatrix, [dx, dy, dz])
+        const side1Dir = matmul3(globalMatrix, [dx * mask1[0], dy * mask1[1], dz * mask1[2]])
+        const side2Dir = matmul3(globalMatrix, [dx * mask2[0], dy * mask2[1], dz * mask2[2]])
+        const side1 = world.getBlock(cursor.offset(...side1Dir))
+        const side2 = world.getBlock(cursor.offset(...side2Dir))
+        const corner = world.getBlock(cursor.offset(...cornerDir))
 
         const side1Block = (side1 && side1.isCube) ? 1 : 0
         const side2Block = (side2 && side2.isCube) ? 1 : 0
