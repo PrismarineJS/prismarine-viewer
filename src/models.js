@@ -168,6 +168,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
       const neighbor = world.getBlock(cursor.plus(dir))
       if (!neighbor) continue
       if (cullIfIdentical && neighbor.type === block.type) continue
+      if (!neighbor.transparent && neighbor.isCube) continue
       if (neighbor.position.y < 0) continue
     }
 
