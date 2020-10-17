@@ -158,6 +158,8 @@ function buildRotationMatrix (axis, degree) {
 }
 
 function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift, block) {
+  const cullIfIdentical = block.name.indexOf('glass') >= 0
+
   for (const face in element.faces) {
     const eFace = element.faces[face]
     const { dir, corners, mask1, mask2 } = elemFaces[face]
@@ -165,7 +167,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
     if (eFace.cullface) {
       const neighbor = world.getBlock(cursor.plus(dir))
       if (!neighbor) continue
-      if (neighbor.type === block.type && block.isCube) continue
+      if (cullIfIdentical && neighbor.type === block.type) continue
       if (neighbor.position.y < 0) continue
     }
 
