@@ -76,7 +76,7 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
   for (const face in elemFaces) {
     const { dir, corners } = elemFaces[face]
 
-    const neighbor = world.getBlock(cursor.plus(dir))
+    const neighbor = world.getBlock(cursor.plus(new Vec3(...dir)))
     if (!neighbor) continue
     if (neighbor.type === type) continue
     if (neighbor.isCube || (neighbor.transparent && neighbor.type !== 0)) continue
@@ -99,7 +99,7 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
         (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
         (pos[1] ? liquidHeight : 0) + (cursor.y & 15) - 8,
         (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
-      attr.normals.push(dir.x, dir.y, dir.z)
+      attr.normals.push(...dir)
 
       attr.uvs.push(pos[3] * su + u, pos[4] * sv + v)
 
@@ -163,10 +163,10 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
   for (const face in element.faces) {
     const eFace = element.faces[face]
     const { corners, mask1, mask2 } = elemFaces[face]
-    const dir = new Vec3(...matmul3(globalMatrix, elemFaces[face].dir))
+    const dir = matmul3(globalMatrix, elemFaces[face].dir)
 
     if (eFace.cullface) {
-      const neighbor = world.getBlock(cursor.plus(dir))
+      const neighbor = world.getBlock(cursor.plus(new Vec3(...dir)))
       if (!neighbor) continue
       if (cullIfIdentical && neighbor.type === block.type) continue
       if (!neighbor.transparent && neighbor.isCube) continue
@@ -235,7 +235,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
         vertex[2] + (cursor.z & 15) - 8
       )
 
-      attr.normals.push(dir.x, dir.y, dir.z)
+      attr.normals.push(...dir)
 
       const baseu = (pos[3] - 0.5) * uvcs - (pos[4] - 0.5) * uvsn + 0.5
       const basev = (pos[3] - 0.5) * uvsn + (pos[4] - 0.5) * uvcs + 0.5
