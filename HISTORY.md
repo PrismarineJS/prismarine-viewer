@@ -1,3 +1,12 @@
+### 1.6.0
+
+* Model rotations (thanks @iRath96)
+* Handling transparent blocks better (thanks @iRath96)
+* Implement multi-part block models (thanks @iRath96)
+* Respects pixel device ratios (thanks @iRath96)
+* Fixed UV coordinates for blocks like hoppers (thanks @iRath96)
+* Liquids should be 14px instead of 16px high (thanks @iRath96)
+
 ### 1.5.0
 
 * Cache blocks for a 30% performance increase
