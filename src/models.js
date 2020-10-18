@@ -2,7 +2,7 @@ const Vec3 = require('vec3').Vec3
 
 const elemFaces = {
   up: {
-    dir: new Vec3(0, 1, 0),
+    dir: [0, 1, 0],
     mask1: [1, 1, 0],
     mask2: [0, 1, 1],
     corners: [
@@ -13,7 +13,7 @@ const elemFaces = {
     ]
   },
   down: {
-    dir: new Vec3(0, -1, 0),
+    dir: [0, -1, 0],
     mask1: [1, 1, 0],
     mask2: [0, 1, 1],
     corners: [
@@ -24,7 +24,7 @@ const elemFaces = {
     ]
   },
   east: {
-    dir: new Vec3(1, 0, 0),
+    dir: [1, 0, 0],
     mask1: [1, 1, 0],
     mask2: [1, 0, 1],
     corners: [
@@ -35,7 +35,7 @@ const elemFaces = {
     ]
   },
   west: {
-    dir: new Vec3(-1, 0, 0),
+    dir: [-1, 0, 0],
     mask1: [1, 1, 0],
     mask2: [1, 0, 1],
     corners: [
@@ -46,7 +46,7 @@ const elemFaces = {
     ]
   },
   north: {
-    dir: new Vec3(0, 0, -1),
+    dir: [0, 0, -1],
     mask1: [1, 0, 1],
     mask2: [0, 1, 1],
     corners: [
@@ -57,7 +57,7 @@ const elemFaces = {
     ]
   },
   south: {
-    dir: new Vec3(0, 0, 1),
+    dir: [0, 0, 1],
     mask1: [1, 0, 1],
     mask2: [0, 1, 1],
     corners: [
@@ -70,12 +70,17 @@ const elemFaces = {
 }
 
 function renderLiquid (world, cursor, texture, type, water, attr) {
+  const blockAbove = world.getBlock(cursor.plus(new Vec3(0, 1, 0)))
+  const liquidHeight = (blockAbove.type === type ? 16 : 14) / 16
+
   for (const face in elemFaces) {
     const { dir, corners } = elemFaces[face]
 
-    const neighbor = world.getBlock(cursor.plus(dir))
-    if (!neighbor || neighbor.type === type || neighbor.isCube || (neighbor.transparent && neighbor.type !== 0) ||
-        neighbor.position.y < 0) continue
+    const neighbor = world.getBlock(cursor.plus(new Vec3(...dir)))
+    if (!neighbor) continue
+    if (neighbor.type === type) continue
+    if (neighbor.isCube || (neighbor.transparent && neighbor.type !== 0)) continue
+    if (neighbor.position.y < 0) continue
 
     let tint = [1, 1, 1]
     if (water) {
@@ -92,9 +97,9 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
     for (const pos of corners) {
       attr.positions.push(
         (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
-        (pos[1] ? 1 : 0) + (cursor.y & 15) - 8,
+        (pos[1] ? liquidHeight : 0) + (cursor.y & 15) - 8,
         (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
-      attr.normals.push(dir.x, dir.y, dir.z)
+      attr.normals.push(...dir)
 
       attr.uvs.push(pos[3] * su + u, pos[4] * sv + v)
 
@@ -108,22 +113,72 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
   }
 }
 
-function renderElement (world, cursor, element, doAO, attr) {
+function vecadd3 (a, b) {
+  if (!b) { return a }
+  return a.map((v, i) => v + b[i])
+}
+
+function vecsub3 (a, b) {
+  if (!b) { return a }
+  return a.map((v, i) => v - b[i])
+}
+
+function matmul3 (matrix, vector) {
+  if (!matrix) { return vector }
+
+  const result = [0, 0, 0]
+  for (let i = 0; i < 3; ++i) {
+    for (let j = 0; j < 3; ++j) { result[i] += matrix[i][j] * vector[j] }
+  }
+  return result
+}
+
+function buildRotationMatrix (axis, degree) {
+  const radians = degree / 180 * Math.PI
+  const cos = Math.cos(radians)
+  const sin = Math.sin(radians)
+
+  const axis0 = { x: 0, y: 1, z: 2 }[axis]
+  const axis1 = (axis0 + 1) % 3
+  const axis2 = (axis0 + 2) % 3
+
+  const matrix = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+
+  matrix[axis0][axis0] = 1
+  matrix[axis1][axis1] = cos
+  matrix[axis1][axis2] = -sin
+  matrix[axis2][axis1] = +sin
+  matrix[axis2][axis2] = cos
+
+  return matrix
+}
+
+function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift, block) {
+  const cullIfIdentical = block.name.indexOf('glass') >= 0
+
   for (const face in element.faces) {
     const eFace = element.faces[face]
-    const { dir, corners, mask1, mask2 } = elemFaces[face]
+    const { corners, mask1, mask2 } = elemFaces[face]
+    const dir = matmul3(globalMatrix, elemFaces[face].dir)
 
     if (eFace.cullface) {
-      const neighbor = world.getBlock(cursor.plus(dir))
-      if (!neighbor || !(neighbor.transparent || !neighbor.isCube) || neighbor.position.y < 0) continue
+      const neighbor = world.getBlock(cursor.plus(new Vec3(...dir)))
+      if (!neighbor) continue
+      if (cullIfIdentical && neighbor.type === block.type) continue
+      if (!neighbor.transparent && neighbor.isCube) continue
+      if (neighbor.position.y < 0) continue
     }
 
-    const minx = element.from[0] / 16
-    const miny = element.from[1] / 16
-    const minz = element.from[2] / 16
-    const maxx = element.to[0] / 16
-    const maxy = element.to[1] / 16
-    const maxz = element.to[2] / 16
+    const minx = element.from[0]
+    const miny = element.from[1]
+    const minz = element.from[2]
+    const maxx = element.to[0]
+    const maxy = element.to[1]
+    const maxz = element.to[2]
 
     const u = eFace.texture.u
     const v = eFace.texture.v
@@ -138,18 +193,49 @@ function renderElement (world, cursor, element, doAO, attr) {
         tint = [0.568, 0.741, 0.349] // TODO: correct tint for each block
       }
     }
+
     // UV rotation
     const r = eFace.rotation || 0
     const uvcs = Math.cos(r * Math.PI / 180)
     const uvsn = -Math.sin(r * Math.PI / 180)
 
+    let localMatrix = null
+    let localShift = null
+
+    if (element.rotation) {
+      localMatrix = buildRotationMatrix(
+        element.rotation.axis,
+        element.rotation.angle
+      )
+
+      localShift = vecsub3(
+        element.rotation.origin,
+        matmul3(
+          localMatrix,
+          element.rotation.origin
+        )
+      )
+    }
+
     const aos = []
     for (const pos of corners) {
+      let vertex = [
+        (pos[0] ? maxx : minx),
+        (pos[1] ? maxy : miny),
+        (pos[2] ? maxz : minz)
+      ]
+
+      vertex = vecadd3(matmul3(localMatrix, vertex), localShift)
+      vertex = vecadd3(matmul3(globalMatrix, vertex), globalShift)
+      vertex = vertex.map(v => v / 16)
+
       attr.positions.push(
-        (pos[0] ? maxx : minx) + (cursor.x & 15) - 8,
-        (pos[1] ? maxy : miny) + (cursor.y & 15) - 8,
-        (pos[2] ? maxz : minz) + (cursor.z & 15) - 8)
-      attr.normals.push(dir.x, dir.y, dir.z)
+        vertex[0] + (cursor.x & 15) - 8,
+        vertex[1] + (cursor.y & 15) - 8,
+        vertex[2] + (cursor.z & 15) - 8
+      )
+
+      attr.normals.push(...dir)
 
       const baseu = (pos[3] - 0.5) * uvcs - (pos[4] - 0.5) * uvsn + 0.5
       const basev = (pos[3] - 0.5) * uvsn + (pos[4] - 0.5) * uvcs + 0.5
@@ -160,9 +246,12 @@ function renderElement (world, cursor, element, doAO, attr) {
         const dx = pos[0] * 2 - 1
         const dy = pos[1] * 2 - 1
         const dz = pos[2] * 2 - 1
-        const side1 = world.getBlock(cursor.offset(dx * mask1[0], dy * mask1[1], dz * mask1[2]))
-        const side2 = world.getBlock(cursor.offset(dx * mask2[0], dy * mask2[1], dz * mask2[2]))
-        const corner = world.getBlock(cursor.offset(dx, dy, dz))
+        const cornerDir = matmul3(globalMatrix, [dx, dy, dz])
+        const side1Dir = matmul3(globalMatrix, [dx * mask1[0], dy * mask1[1], dz * mask1[2]])
+        const side2Dir = matmul3(globalMatrix, [dx * mask2[0], dy * mask2[1], dz * mask2[2]])
+        const side1 = world.getBlock(cursor.offset(...side1Dir))
+        const side2 = world.getBlock(cursor.offset(...side2Dir))
+        const corner = world.getBlock(cursor.offset(...cornerDir))
 
         const side1Block = (side1 && side1.isCube) ? 1 : 0
         const side2Block = (side2 && side2.isCube) ? 1 : 0
@@ -210,18 +299,33 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
         const block = world.getBlock(cursor)
         if (block.variant === undefined) {
-          block.variant = getModelVariant(block, blocksStates)
+          block.variant = getModelVariants(block, blocksStates)
         }
-        const variant = block.variant
-        if (!variant || !variant.model) continue
 
-        if (block.name === 'water') {
-          renderLiquid(world, cursor, variant.model.textures.particle, block.type, true, attr)
-        } else if (block.name === 'lava') {
-          renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
-        } else {
-          for (const element of variant.model.elements) {
-            renderElement(world, cursor, element, variant.model.ao, attr)
+        for (const variant of block.variant) {
+          if (!variant || !variant.model) continue
+
+          if (block.name === 'water') {
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, true, attr)
+          } else if (block.name === 'lava') {
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
+          } else {
+            let globalMatrix = null
+            let globalShift = null
+
+            for (const axis of ['x', 'y', 'z']) {
+              if (axis in variant) {
+                if (globalMatrix) { console.warn('oh no') }
+                // TODO: matrices should be concatenated (multiplied)
+                globalMatrix = buildRotationMatrix(axis, -variant[axis])
+                globalShift = [8, 8, 8]
+                globalShift = vecsub3(globalShift, matmul3(globalMatrix, globalShift))
+              }
+            }
+
+            for (const element of variant.model.elements) {
+              renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift, block)
+            }
           }
         }
       }
@@ -237,6 +341,8 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
 }
 
 function parseProperties (properties) {
+  if (typeof properties === 'object') { return properties }
+
   const json = {}
   for (const prop of properties.split(',')) {
     const [key, value] = prop.split('=')
@@ -246,6 +352,8 @@ function parseProperties (properties) {
 }
 
 function matchProperties (block, properties) {
+  if (!properties) { return true }
+
   properties = parseProperties(properties)
   const blockProps = block.getProperties()
   for (const prop in blockProps) {
@@ -256,23 +364,31 @@ function matchProperties (block, properties) {
   return true
 }
 
-function getModelVariant (block, blockStates) {
+function getModelVariants (block, blockStates) {
   const state = blockStates[block.name]
-  if (!state) return null
+  if (!state) return []
   if (state.variants) {
     for (const [properties, variant] of Object.entries(state.variants)) {
       if (!matchProperties(block, properties)) continue
-      if (variant instanceof Array) return variant[0] // TODO: random
-      return variant
+      if (variant instanceof Array) return [variant[0]]
+      return [variant]
     }
   }
   if (state.multipart) {
-    for (const variant of state.multipart) { // TODO: match properties
-      if (variant.apply instanceof Array) return variant.apply[0] // TODO: random
-      return variant.apply
+    const parts = state.multipart.filter(multipart => matchProperties(block, multipart.when))
+    let variants = []
+    for (const part of parts) {
+      if (part.apply instanceof Array) {
+        variants = [...variants, ...part.apply]
+      } else {
+        variants = [...variants, part.apply]
+      }
     }
+
+    return variants
   }
-  return null
+
+  return []
 }
 
 module.exports = { getSectionGeometry }

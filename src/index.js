@@ -28,6 +28,7 @@ const entities = new Entities(scene)
 const primitives = new Primitives(scene)
 
 const renderer = new THREE.WebGLRenderer()
+renderer.setPixelRatio(window.devicePixelRatio || 1)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
