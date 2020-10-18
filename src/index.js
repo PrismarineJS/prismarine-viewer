@@ -34,6 +34,8 @@ document.body.appendChild(renderer.domElement)
 
 let controls = new THREE.OrbitControls(camera, renderer.domElement)
 
+var pitchyaw = {pitch:0, yaw:0};
+
 function animate () {
   window.requestAnimationFrame(animate)
   if (controls) controls.update()
@@ -56,8 +58,11 @@ socket.on('version', (version) => {
         controls = null
       }
       camera.position.set(pos.x, pos.y + 1.6, pos.z)
-      camera.rotation.x = camera.rotation.x * 0.9 + pitch * 0.1
-      camera.rotation.y = camera.rotation.y * 0.9 + yaw * 0.1
+      pitch = pitchyaw.pitch*.9+pitch;
+      yaw = pitchyaw.yaw*.9+yaw;
+      pitchyaw.pitch = pitch;
+      pitchyaw.yaw = yaw;
+      camera.lookAt(pos.x-Math.cos(pitch)*Math.sin(yaw), pos.y-Math.sin(pitch)+1.6, pos.z-Math.cos(pitch)*Math.cos(yaw))
       return
     }
     if (pos.y > 0 && firstPositionUpdate) {
