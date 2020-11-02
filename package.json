@@ -32,7 +32,7 @@
     "jest-puppeteer": "^4.4.0",
     "minecraft-wrap": "^1.2.3",
     "mineflayer": "^2.28.1",
-    "mineflayer-pathfinder": "1.0.10",
+    "mineflayer-pathfinder": "^1.0.11",
     "puppeteer": "^5.1.0",
     "require-self": "^0.2.3",
     "standard": "^16.0.1"
