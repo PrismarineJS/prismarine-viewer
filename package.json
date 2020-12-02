@@ -19,6 +19,7 @@
     "express-browserify": "^1.0.3",
     "minecraft-assets": "^1.3.1",
     "minecraft-data": "^2.67.0",
+    "node-canvas-webgl": "^0.2.6",
     "prismarine-block": "^1.7.1",
     "prismarine-chunk": "^1.20.3",
     "prismarine-world": "^3.1.0",

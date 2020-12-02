@@ -315,7 +315,7 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
 
             for (const axis of ['x', 'y', 'z']) {
               if (axis in variant) {
-                if (globalMatrix) { console.warn('oh no') }
+                // if (globalMatrix) { console.warn('oh no') }
                 // TODO: matrices should be concatenated (multiplied)
                 globalMatrix = buildRotationMatrix(axis, -variant[axis])
                 globalShift = [8, 8, 8]
