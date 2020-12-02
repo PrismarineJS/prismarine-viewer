@@ -6,6 +6,7 @@ const bot = mineflayer.createBot({
 })
 
 bot.once('spawn', () => {
-  mineflayerViewer(bot, { frames: 200, width: 512, height: 512 })
+  // Record 200 frames, 512x512 pixels, and save them to output.mp4
+  mineflayerViewer(bot, { output: 'output.mp4', frames: 200, width: 512, height: 512 })
   bot.setControlState('jump', true)
 })

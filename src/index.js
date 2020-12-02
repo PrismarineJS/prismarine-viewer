@@ -56,8 +56,7 @@ socket.on('version', (version) => {
         controls = null
       }
       camera.position.set(pos.x, pos.y + 1.6, pos.z)
-      camera.rotation.x = camera.rotation.x * 0.9 + pitch * 0.1
-      camera.rotation.y = camera.rotation.y * 0.9 + yaw * 0.1
+      camera.rotation.set(pitch, yaw, 0, 'ZYX')
       return
     }
     if (pos.y > 0 && firstPositionUpdate) {
