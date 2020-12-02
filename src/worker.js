@@ -1,30 +1,20 @@
-/* global XMLHttpRequest postMessage self performance */
+/* global postMessage self performance */
+
+if (!global.self) {
+  // If we are in a node environement, we need to fake some env variables
+  /* eslint-disable no-eval */
+  const r = eval('require') // yeah I know bad spooky eval, booouh
+  const { parentPort } = r('worker_threads')
+  global.self = parentPort
+  global.postMessage = (value, transferList) => { parentPort.postMessage(value, transferList) }
+  global.performance = r('perf_hooks').performance
+}
 
 const { Vec3 } = require('vec3')
 const { World } = require('./world')
 const { getSectionGeometry } = require('./models')
 
-function getJSON (url, callback) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', url, true)
-  xhr.responseType = 'json'
-  xhr.onload = function () {
-    const status = xhr.status
-    if (status === 200) {
-      callback(null, xhr.response)
-    } else {
-      callback(status, xhr.response)
-    }
-  }
-  xhr.send()
-}
-
 let blocksStates = null
-getJSON('blocksStates.json', (err, json) => {
-  if (err) return
-  blocksStates = json
-})
-
 let world = null
 
 function sectionKey (x, y, z) {
@@ -48,6 +38,8 @@ function setSectionDirty (pos, value = true) {
 self.onmessage = ({ data }) => {
   if (data.type === 'version') {
     world = new World(data.version)
+  } else if (data.type === 'blockStates') {
+    blocksStates = data.json
   } else if (data.type === 'dirty') {
     const loc = new Vec3(data.x, data.y, data.z)
     setSectionDirty(loc, data.value)

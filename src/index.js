@@ -1,6 +1,8 @@
-/* global THREE */
+/* global XMLHttpRequest THREE */
+
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
+
 const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
@@ -8,6 +10,21 @@ const Vec3 = require('vec3').Vec3
 
 const io = require('socket.io-client')
 const socket = io()
+
+function getJSON (url, callback) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', url, true)
+  xhr.responseType = 'json'
+  xhr.onload = function () {
+    const status = xhr.status
+    if (status === 200) {
+      callback(null, xhr.response)
+    } else {
+      callback(status, xhr.response)
+    }
+  }
+  xhr.send()
+}
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color('lightblue')
@@ -23,9 +40,15 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.z = 5
 let firstPositionUpdate = true
 
-const world = new WorldRenderer(scene)
+const worldTexture = new THREE.TextureLoader().load('texture.png')
+const world = new WorldRenderer(scene, worldTexture)
 const entities = new Entities(scene)
 const primitives = new Primitives(scene)
+
+getJSON('blocksStates.json', (err, json) => {
+  if (err) return
+  world.setBlocksStates(json)
+})
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setPixelRatio(window.devicePixelRatio || 1)

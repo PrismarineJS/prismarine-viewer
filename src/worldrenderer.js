@@ -1,5 +1,4 @@
 /* global THREE Worker */
-
 const Vec3 = require('vec3').Vec3
 
 function mod (x, n) {
@@ -7,12 +6,11 @@ function mod (x, n) {
 }
 
 class WorldRenderer {
-  constructor (scene, numWorkers = 4) {
+  constructor (scene, texture, numWorkers = 4) {
     this.sectionMeshs = {}
     this.scene = scene
     this.loadedChunks = {}
 
-    const texture = new THREE.TextureLoader().load('texture.png')
     texture.magFilter = THREE.NearestFilter
     texture.minFilter = THREE.NearestFilter
     texture.flipY = false
@@ -20,7 +18,12 @@ class WorldRenderer {
 
     this.workers = []
     for (let i = 0; i < numWorkers; i++) {
-      const worker = new Worker('worker.js')
+      // Node environement needs an absolute path, but browser needs the url of the file
+      let src = __dirname
+      if (src === '/src') src = 'worker.js'
+      else src += '/worker.js'
+
+      const worker = new Worker(src)
       worker.onmessage = ({ data }) => {
         if (data.type === 'geometry') {
           let mesh = this.sectionMeshs[data.key]
@@ -42,6 +45,7 @@ class WorldRenderer {
           this.scene.add(mesh)
         }
       }
+      if (worker.on) worker.on('message', (data) => { worker.onmessage({ data }) })
       this.workers.push(worker)
     }
   }
@@ -53,6 +57,12 @@ class WorldRenderer {
     this.sectionMeshs = {}
     for (const worker of this.workers) {
       worker.postMessage({ type: 'version', version })
+    }
+  }
+
+  setBlocksStates (blockStates) {
+    for (const worker of this.workers) {
+      worker.postMessage({ type: 'blockStates', json: blockStates })
     }
   }
 
