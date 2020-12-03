@@ -1,3 +1,10 @@
+### 1.7.0
+
+* Added headless rendering
+* Added writing to video file example
+* Added streaming to python example
+* Fixed camera rotation
+
 ### 1.6.0
 
 * Model rotations (thanks @iRath96)
