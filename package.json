@@ -1,6 +1,6 @@
 {
   "name": "prismarine-viewer",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "Web based viewer",
   "main": "index.js",
   "scripts": {
