@@ -1,3 +1,8 @@
+### 1.8.0
+
+* Fix dirty chunk unloading bug (thanks @extremeheat)
+* Add blockClicked event and clickmove example
+
 ### 1.7.0
 
 * Added headless rendering
