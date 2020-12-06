@@ -64,6 +64,16 @@ function animate () {
 }
 animate()
 
+window.onmousedown = (evt) => {
+  const raycaster = new THREE.Raycaster()
+  const mouse = new THREE.Vector2()
+  mouse.x = (evt.clientX / window.innerWidth) * 2 - 1
+  mouse.y = -(evt.clientY / window.innerHeight) * 2 + 1
+  raycaster.setFromCamera(mouse, camera)
+  const ray = raycaster.ray
+  socket.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
+}
+
 socket.on('version', (version) => {
   console.log('Using version: ' + version)
   world.setVersion(version)
