@@ -28,10 +28,11 @@ function setSectionDirty (pos, value = true) {
   const y = Math.floor(pos.y / 16) * 16
   const z = Math.floor(pos.z / 16) * 16
   const chunk = world.getColumn(x, z)
-  if (chunk && chunk.sections[Math.floor(y / 16)]) {
-    const key = sectionKey(x, y, z)
+  const key = sectionKey(x, y, z)
+  if (!value) {
+    delete dirtySections[key]
+  } else if (chunk && chunk.sections[Math.floor(y / 16)]) {
     dirtySections[key] = value
-    if (!dirtySections[key]) delete dirtySections[key]
   }
 }
 
