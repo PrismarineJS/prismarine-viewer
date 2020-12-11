@@ -3,7 +3,7 @@
 function getMesh (primitive) {
   if (primitive.type === 'line') {
     const color = primitive.color ? primitive.color : 0xff0000
-    const material = new THREE.LineBasicMaterial({ color })
+    const material = new THREE.LineBasicMaterial({ color, linewidth: 3 })
 
     const points = []
     for (const p of primitive.points) {
