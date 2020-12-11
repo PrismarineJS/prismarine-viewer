@@ -13,12 +13,14 @@ bot.loadPlugin(pathfinder)
 bot.once('spawn', () => {
   mineflayerViewer(bot, { port: 3000 })
 
-  const path = [bot.entity.position.clone()]
-  bot.on('move', () => {
-    if (path[path.length - 1].distanceTo(bot.entity.position) > 1) {
-      path.push(bot.entity.position.clone())
-      bot.viewer.drawLine('path', path)
+  bot.on('path_update', (r) => {
+    const nodesPerTick = (r.visitedNodes * 50 / r.time).toFixed(2)
+    console.log(`I can get there in ${r.path.length} moves. Computation took ${r.time.toFixed(2)} ms (${nodesPerTick} nodes/tick).`)
+    const path = []
+    for (const node of r.path) {
+      path.push({ x: node.x, y: node.y + 0.5, z: node.z })
     }
+    bot.viewer.drawLine('path', path, 0xff00ff)
   })
 
   const mcData = require('minecraft-data')(bot.version)
