@@ -70,16 +70,16 @@ const elemFaces = {
 }
 
 function renderLiquid (world, cursor, texture, type, water, attr) {
-  const blockAbove = world.getBlock(cursor.plus(new Vec3(0, 1, 0)))
+  const blockAbove = world.getBlock(cursor.offset(0, 1, 0))
   const liquidHeight = (blockAbove.type === type ? 16 : 14) / 16
 
   for (const face in elemFaces) {
     const { dir, corners } = elemFaces[face]
 
-    const neighbor = world.getBlock(cursor.plus(new Vec3(...dir)))
+    const neighbor = world.getBlock(cursor.offset(...dir))
     if (!neighbor) continue
     if (neighbor.type === type) continue
-    if (neighbor.isCube || (neighbor.transparent && neighbor.type !== 0)) continue
+    if (neighbor.isCube || neighbor.material === 'plant' || neighbor.getProperties().waterlogged) continue
     if (neighbor.position.y < 0) continue
 
     let tint = [1, 1, 1]
@@ -114,23 +114,22 @@ function renderLiquid (world, cursor, texture, type, water, attr) {
 }
 
 function vecadd3 (a, b) {
-  if (!b) { return a }
-  return a.map((v, i) => v + b[i])
+  if (!b) return a
+  return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
 }
 
 function vecsub3 (a, b) {
-  if (!b) { return a }
-  return a.map((v, i) => v - b[i])
+  if (!b) return a
+  return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
 }
 
 function matmul3 (matrix, vector) {
-  if (!matrix) { return vector }
-
-  const result = [0, 0, 0]
-  for (let i = 0; i < 3; ++i) {
-    for (let j = 0; j < 3; ++j) { result[i] += matrix[i][j] * vector[j] }
-  }
-  return result
+  if (!matrix) return vector
+  return [
+    matrix[0][0] * vector[0] + matrix[0][1] * vector[1] + matrix[0][2] * vector[2],
+    matrix[1][0] * vector[0] + matrix[1][1] * vector[1] + matrix[1][2] * vector[2],
+    matrix[2][0] * vector[0] + matrix[2][1] * vector[1] + matrix[2][2] * vector[2]
+  ]
 }
 
 function buildRotationMatrix (axis, degree) {
