@@ -9,7 +9,9 @@ const { Primitives } = require('./primitives')
 const Vec3 = require('vec3').Vec3
 
 const io = require('socket.io-client')
-const socket = io()
+const socket = io('http://localhost/socket.io', {
+  path: '/' /* placeholder */
+})
 
 function getJSON (url, callback) {
   const xhr = new XMLHttpRequest()
