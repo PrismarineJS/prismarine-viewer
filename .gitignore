@@ -2,3 +2,7 @@
 package-lock.json
 /test/*.png
 versions/
+public/index.js
+public/worker.js
+public/textures/
+public/blocksStates/
