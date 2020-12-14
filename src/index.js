@@ -40,15 +40,9 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.z = 5
 let firstPositionUpdate = true
 
-const worldTexture = new THREE.TextureLoader().load('texture.png')
-const world = new WorldRenderer(scene, worldTexture)
+const world = new WorldRenderer(scene)
 const entities = new Entities(scene)
 const primitives = new Primitives(scene)
-
-getJSON('blocksStates.json', (err, json) => {
-  if (err) return
-  world.setBlocksStates(json)
-})
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setPixelRatio(window.devicePixelRatio || 1)
@@ -80,6 +74,13 @@ socket.on('version', (version) => {
   entities.clear()
   primitives.clear()
   firstPositionUpdate = true
+
+  getJSON('blocksStates/' + version + '.json', (err, json) => {
+    if (err) return
+    world.setBlocksStates(json)
+  })
+
+  world.setTextureAtlas(new THREE.TextureLoader().load('textures/' + version + '.png'))
 
   let botMesh
   socket.on('position', ({ pos, addMesh, yaw, pitch }) => {

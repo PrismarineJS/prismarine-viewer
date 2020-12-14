@@ -6,15 +6,12 @@ function mod (x, n) {
 }
 
 class WorldRenderer {
-  constructor (scene, texture, numWorkers = 4) {
+  constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
     this.scene = scene
     this.loadedChunks = {}
 
-    texture.magFilter = THREE.NearestFilter
-    texture.minFilter = THREE.NearestFilter
-    texture.flipY = false
-    this.material = new THREE.MeshLambertMaterial({ map: texture, vertexColors: true, transparent: true, alphaTest: 0.1 })
+    this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
     this.workers = []
     for (let i = 0; i < numWorkers; i++) {
@@ -58,6 +55,13 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'version', version })
     }
+  }
+
+  setTextureAtlas (texture) {
+    texture.magFilter = THREE.NearestFilter
+    texture.minFilter = THREE.NearestFilter
+    texture.flipY = false
+    this.material.map = texture
   }
 
   setBlocksStates (blockStates) {
