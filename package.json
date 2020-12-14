@@ -13,6 +13,7 @@
   "author": "PrismarineJS",
   "license": "MIT",
   "dependencies": {
+    "assert": "^2.0.0",
     "canvas": "^2.6.1",
     "compression": "^1.7.4",
     "express": "^4.17.1",
