@@ -12,7 +12,13 @@ const indexConfig = {
   output: {
     path: path.resolve(__dirname, './public'),
     filename: './index.js'
-  }
+  },
+  plugins: [
+    // fix "process is not defined" error:
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    })
+  ]
 }
 
 const workerConfig = {
@@ -21,7 +27,13 @@ const workerConfig = {
   output: {
     path: path.resolve(__dirname, './public'),
     filename: './worker.js'
-  }
+  },
+  plugins: [
+    // fix "process is not defined" error:
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    })
+  ]
 }
 
 const texturesPath = path.resolve(__dirname, './public/textures')
