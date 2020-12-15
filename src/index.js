@@ -1,4 +1,4 @@
-/* global XMLHttpRequest THREE */
+/* global THREE */
 
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
@@ -7,24 +7,10 @@ const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
 const { Vec3 } = require('vec3')
+const fetch = require('node-fetch')
 
 const io = require('socket.io-client')
 const socket = io()
-
-function getJSON (url, callback) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', url, true)
-  xhr.responseType = 'json'
-  xhr.onload = function () {
-    const status = xhr.status
-    if (status === 200) {
-      callback(null, xhr.response)
-    } else {
-      callback(status, xhr.response)
-    }
-  }
-  xhr.send()
-}
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color('lightblue')
@@ -75,11 +61,9 @@ socket.on('version', (version) => {
   primitives.clear()
   firstPositionUpdate = true
 
-  getJSON('blocksStates/' + version + '.json', (err, json) => {
-    if (err) return
+  fetch('blocksStates/' + version + '.json').then(res => res.json()).then(json => {
     world.setBlocksStates(json)
   })
-
   world.setTextureAtlas(new THREE.TextureLoader().load('textures/' + version + '.png'))
 
   let botMesh
