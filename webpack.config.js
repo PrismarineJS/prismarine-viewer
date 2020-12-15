@@ -17,6 +17,9 @@ const indexConfig = {
     // fix "process is not defined" error:
     new webpack.ProvidePlugin({
       process: 'process/browser'
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
     })
   ]
 }
@@ -32,6 +35,9 @@ const workerConfig = {
     // fix "process is not defined" error:
     new webpack.ProvidePlugin({
       process: 'process/browser'
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
     })
   ]
 }
