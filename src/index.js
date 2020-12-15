@@ -3,44 +3,27 @@
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 
-const { WorldRenderer } = require('./worldrenderer')
-const { Entities } = require('./entities')
-const { Primitives } = require('./primitives')
+const { Viewer } = require('./viewer')
 const { Vec3 } = require('vec3')
-const { getVersion } = require('./version')
 
 const io = require('socket.io-client')
 const socket = io()
 
-const scene = new THREE.Scene()
-scene.background = new THREE.Color('lightblue')
-
-const ambientLight = new THREE.AmbientLight(0xcccccc)
-scene.add(ambientLight)
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-directionalLight.position.set(1, 1, 0.5).normalize()
-scene.add(directionalLight)
-
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.z = 5
 let firstPositionUpdate = true
-
-const world = new WorldRenderer(scene)
-const entities = new Entities(scene)
-const primitives = new Primitives(scene, camera)
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setPixelRatio(window.devicePixelRatio || 1)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
-let controls = new THREE.OrbitControls(camera, renderer.domElement)
+const viewer = new Viewer(renderer)
+
+let controls = new THREE.OrbitControls(viewer.camera, renderer.domElement)
 
 function animate () {
   window.requestAnimationFrame(animate)
   if (controls) controls.update()
-  renderer.render(scene, camera)
+  renderer.render(viewer.scene, viewer.camera)
 }
 animate()
 
@@ -49,17 +32,13 @@ window.addEventListener('pointerdown', (evt) => {
   const mouse = new THREE.Vector2()
   mouse.x = (evt.clientX / window.innerWidth) * 2 - 1
   mouse.y = -(evt.clientY / window.innerHeight) * 2 + 1
-  raycaster.setFromCamera(mouse, camera)
+  raycaster.setFromCamera(mouse, viewer.camera)
   const ray = raycaster.ray
   socket.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
 })
 
 socket.on('version', (version) => {
-  version = getVersion(version)
-  console.log('Using version: ' + version)
-  world.setVersion(version)
-  entities.clear()
-  primitives.clear()
+  viewer.setVersion(version)
   firstPositionUpdate = true
 
   let botMesh
@@ -69,13 +48,12 @@ socket.on('version', (version) => {
         controls.dispose()
         controls = null
       }
-      camera.position.set(pos.x, pos.y + 1.6, pos.z)
-      camera.rotation.set(pitch, yaw, 0, 'ZYX')
+      viewer.setFirstPersonCamera(pos, yaw, pitch)
       return
     }
     if (pos.y > 0 && firstPositionUpdate) {
       controls.target.set(pos.x, pos.y, pos.z)
-      camera.position.set(pos.x, pos.y + 20, pos.z + 20)
+      viewer.camera.position.set(pos.x, pos.y + 20, pos.z + 20)
       controls.update()
       firstPositionUpdate = false
     }
@@ -85,30 +63,30 @@ socket.on('version', (version) => {
         geometry.translate(0, 0.9, 0)
         const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
         botMesh = new THREE.Mesh(geometry, material)
-        scene.add(botMesh)
+        viewer.scene.add(botMesh)
       }
       botMesh.position.set(pos.x, pos.y, pos.z)
     }
   })
 
   socket.on('entity', (e) => {
-    entities.update(e)
+    viewer.updateEntity(e)
   })
 
   socket.on('primitive', (p) => {
-    primitives.update(p)
+    viewer.updatePrimitive(p)
   })
 
   socket.on('chunk', (data) => {
     const [x, z] = data.coords.split(',')
-    world.addColumn(parseInt(x, 10), parseInt(z, 10), data.chunk)
+    viewer.addColumn(parseInt(x, 10), parseInt(z, 10), data.chunk)
   })
 
   socket.on('unloadChunk', ({ x, z }) => {
-    world.removeColumn(x, z)
+    viewer.removeColumn(x, z)
   })
 
   socket.on('blockUpdate', ({ pos, stateId }) => {
-    world.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
+    viewer.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
   })
 })
