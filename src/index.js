@@ -7,7 +7,7 @@ const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
 const { Vec3 } = require('vec3')
-const fetch = require('node-fetch')
+const { getVersion } = require('./version')
 
 const io = require('socket.io-client')
 const socket = io()
@@ -55,16 +55,12 @@ window.addEventListener('pointerdown', (evt) => {
 })
 
 socket.on('version', (version) => {
+  version = getVersion(version)
   console.log('Using version: ' + version)
   world.setVersion(version)
   entities.clear()
   primitives.clear()
   firstPositionUpdate = true
-
-  fetch('blocksStates/' + version + '.json').then(res => res.json()).then(json => {
-    world.setBlocksStates(json)
-  })
-  world.setTextureAtlas(new THREE.TextureLoader().load('textures/' + version + '.png'))
 
   let botMesh
   socket.on('position', ({ pos, addMesh, yaw, pitch }) => {
