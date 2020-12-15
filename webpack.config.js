@@ -20,7 +20,14 @@ const indexConfig = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    })
+    }),
+    new webpack.DefinePlugin({
+      __SUPPORTED_VERSIONS__: mcAssets.versions.map(v => `"${v}"`)
+    }),
+    new webpack.NormalModuleReplacementPlugin(
+      /src\/utils/,
+      './utils.web.js'
+    )
   ]
 }
 
@@ -38,6 +45,9 @@ const workerConfig = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
+    }),
+    new webpack.DefinePlugin({
+      __SUPPORTED_VERSIONS__: mcAssets.versions.map(v => `"${v}"`)
     })
   ]
 }

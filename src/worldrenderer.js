@@ -1,6 +1,7 @@
 /* global Worker */
 const THREE = require('three')
 const Vec3 = require('vec3').Vec3
+const { loadTexture, loadJSON } = require('./utils')
 
 function mod (x, n) {
   return ((x % n) + n) % n
@@ -56,19 +57,19 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'version', version })
     }
-  }
 
-  setTextureAtlas (texture) {
-    texture.magFilter = THREE.NearestFilter
-    texture.minFilter = THREE.NearestFilter
-    texture.flipY = false
-    this.material.map = texture
-  }
+    loadTexture(`textures/${version}.png`, texture => {
+      texture.magFilter = THREE.NearestFilter
+      texture.minFilter = THREE.NearestFilter
+      texture.flipY = false
+      this.material.map = texture
+    })
 
-  setBlocksStates (blockStates) {
-    for (const worker of this.workers) {
-      worker.postMessage({ type: 'blockStates', json: blockStates })
-    }
+    loadJSON(`blocksStates/${version}.json`, blockStates => {
+      for (const worker of this.workers) {
+        worker.postMessage({ type: 'blockStates', json: blockStates })
+      }
+    })
   }
 
   addColumn (x, z, chunk) {
