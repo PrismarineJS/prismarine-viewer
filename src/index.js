@@ -77,9 +77,8 @@ socket.on('version', (version) => {
     viewer.updatePrimitive(p)
   })
 
-  socket.on('chunk', (data) => {
-    const [x, z] = data.coords.split(',')
-    viewer.addColumn(parseInt(x, 10), parseInt(z, 10), data.chunk)
+  socket.on('chunk', ({ x, z, chunk }) => {
+    viewer.addColumn(x, z, chunk)
   })
 
   socket.on('unloadChunk', ({ x, z }) => {
