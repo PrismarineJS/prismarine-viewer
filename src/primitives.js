@@ -1,24 +1,28 @@
-/* global THREE */
+const THREE = require('three')
+const { MeshLine, MeshLineMaterial } = require('three.meshline')
 
-function getMesh (primitive) {
+function getMesh (primitive, camera) {
   if (primitive.type === 'line') {
     const color = primitive.color ? primitive.color : 0xff0000
-    const material = new THREE.LineBasicMaterial({ color, linewidth: 3 })
+    const resolution = new THREE.Vector2(window.innerWidth / camera.zoom, window.innerHeight / camera.zoom)
+    const material = new MeshLineMaterial({ color, resolution, sizeAttenuation: false, lineWidth: 8 })
 
     const points = []
     for (const p of primitive.points) {
-      points.push(new THREE.Vector3(p.x, p.y, p.z))
+      points.push(p.x, p.y, p.z)
     }
 
-    const geometry = new THREE.BufferGeometry().setFromPoints(points)
-    return new THREE.Line(geometry, material)
+    const line = new MeshLine()
+    line.setPoints(points)
+    return new THREE.Mesh(line, material)
   }
   return null
 }
 
 class Primitives {
-  constructor (scene) {
+  constructor (scene, camera) {
     this.scene = scene
+    this.camera = camera
     this.primitives = {}
   }
 
@@ -35,7 +39,7 @@ class Primitives {
       delete this.primitives[primitive.id]
     }
 
-    const mesh = getMesh(primitive)
+    const mesh = getMesh(primitive, this.camera)
     if (!mesh) return
     this.primitives[primitive.id] = mesh
     this.scene.add(mesh)

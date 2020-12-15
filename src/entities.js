@@ -1,4 +1,4 @@
-/* global THREE */
+const THREE = require('three')
 
 function getEntityMesh (entity) {
   if (entity.type === 'player') {

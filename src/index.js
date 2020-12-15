@@ -6,7 +6,7 @@ require('three/examples/js/controls/OrbitControls')
 const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
-const Vec3 = require('vec3').Vec3
+const { Vec3 } = require('vec3')
 
 const io = require('socket.io-client')
 const socket = io()
@@ -42,7 +42,7 @@ let firstPositionUpdate = true
 
 const world = new WorldRenderer(scene)
 const entities = new Entities(scene)
-const primitives = new Primitives(scene)
+const primitives = new Primitives(scene, camera)
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setPixelRatio(window.devicePixelRatio || 1)
@@ -58,7 +58,7 @@ function animate () {
 }
 animate()
 
-window.onmousedown = (evt) => {
+window.addEventListener('pointerdown', (evt) => {
   const raycaster = new THREE.Raycaster()
   const mouse = new THREE.Vector2()
   mouse.x = (evt.clientX / window.innerWidth) * 2 - 1
@@ -66,7 +66,7 @@ window.onmousedown = (evt) => {
   raycaster.setFromCamera(mouse, camera)
   const ray = raycaster.ray
   socket.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
-}
+})
 
 socket.on('version', (version) => {
   console.log('Using version: ' + version)
