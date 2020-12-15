@@ -21,9 +21,6 @@ const indexConfig = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
-    new webpack.DefinePlugin({
-      __SUPPORTED_VERSIONS__: mcAssets.versions.map(v => `"${v}"`)
-    }),
     new webpack.NormalModuleReplacementPlugin(
       /src\/utils/,
       './utils.web.js'
@@ -45,9 +42,6 @@ const workerConfig = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    }),
-    new webpack.DefinePlugin({
-      __SUPPORTED_VERSIONS__: mcAssets.versions.map(v => `"${v}"`)
     })
   ]
 }
@@ -73,5 +67,7 @@ for (const version of mcAssets.versions) {
   const blocksStates = JSON.stringify(prepareBlocksStates(assets, atlas))
   fs.writeFileSync(path.resolve(blockStatesPath, version + '.json'), blocksStates)
 }
+
+fs.writeFileSync(path.resolve(__dirname, './public/supportedVersions.json'), '[' + mcAssets.versions.map(v => `"${v}"`).toString() + ']')
 
 module.exports = [indexConfig, workerConfig]

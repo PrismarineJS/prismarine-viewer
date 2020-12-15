@@ -1,5 +1,4 @@
-/* global __SUPPORTED_VERSIONS__ */
-const supportedVersions = __SUPPORTED_VERSIONS__
+const supportedVersions = require('../public/supportedVersions.json')
 
 const lastOfMajor = {}
 for (const version of supportedVersions) {
