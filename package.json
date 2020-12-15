@@ -21,6 +21,7 @@
     "minecraft-assets": "^1.4.0",
     "minecraft-data": "^2.70.2",
     "node-canvas-webgl": "^0.2.6",
+    "node-fetch": "^2.6.1",
     "prismarine-block": "^1.7.2",
     "prismarine-chunk": "^1.20.3",
     "prismarine-world": "^3.1.1",
