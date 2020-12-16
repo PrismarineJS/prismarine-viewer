@@ -4,7 +4,6 @@ global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 
 const { Viewer } = require('./viewer')
-const { Vec3 } = require('vec3')
 
 const io = require('socket.io-client')
 const socket = io()
@@ -39,7 +38,9 @@ window.addEventListener('pointerdown', (evt) => {
 
 socket.on('version', (version) => {
   viewer.setVersion(version)
+
   firstPositionUpdate = true
+  viewer.listen(socket)
 
   let botMesh
   socket.on('position', ({ pos, addMesh, yaw, pitch }) => {
@@ -67,25 +68,5 @@ socket.on('version', (version) => {
       }
       botMesh.position.set(pos.x, pos.y, pos.z)
     }
-  })
-
-  socket.on('entity', (e) => {
-    viewer.updateEntity(e)
-  })
-
-  socket.on('primitive', (p) => {
-    viewer.updatePrimitive(p)
-  })
-
-  socket.on('chunk', ({ x, z, chunk }) => {
-    viewer.addColumn(x, z, chunk)
-  })
-
-  socket.on('unloadChunk', ({ x, z }) => {
-    viewer.removeColumn(x, z)
-  })
-
-  socket.on('blockUpdate', ({ pos, stateId }) => {
-    viewer.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
   })
 })

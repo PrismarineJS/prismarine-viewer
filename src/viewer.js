@@ -4,6 +4,7 @@ const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
 const { getVersion } = require('./version')
+const { Vec3 } = require('vec3')
 
 class Viewer {
   constructor (renderer) {
@@ -56,6 +57,28 @@ class Viewer {
   setFirstPersonCamera (pos, yaw, pitch) {
     this.camera.position.set(pos.x, pos.y + 1.6, pos.z)
     this.camera.rotation.set(pitch, yaw, 0, 'ZYX')
+  }
+
+  listen (emitter) {
+    emitter.on('entity', (e) => {
+      this.updateEntity(e)
+    })
+
+    emitter.on('primitive', (p) => {
+      this.updatePrimitive(p)
+    })
+
+    emitter.on('loadChunk', ({ x, z, chunk }) => {
+      this.addColumn(x, z, chunk)
+    })
+
+    emitter.on('unloadChunk', ({ x, z }) => {
+      this.removeColumn(x, z)
+    })
+
+    emitter.on('blockUpdate', ({ pos, stateId }) => {
+      this.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
+    })
   }
 }
 
