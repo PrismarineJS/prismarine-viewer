@@ -1,8 +1,10 @@
 /* global XMLHttpRequest */
 const THREE = require('three')
+const path = require('path')
 
 function loadTexture(texture, cb) {
-  cb(new THREE.TextureLoader().load(texture))
+  const url = path.resolve(__dirname, '../public/' + texture)
+  cb(new THREE.TextureLoader().load(url))
 }
 
 function loadJSON(json, cb) {
