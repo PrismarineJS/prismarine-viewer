@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Prismarine Viewer</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+
+  <div id='splash'>
+    <div class='header'>Prismarine Viewer</div>
+
+    <div>
+      <div>Drag a folder to the window or <a href='' onclick='connect()'>connect to mineflayer</a></div>
+    </div>
+
+  </div>
+
+  <script type="text/javascript" src="stats.js" type="module"></script>
+  <script>
+    var stats = new Stats();
+    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild(stats.dom);
+  </script>
+  <script type="text/javascript" src="bootstrap.js"></script>
+</body>
+
+</html>
