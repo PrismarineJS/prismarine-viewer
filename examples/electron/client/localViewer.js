@@ -39,6 +39,10 @@ class LocalViewer {
     // Initialize viewer, load chunks
     this.worldView.init(this.center)
 
+    // TODO: not sure why, but not setting this here 
+    // causes the controls to not work
+    this.viewer.camera.position.set(0, 90, 0)
+
     // Browser animation loop
     const animate = () => {
       window.requestAnimationFrame(animate)
