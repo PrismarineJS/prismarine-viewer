@@ -2,6 +2,7 @@ const LocalViewer = require('./localViewer')
 
 const World = require('prismarine-world')
 
+// TODO: Better way to do inputs
 async function prompt(message, defaultMessage) {
   return new Promise(ret => {
     let element = document.querySelector('#prompt')
@@ -16,13 +17,11 @@ async function prompt(message, defaultMessage) {
   
     window.btnOk = function() {
       let val = document.querySelector('#prompt-val').value
-      // console.log('ok')
       element?.remove()
       ret(val)
     }
   
     window.btnCancel = function() {
-      // console.log('fail')
       element?.remove()
       ret(false)
     }
@@ -31,10 +30,9 @@ async function prompt(message, defaultMessage) {
 
 async function openWorld(path, version) {
   if (!path) return
-  let provider = null
   try {
     if (!version) throw 0;
-    provider = World(version)
+    let provider = World(version)
   } catch (e) {
     console.log(e)
     version = await prompt('Version to load world as', '1.13.1')
@@ -45,18 +43,22 @@ async function openWorld(path, version) {
 
   console.info('[app] loading %s world at "%s"', version, path)
 
-  hideSplash()
+  removeSplash()
 
   global.viewer = new LocalViewer(version, path)
   viewer.start()
 }
 
-function hideSplash() {
-  document.querySelector('#splash').style.display = 'none'
+async function startmf(props) {
+  if (!props) {
+    props = {}
+
+  }
 }
 
-function showSplash() {
-  document.querySelector('#splash').style.display = undefined
+// remove so event handlers also deleted
+function removeSplash() {
+  document.querySelector('#splash').remove()
 }
 
 document.querySelector('#splash').ondragover = (ev) => {
