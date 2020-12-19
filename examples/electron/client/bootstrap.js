@@ -1,7 +1,5 @@
 const LocalViewer = require('./localViewer')
 
-const World = require('prismarine-world')
-
 // TODO: Better way to do inputs
 async function prompt(message, defaultMessage) {
   return new Promise(ret => {
@@ -30,15 +28,14 @@ async function prompt(message, defaultMessage) {
 
 async function openWorld(path, version) {
   if (!path) return
-  try {
-    if (!version) throw 0;
-    let provider = World(version)
-  } catch (e) {
-    console.log(e)
+
+  if (!path.endsWith('region') && !path.endsWith('region/')) {
+    path += '/region'
+  }
+
+  if (!version) {
     version = await prompt('Version to load world as', '1.13.1')
     if (!version) return
-    openWorld(path, version)
-    return
   }
 
   console.info('[app] loading %s world at "%s"', version, path)
@@ -47,13 +44,6 @@ async function openWorld(path, version) {
 
   global.viewer = new LocalViewer(version, path)
   viewer.start()
-}
-
-async function startmf(props) {
-  if (!props) {
-    props = {}
-
-  }
 }
 
 // remove so event handlers also deleted
