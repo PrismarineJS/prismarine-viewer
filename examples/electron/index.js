@@ -1,25 +1,19 @@
 const path = require('path')
 const { app, BrowserWindow } = require('electron')
 
-let mainWindow = null
-
-function createMainWindow() {
+function createMainWindow () {
   const window = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
-      preload: path.join(__dirname, "./client/preload.js")
+      preload: path.join(__dirname, './client/preload.js')
     }
   })
 
   // Open dev tools on load
   window.webContents.openDevTools()
 
-  window.loadFile(path.join(__dirname, "./client/index.html"));
-
-  window.on('closed', () => {
-    mainWindow = null
-  })
+  window.loadFile(path.join(__dirname, './client/index.html'))
 
   window.webContents.on('devtools-opened', () => {
     window.focus()
@@ -32,7 +26,7 @@ function createMainWindow() {
 }
 
 app.on('ready', () => {
-  mainWindow = createMainWindow()
+  createMainWindow()
 })
 
 app.on('window-all-closed', function () {
