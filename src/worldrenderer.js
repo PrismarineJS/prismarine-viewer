@@ -1,7 +1,7 @@
 /* global Worker */
 const THREE = require('three')
 const Vec3 = require('vec3').Vec3
-const { loadTexture, loadJSON } = require('./utils')
+const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
 
 function mod (x, n) {
   return ((x % n) + n) % n
