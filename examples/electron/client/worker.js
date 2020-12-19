@@ -1,2 +1,2 @@
 // hack for path resolving
-require('prismarine-viewer/src/worker')
+require('prismarine-viewer/viewer/lib/worker')
