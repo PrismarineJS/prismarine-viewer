@@ -1,5 +1,5 @@
 const path = require('path')
-const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
+const { app, BrowserWindow } = require('electron')
 
 let mainWindow = null
 
@@ -30,7 +30,6 @@ function createMainWindow() {
 
   return window
 }
-
 
 app.on('ready', () => {
   mainWindow = createMainWindow()
