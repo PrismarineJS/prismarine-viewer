@@ -1,32 +1,33 @@
+/* global confirm */
+
 const LocalViewer = require('./localViewer')
 
 // TODO: Better way to do inputs
-async function prompt(message, defaultMessage) {
-  return new Promise(ret => {
+async function prompt (message, defaultMessage) {
+  return new Promise(resolve => {
     let element = document.querySelector('#prompt')
-    if (!element)
-      document.body.innerHTML += `<div id="prompt"></div>`
+    if (!element) { document.body.innerHTML += '<div id="prompt"></div>' }
     element = document.querySelector('#prompt')
     element.innerHTML = `
     <div>${message}</div>
     <input id="prompt-val" type="text" value="${defaultMessage}" />
     <button onclick="btnOk()">OK</button>
     <button onclick="btnCancel()">Cancel</button>`
-  
-    window.btnOk = function() {
-      let val = document.querySelector('#prompt-val').value
+
+    window.btnOk = function () {
+      const val = document.querySelector('#prompt-val').value
       element?.remove()
-      ret(val)
+      resolve(val)
     }
-  
-    window.btnCancel = function() {
+
+    window.btnCancel = function () {
       element?.remove()
-      ret(false)
+      resolve(false)
     }
   })
 }
 
-async function openWorld(path, version) {
+async function openWorld (path, version) {
   if (!path) return
 
   if (!path.endsWith('region') && !path.endsWith('region/')) {
@@ -43,11 +44,11 @@ async function openWorld(path, version) {
   removeSplash()
 
   global.viewer = new LocalViewer(version, path)
-  viewer.start()
+  global.viewer.start()
 }
 
 // remove so event handlers also deleted
-function removeSplash() {
+function removeSplash () {
   document.querySelector('#splash').remove()
 }
 
@@ -59,6 +60,6 @@ document.querySelector('#splash').ondrop = function (e) {
   console.log(e.dataTransfer.files[0].path)
 
   const path = e.dataTransfer.files[0].path
-  let ok = confirm(`Open the save at ${path}?`)
+  const ok = confirm(`Open the save at ${path}?`)
   if (ok) openWorld(path)
 }

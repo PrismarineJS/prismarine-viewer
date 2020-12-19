@@ -1,3 +1,4 @@
+/* global THREE */
 const { WorldView } = require('prismarine-viewer/lib/worldView')
 const { Viewer } = require('prismarine-viewer/src/viewer')
 const { Vec3 } = require('vec3')
@@ -5,7 +6,7 @@ global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 
 class LocalViewer {
-  constructor(version, savePath, viewDistance = 4) {
+  constructor (version, savePath, viewDistance = 4) {
     this.version = version
     this.viewDistance = viewDistance
     this.center = new Vec3(0, 90, 0)
@@ -16,7 +17,7 @@ class LocalViewer {
     this.Anvil = require('prismarine-provider-anvil').Anvil(version)
   }
 
-  start() {
+  start () {
     // Create viewer data provider
     this.world = new this.World(null, new this.Anvil(this.savePath), 0 /* no saving */)
     this.worldView = new WorldView(this.world, this.viewDistance, this.center)
@@ -26,7 +27,7 @@ class LocalViewer {
     this.renderer.setPixelRatio(window.devicePixelRatio || 1)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(this.renderer.domElement)
-    
+
     // Create viewer
     this.viewer = new Viewer(this.renderer)
     this.viewer.setVersion(this.version)
