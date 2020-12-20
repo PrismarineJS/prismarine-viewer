@@ -1,14 +1,18 @@
 /* global THREE */
 
+/*
+This is an example of using only the core API (.viewer) to implement rendering a world and saving a video of it
+*/
+
 const { spawn } = require('child_process')
 const net = require('net')
 global.THREE = require('three')
 global.Worker = require('worker_threads').Worker
 const { createCanvas } = require('node-canvas-webgl/lib')
 
-const { WorldView, Viewer, getBufferFromStream } = require('../viewer')
+const { Viewer, WorldView, getBufferFromStream } = require('..').viewer
 
-module.exports = (bot, { viewDistance = 6, output = 'output.mp4', frames = 200, width = 512, height = 512 }) => {
+const start = (bot, { viewDistance = 6, output = 'output.mp4', frames = 200, width = 512, height = 512 } = {}) => {
   const canvas = createCanvas(width, height)
   const renderer = new THREE.WebGLRenderer({ canvas })
   const viewer = new Viewer(renderer)
@@ -93,3 +97,27 @@ module.exports = (bot, { viewDistance = 6, output = 'output.mp4', frames = 200, 
 
   return client
 }
+
+const mineflayer = require('mineflayer')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node echo.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'echo',
+  password: process.argv[5]
+})
+
+bot.on('chat', (username, message) => {
+  if (username === bot.username) return
+  bot.chat(message)
+})
+
+bot.on('spawn', () => {
+  start(bot)
+  bot.setControlState('jump', true)
+})

@@ -1,13 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 const webpack = require('webpack')
 const path = require('path')
-const { makeTextureAtlas } = require('./lib/atlas')
-const { prepareBlocksStates } = require('./lib/models')
-const mcAssets = require('minecraft-assets')
-const fs = require('fs')
 
 const indexConfig = {
-  entry: './src/index.js',
+  entry: './lib/index.js',
   mode: 'development',
   output: {
     path: path.resolve(__dirname, './public'),
@@ -22,17 +18,17 @@ const indexConfig = {
       Buffer: ['buffer', 'Buffer']
     }),
     new webpack.NormalModuleReplacementPlugin(
-      /src\/utils/,
+      /viewer\/lib\/utils/,
       './utils.web.js'
     )
   ]
 }
 
 const workerConfig = {
-  entry: './src/worker.js',
+  entry: './viewer/lib/worker.js',
   mode: 'development',
   output: {
-    path: path.resolve(__dirname, './public'),
+    path: path.join(__dirname, '/public'),
     filename: './worker.js'
   },
   plugins: [
@@ -45,29 +41,5 @@ const workerConfig = {
     })
   ]
 }
-
-const texturesPath = path.resolve(__dirname, './public/textures')
-if (!fs.existsSync(texturesPath)) {
-  fs.mkdirSync(texturesPath)
-}
-
-const blockStatesPath = path.resolve(__dirname, './public/blocksStates')
-if (!fs.existsSync(blockStatesPath)) {
-  fs.mkdirSync(blockStatesPath)
-}
-
-for (const version of mcAssets.versions) {
-  const assets = mcAssets(version)
-  const atlas = makeTextureAtlas(assets)
-  const out = fs.createWriteStream(path.resolve(texturesPath, version + '.png'))
-  const stream = atlas.canvas.pngStream()
-  stream.on('data', (chunk) => out.write(chunk))
-  stream.on('end', () => console.log('Generated textures/' + version + '.png'))
-
-  const blocksStates = JSON.stringify(prepareBlocksStates(assets, atlas))
-  fs.writeFileSync(path.resolve(blockStatesPath, version + '.json'), blocksStates)
-}
-
-fs.writeFileSync(path.resolve(__dirname, './public/supportedVersions.json'), '[' + mcAssets.versions.map(v => `"${v}"`).toString() + ']')
 
 module.exports = [indexConfig, workerConfig]

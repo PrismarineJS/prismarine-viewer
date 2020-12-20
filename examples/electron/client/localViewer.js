@@ -1,6 +1,5 @@
 /* global THREE */
-const { WorldView } = require('prismarine-viewer/lib/worldView')
-const { Viewer } = require('prismarine-viewer/src/viewer')
+const { WorldView, Viewer } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
