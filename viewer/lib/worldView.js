@@ -1,4 +1,4 @@
-const { spiral, ViewRect, chunkPos } = require('./utils')
+const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
 const EventEmitter = require('events')
 

@@ -54,6 +54,11 @@ More examples:
 
 ### prismarine-viewer
 
+#### viewer
+
+The core rendering library. It provides Viewer and WorldView which together make it possible to render a minecraft world.
+Check its [API](viewer/README.md)
+
 #### mineflayer
 
 Serve a webserver allowing to visualize the bot surrounding, in first or third person. Comes with drawing functionnalities.

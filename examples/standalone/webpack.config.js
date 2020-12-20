@@ -3,7 +3,7 @@ const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 
 const config = {
-  entry: './index.js',
+  entry: path.resolve(__dirname, './index.js'),
   output: {
     path: path.resolve(__dirname, './public'),
     filename: './index.js'
@@ -17,7 +17,7 @@ const config = {
       Buffer: ['buffer', 'Buffer']
     }),
     new webpack.NormalModuleReplacementPlugin(
-      /prismarine-viewer\/src\/utils/,
+      /prismarine-viewer\/viewer\/lib\/utils/,
       './utils.web.js'
     ),
     new CopyPlugin({
