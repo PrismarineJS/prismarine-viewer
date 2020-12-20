@@ -12,7 +12,7 @@ The viewer exposes methods to render a world to a three.js renderer.
 
 Build the viewer.
 
-* renderer is a Tree.js instance
+* renderer is a [WebGLRenderer](https://threejs.org/docs/#api/en/renderers/WebGLRenderer) instance
 
 #### setVersion(version)
 

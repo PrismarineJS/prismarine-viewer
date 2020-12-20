@@ -1,12 +1,16 @@
 /* global THREE */
 
+/*
+This is an example of using only the core API (.viewer) to implement rendering a world and saving a video of it
+*/
+
 const { spawn } = require('child_process')
 const net = require('net')
 global.THREE = require('three')
 global.Worker = require('worker_threads').Worker
 const { createCanvas } = require('node-canvas-webgl/lib')
 
-const { Viewer, WorldView, getBufferFromStream } = require('..')
+const { Viewer, WorldView, getBufferFromStream } = require('..').viewer
 
 const start = (bot, { viewDistance = 6, output = 'output.mp4', frames = 200, width = 512, height = 512 } = {}) => {
   const canvas = createCanvas(width, height)
