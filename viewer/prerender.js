@@ -4,12 +4,12 @@ const { prepareBlocksStates } = require('./lib/modelsBuilder')
 const mcAssets = require('minecraft-assets')
 const fs = require('fs')
 
-const texturesPath = path.resolve(__dirname, './public/textures')
+const texturesPath = path.resolve(__dirname, '../public/textures')
 if (!fs.existsSync(texturesPath)) {
   fs.mkdirSync(texturesPath)
 }
 
-const blockStatesPath = path.resolve(__dirname, './public/blocksStates')
+const blockStatesPath = path.resolve(__dirname, '../public/blocksStates')
 if (!fs.existsSync(blockStatesPath)) {
   fs.mkdirSync(blockStatesPath)
 }
@@ -26,4 +26,4 @@ for (const version of mcAssets.versions) {
   fs.writeFileSync(path.resolve(blockStatesPath, version + '.json'), blocksStates)
 }
 
-fs.writeFileSync(path.resolve(__dirname, './public/supportedVersions.json'), '[' + mcAssets.versions.map(v => `"${v}"`).toString() + ']')
+fs.writeFileSync(path.resolve(__dirname, '../public/supportedVersions.json'), '[' + mcAssets.versions.map(v => `"${v}"`).toString() + ']')
