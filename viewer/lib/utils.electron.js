@@ -1,12 +1,13 @@
 const THREE = require('three')
+const path = require('path')
 
 function loadTexture (texture, cb) {
-  const url = require.resolve('prismarine-viewer/public/' + texture)
+  const url = path.resolve('../../public/' + texture)
   cb(new THREE.TextureLoader().load(url))
 }
 
 function loadJSON (json, cb) {
-  cb(require('prismarine-viewer/public/' + json))
+  cb(require('../../public/' + json))
 }
 
 module.exports = { loadTexture, loadJSON }

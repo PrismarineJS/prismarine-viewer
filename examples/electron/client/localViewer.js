@@ -49,6 +49,12 @@ class LocalViewer {
       this.renderer.render(this.viewer.scene, this.viewer.camera)
     }
     animate()
+
+    window.addEventListener('resize', () => {
+      this.viewer.camera.aspect = window.innerWidth / window.innerHeight
+      this.viewer.camera.updateProjectionMatrix()
+      this.renderer.setSize(window.innerWidth, window.innerHeight)
+    })
   }
 }
 
