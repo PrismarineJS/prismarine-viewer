@@ -1,0 +1,14 @@
+{
+    "name": "prismarine-viewer-electron",
+    "version": "1.0.0",
+    "description": "prismarine-viewer-electron",
+    "main": "index.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {
+        "prismarine-viewer": "file:../../",
+        "prismarine-provider-anvil": "^2.3.1",
+        "electron": "^11.0.2"
+    }
+}

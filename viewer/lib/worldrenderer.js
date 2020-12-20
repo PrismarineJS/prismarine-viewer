@@ -1,20 +1,19 @@
-/* global THREE Worker */
+/* global Worker */
+const THREE = require('three')
 const Vec3 = require('vec3').Vec3
+const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
 
 function mod (x, n) {
   return ((x % n) + n) % n
 }
 
 class WorldRenderer {
-  constructor (scene, texture, numWorkers = 4) {
+  constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
     this.scene = scene
     this.loadedChunks = {}
 
-    texture.magFilter = THREE.NearestFilter
-    texture.minFilter = THREE.NearestFilter
-    texture.flipY = false
-    this.material = new THREE.MeshLambertMaterial({ map: texture, vertexColors: true, transparent: true, alphaTest: 0.1 })
+    this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
     this.workers = []
     for (let i = 0; i < numWorkers; i++) {
@@ -58,12 +57,19 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'version', version })
     }
-  }
 
-  setBlocksStates (blockStates) {
-    for (const worker of this.workers) {
-      worker.postMessage({ type: 'blockStates', json: blockStates })
-    }
+    loadTexture(`textures/${version}.png`, texture => {
+      texture.magFilter = THREE.NearestFilter
+      texture.minFilter = THREE.NearestFilter
+      texture.flipY = false
+      this.material.map = texture
+    })
+
+    loadJSON(`blocksStates/${version}.json`, blockStates => {
+      for (const worker of this.workers) {
+        worker.postMessage({ type: 'blockStates', json: blockStates })
+      }
+    })
   }
 
   addColumn (x, z, chunk) {
