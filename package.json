@@ -30,9 +30,7 @@
     "socket.io-client": "^3.0.4",
     "three": "^0.123.0",
     "three.meshline": "^1.3.0",
-    "vec3": "^0.1.7",
-    "webpack": "^5.10.2",
-    "webpack-cli": "^4.2.0"
+    "vec3": "^0.1.7"
   },
   "devDependencies": {
     "jest": "^26.6.3",
@@ -42,6 +40,8 @@
     "mineflayer-pathfinder": "^1.2.2",
     "puppeteer": "^5.5.0",
     "require-self": "^0.2.3",
-    "standard": "^16.0.3"
+    "standard": "^16.0.3",
+    "webpack": "^5.10.2",
+    "webpack-cli": "^4.2.0"
   }
 }
