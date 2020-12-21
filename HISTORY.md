@@ -1,3 +1,6 @@
+### 1.9.3
+* electron path fix
+
 ### 1.9.0
 
 * Refactor package to expose rendering api
