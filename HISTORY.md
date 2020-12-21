@@ -1,3 +1,9 @@
+### 1.9.0
+
+* Refactor package to expose rendering api
+* Add electron demo
+* Add static standalone demo
+
 ### 1.8.0
 
 * Fix dirty chunk unloading bug (thanks @extremeheat)
