@@ -24,6 +24,8 @@ class Viewer {
     this.world = new WorldRenderer(this.scene)
     this.entities = new Entities(this.scene)
     this.primitives = new Primitives(this.scene, this.camera)
+
+    this.domElement = renderer.domElement
   }
 
   setVersion (version) {
@@ -78,6 +80,16 @@ class Viewer {
 
     emitter.on('blockUpdate', ({ pos, stateId }) => {
       this.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
+    })
+
+    this.domElement.addEventListener('pointerdown', (evt) => {
+      const raycaster = new THREE.Raycaster()
+      const mouse = new THREE.Vector2()
+      mouse.x = (evt.clientX / this.domElement.clientWidth) * 2 - 1
+      mouse.y = -(evt.clientY / this.domElement.clientHeight) * 2 + 1
+      raycaster.setFromCamera(mouse, this.camera)
+      const ray = raycaster.ray
+      emitter.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
     })
   }
 }
