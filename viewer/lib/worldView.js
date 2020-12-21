@@ -1,15 +1,16 @@
 const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
+const { RaycastIterator } = require('mineflayer/lib/iterators')
 const EventEmitter = require('events')
 
 class WorldView extends EventEmitter {
-  constructor (world, viewDistance, position = new Vec3(0, 0, 0)) {
+  constructor (world, viewDistance, position = new Vec3(0, 0, 0), emitter = null) {
     super()
     this.world = world
     this.viewDistance = viewDistance
     this.loadedChunks = {}
     this.lastPos = new Vec3(0, 0, 0).update(position)
-    this.emitter = this
+    this.emitter = emitter || this
 
     const worldView = this
     this.listeners = {
@@ -31,10 +32,11 @@ class WorldView extends EventEmitter {
         worldView.emitter.emit('blockUpdate', { pos: oldBlock.position, stateId })
       }
     }
-  }
 
-  forward (emitter) {
-    this.emitter = emitter
+    this.emitter.on('mouseClick', async (click) => {
+      const { block, face } = await this.getClickedBlock(click.origin, click.direction)
+      this.emit('blockClicked', block, face, click.button)
+    })
   }
 
   listenToBot (bot) {
@@ -104,6 +106,22 @@ class WorldView extends EventEmitter {
       })
     }
     this.lastPos.update(pos)
+  }
+
+  async getClickedBlock (viewPos, viewDir, maxDistance = 256) {
+    const iter = new RaycastIterator(new Vec3(viewPos.x, viewPos.y, viewPos.z), new Vec3(viewDir.x, viewDir.y, viewDir.z), maxDistance)
+    let pos = iter.next()
+    while (pos) {
+      const position = new Vec3(pos.x, pos.y, pos.z)
+      const block = await this.world.getBlock(position)
+      // TODO: Check boundingBox of block
+      if (block && block.type !== 0) {
+        block.position = position
+        return { block, face: pos.face }
+      }
+      pos = iter.next()
+    }
+    return { block: null, face: 0 }
   }
 }
 

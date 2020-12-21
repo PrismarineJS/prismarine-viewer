@@ -76,18 +76,14 @@ the emitter should emit these events:
 
 WorldView represents the world from a player/camera point of view
 
-#### WorldView(world, viewDistance, position = new Vec3(0, 0, 0))
+#### WorldView(world, viewDistance, position = new Vec3(0, 0, 0), emitter = null)
 
 Build a WorldView
 
 * world is a prismarine-world
 * viewDistance is the number of considered chunks
 * position is the position of the camera
-
-#### WorldView.forward(emitter)
-
-start emitting to the specified emitter.
-Will emit the events specified above for Viewer
+* emitter is the event emitter to connect (could be null to set emitter to itself or a socket)
 
 #### WorldView.listenToBot(bot)
 
