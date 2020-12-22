@@ -71,6 +71,8 @@ the emitter should emit these events:
 * loadChunk({x, z, chunk}) ; add a column
 * unloadChunk({x, z}) ; removes a column
 * blockUpdate({pos, stateId}) ; update a block
+it also listen to these events:
+* mouseClick({ origin, direction, button })
 
 ### WorldView
 
