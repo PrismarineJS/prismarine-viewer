@@ -1,3 +1,7 @@
+### 1.11.0
+* 1.16.4 support
+* Fix rotations
+
 ### 1.10.0
 
 * Add prefix option
