@@ -132,6 +132,32 @@ function matmul3 (matrix, vector) {
   ]
 }
 
+function matmulmat3 (a, b) {
+  const te = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+  const a11 = a[0][0]; const a12 = a[1][0]; const a13 = a[2][0]
+  const a21 = a[0][1]; const a22 = a[1][1]; const a23 = a[2][1]
+  const a31 = a[0][2]; const a32 = a[1][2]; const a33 = a[2][2]
+
+  const b11 = b[0][0]; const b12 = b[1][0]; const b13 = b[2][0]
+  const b21 = b[0][1]; const b22 = b[1][1]; const b23 = b[2][1]
+  const b31 = b[0][2]; const b32 = b[1][2]; const b33 = b[2][2]
+
+  te[0][0] = a11 * b11 + a12 * b21 + a13 * b31
+  te[1][0] = a11 * b12 + a12 * b22 + a13 * b32
+  te[2][0] = a11 * b13 + a12 * b23 + a13 * b33
+
+  te[0][1] = a21 * b11 + a22 * b21 + a23 * b31
+  te[1][1] = a21 * b12 + a22 * b22 + a23 * b32
+  te[2][1] = a21 * b13 + a22 * b23 + a23 * b33
+
+  te[0][2] = a31 * b11 + a32 * b21 + a33 * b31
+  te[1][2] = a31 * b12 + a32 * b22 + a33 * b32
+  te[2][2] = a31 * b13 + a32 * b23 + a33 * b33
+
+  return te
+}
+
 function buildRotationMatrix (axis, degree) {
   const radians = degree / 180 * Math.PI
   const cos = Math.cos(radians)
@@ -314,12 +340,14 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
 
             for (const axis of ['x', 'y', 'z']) {
               if (axis in variant) {
-                // if (globalMatrix) { console.warn('oh no') }
-                // TODO: matrices should be concatenated (multiplied)
-                globalMatrix = buildRotationMatrix(axis, -variant[axis])
-                globalShift = [8, 8, 8]
-                globalShift = vecsub3(globalShift, matmul3(globalMatrix, globalShift))
+                if (!globalMatrix) globalMatrix = buildRotationMatrix(axis, -variant[axis])
+                else globalMatrix = matmulmat3(globalMatrix, buildRotationMatrix(axis, -variant[axis]))
               }
+            }
+
+            if (globalMatrix) {
+              globalShift = [8, 8, 8]
+              globalShift = vecsub3(globalShift, matmul3(globalMatrix, globalShift))
             }
 
             for (const element of variant.model.elements) {
