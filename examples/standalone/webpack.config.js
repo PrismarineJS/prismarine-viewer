@@ -8,6 +8,15 @@ const config = {
     path: path.resolve(__dirname, './public'),
     filename: './index.js'
   },
+  resolve: {
+    fallback: {
+      zlib: require.resolve('browserify-zlib'),
+      stream: require.resolve('stream-browserify'),
+      buffer: require.resolve('buffer/'),
+      events: require.resolve('events/'),
+      assert: require.resolve('assert/')
+    }
+  },
   plugins: [
     // fix "process is not defined" error:
     new webpack.ProvidePlugin({
