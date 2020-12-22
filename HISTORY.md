@@ -1,4 +1,10 @@
+### 1.10.0
+
+* Add prefix option
+* Paste schematic in standalone example
+
 ### 1.9.3
+
 * electron path fix
 
 ### 1.9.0
