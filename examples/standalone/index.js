@@ -18,7 +18,7 @@ function getSchematic (url, cb) {
 
 // load and paste a schematic
 getSchematic('smallhouse1.schem', async (data) => {
-  const schem = await Schematic.read(Buffer.from(data), '1.16.1')
+  const schem = await Schematic.read(Buffer.from(data), '1.16.4')
 
   const version = schem.version
   const viewDistance = 6

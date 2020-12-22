@@ -18,7 +18,7 @@
     "canvas": "^2.6.1",
     "compression": "^1.7.4",
     "express": "^4.17.1",
-    "minecraft-assets": "^1.4.0",
+    "minecraft-assets": "^1.5.0",
     "minecraft-data": "^2.70.2",
     "node-canvas-webgl": "^0.2.6",
     "prismarine-block": "^1.7.2",
