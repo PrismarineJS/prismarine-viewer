@@ -18,7 +18,8 @@ const indexConfig = {
       Buffer: ['buffer', 'Buffer']
     }),
     new webpack.NormalModuleReplacementPlugin(
-      /viewer\/lib\/utils/,
+      // eslint-disable-next-line
+      /viewer[\/|\\]lib[\/|\\]utils/,
       './utils.web.js'
     )
   ]
