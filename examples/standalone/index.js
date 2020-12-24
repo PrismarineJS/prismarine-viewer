@@ -1,5 +1,5 @@
 /* global THREE XMLHttpRequest */
-const { WorldView, Viewer } = require('prismarine-viewer/viewer')
+const { WorldView, Viewer, MapControls } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
@@ -58,7 +58,7 @@ getSchematic('smallhouse1.schem', async (data) => {
   const viewer = new Viewer(renderer)
   viewer.setVersion(version)
   // Attach controls to viewer
-  const controls = new THREE.OrbitControls(viewer.camera, renderer.domElement)
+  const controls = new MapControls(viewer.camera, renderer.domElement)
 
   // Link WorldView and Viewer
   viewer.listen(worldView)
