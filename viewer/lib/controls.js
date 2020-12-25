@@ -41,7 +41,7 @@ class CustomControls {
 
     // How far you can dolly in and out ( PerspectiveCamera only )
     this.minDistance = 0
-    this.maxDistance = Infinity
+    this.maxDistance = 100
 
     // How far you can zoom in and out ( OrthographicCamera only )
     this.minZoom = 0
@@ -78,6 +78,7 @@ class CustomControls {
     this.enableTouchPan = true
     this.panSpeed = 1.0
     this.screenSpacePanning = false // if false, pan orthogonal to world-space direction camera.up
+    this.keyPanDistance = 32 // how far to pan
     this.keyPanSpeed = 10	// pixels moved per arrow key push
     this.verticalTranslationSpeed = 0.5 // how much Y increments moving up/down
 
@@ -163,7 +164,7 @@ class CustomControls {
   update(force) {
     // tick controls if called from render loop
     if (!force) {
-      this.tickContols()
+      this.tickControls()
     }
 
     var offset = new THREE.Vector3()
@@ -319,7 +320,7 @@ class CustomControls {
   }
 
   // deltaX and deltaY are in pixels; right and down are positive
-  pan(deltaX, deltaY) {
+  pan(deltaX, deltaY, distance) {
     let offset = new THREE.Vector3()
 
     if (this.object.isPerspectiveCamera) {
@@ -330,6 +331,7 @@ class CustomControls {
 
       // half of the fov is center to top of screen
       targetDistance *= Math.tan((this.object.fov / 2) * Math.PI / 180.0)
+      targetDistance = distance || targetDistance
 
       // we use only clientHeight here so aspect ratio does not distort speed
       this.panLeft(2 * deltaX * targetDistance / this.element.clientHeight, this.object.matrix)
@@ -716,18 +718,18 @@ class CustomControls {
 
   //#endregion
 
-  tickContols = () => {
+  tickControls = () => {
     const control = this.controlMap
 
     for (var keyCode of this.keyDowns) {
       if (control.MOVE_FORWARD.includes(keyCode)) {
-        this.pan(0, this.keyPanSpeed)
+        this.pan(0, this.keyPanSpeed, this.keyPanDistance)
       } else if (control.MOVE_BACKWARD.includes(keyCode)) {
-        this.pan(0, -this.keyPanSpeed)
+        this.pan(0, -this.keyPanSpeed, this.keyPanDistance)
       } else if (control.MOVE_LEFT.includes(keyCode)) {
-        this.pan(this.keyPanSpeed, 0)
+        this.pan(this.keyPanSpeed, 0, this.keyPanDistance)
       } else if (control.MOVE_RIGHT.includes(keyCode)) {
-        this.pan(-this.keyPanSpeed, 0)
+        this.pan(-this.keyPanSpeed, 0, this.keyPanDistance)
       } else if (control.MOVE_UP.includes(keyCode)) {
         this.translateY(+this.verticalTranslationSpeed)
       } else if (control.MOVE_DOWN.includes(keyCode)) {
@@ -912,9 +914,9 @@ class CustomControls {
   }
 
   registerHandlers() {
-    this.element.ownerDocument.addEventListener('pointermove', this.onPointerMove, false)
-    this.element.ownerDocument.addEventListener('pointerup', this.onPointerUp, false)
-    this.element.ownerDocument.addEventListener('pointerdown', this.onPointerDown, false)
+    this.element.addEventListener('pointermove', this.onPointerMove, false)
+    this.element.addEventListener('pointerup', this.onPointerUp, false)
+    this.element.addEventListener('pointerdown', this.onPointerDown, false)
     this.element.addEventListener('wheel', this.onMouseWheel, true)
 
     this.element.addEventListener('touchstart', this.onTouchStart, false)
@@ -928,20 +930,18 @@ class CustomControls {
   }
 
   unregisterHandlers() {
-    this.element.removeEventListener('contextmenu', this.onContextMenu, false)
-
+    this.element.removeEventListener('pointermove', this.onPointerMove, false)
+    this.element.removeEventListener('pointerup', this.onPointerUp, false)
     this.element.removeEventListener('pointerdown', this.onPointerDown, false)
     this.element.removeEventListener('wheel', this.onMouseWheel, false)
 
     this.element.removeEventListener('touchstart', this.onTouchStart, false)
     this.element.removeEventListener('touchend', this.onTouchEnd, false)
     this.element.removeEventListener('touchmove', this.onTouchMove, false)
-
-    this.element.ownerDocument.removeEventListener('pointermove', this.onPointerMove, false)
-    this.element.ownerDocument.removeEventListener('pointerup', this.onPointerUp, false)
-
-    this.element.removeEventListener('keydown', this.onKeyDown, false)
-    this.element.removeEventListener('keyup', this.onKeyUp, false)
+    
+    this.element.ownerDocument.removeEventListener('contextmenu', this.onContextMenu, false)
+    this.element.ownerDocument.removeEventListener('keydown', this.onKeyDown, false)
+    this.element.ownerDocument.removeEventListener('keyup', this.onKeyUp, false)
   }
 
   dispatchEvent = () => {
