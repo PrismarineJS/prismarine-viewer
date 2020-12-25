@@ -28,7 +28,7 @@
     "protodef": "^1.8.3",
     "socket.io": "^3.0.4",
     "socket.io-client": "^3.0.4",
-    "three": "^0.123.0",
+    "three": "^0.124.0",
     "three.meshline": "^1.3.0",
     "vec3": "^0.1.7"
   },
