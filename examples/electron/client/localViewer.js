@@ -2,7 +2,6 @@
 const { WorldView, Viewer, MapControls } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
-require('three/examples/js/controls/OrbitControls')
 
 class LocalViewer {
   constructor (version, savePath, viewDistance = 4) {

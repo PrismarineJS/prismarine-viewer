@@ -2,7 +2,6 @@
 const { WorldView, Viewer, MapControls } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
-require('three/examples/js/controls/OrbitControls')
 
 const { Schematic } = require('prismarine-schematic')
 

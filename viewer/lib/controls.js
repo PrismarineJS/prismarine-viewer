@@ -121,6 +121,19 @@ class MapControls {
     this.ticks = 0
 
     // register event handlers
+    this.onPointerMove = this.onPointerMove.bind(this)
+    this.onPointerUp = this.onPointerUp.bind(this)
+    this.onPointerDown = this.onPointerDown.bind(this)
+    this.onMouseWheel = this.onMouseWheel.bind(this)
+    
+    this.onTouchStart = this.onTouchStart.bind(this)
+    this.onTouchEnd = this.onTouchEnd.bind(this)
+    this.onTouchMove = this.onTouchMove.bind(this)
+
+    this.onContextMenu = this.onContextMenu.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
+
     this.registerHandlers()
   }
 
@@ -871,18 +884,18 @@ class MapControls {
   }
 
   registerHandlers() {
-    this.element.addEventListener('pointermove', this.onPointerMove.bind(this), false)
-    this.element.addEventListener('pointerup', this.onPointerUp.bind(this), false)
-    this.element.addEventListener('pointerdown', this.onPointerDown.bind(this), false)
-    this.element.addEventListener('wheel', this.onMouseWheel.bind(this), true)
+    this.element.addEventListener('pointermove', this.onPointerMove, false)
+    this.element.addEventListener('pointerup', this.onPointerUp, false)
+    this.element.addEventListener('pointerdown', this.onPointerDown, false)
+    this.element.addEventListener('wheel', this.onMouseWheel, true)
 
-    this.element.addEventListener('touchstart', this.onTouchStart.bind(this), false)
-    this.element.addEventListener('touchend', this.onTouchEnd.bind(this), false)
-    this.element.addEventListener('touchmove', this.onTouchMove.bind(this), false)
+    this.element.addEventListener('touchstart', this.onTouchStart, false)
+    this.element.addEventListener('touchend', this.onTouchEnd, false)
+    this.element.addEventListener('touchmove', this.onTouchMove, false)
 
-    this.element.ownerDocument.addEventListener('contextmenu', this.onContextMenu.bind(this), false)
-    this.element.ownerDocument.addEventListener('keydown', this.onKeyDown.bind(this), false)
-    this.element.ownerDocument.addEventListener('keyup', this.onKeyUp.bind(this), false)
+    this.element.ownerDocument.addEventListener('contextmenu', this.onContextMenu, false)
+    this.element.ownerDocument.addEventListener('keydown', this.onKeyDown, false)
+    this.element.ownerDocument.addEventListener('keyup', this.onKeyUp, false)
     console.log('[controls] registered handlers', this.element)
   }
 
@@ -890,7 +903,7 @@ class MapControls {
     this.element.removeEventListener('pointermove', this.onPointerMove, false)
     this.element.removeEventListener('pointerup', this.onPointerUp, false)
     this.element.removeEventListener('pointerdown', this.onPointerDown, false)
-    this.element.removeEventListener('wheel', this.onMouseWheel, false)
+    this.element.removeEventListener('wheel', this.onMouseWheel, true)
 
     this.element.removeEventListener('touchstart', this.onTouchStart, false)
     this.element.removeEventListener('touchend', this.onTouchEnd, false)
@@ -899,6 +912,7 @@ class MapControls {
     this.element.ownerDocument.removeEventListener('contextmenu', this.onContextMenu, false)
     this.element.ownerDocument.removeEventListener('keydown', this.onKeyDown, false)
     this.element.ownerDocument.removeEventListener('keyup', this.onKeyUp, false)
+    console.log('[controls] unregistered handlers', this.element)
   }
 
   dispatchEvent() {
