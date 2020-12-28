@@ -1,3 +1,6 @@
+### 1.11.1
+* use iterators from pworld
+
 ### 1.11.0
 * 1.16.4 support
 * Fix rotations
