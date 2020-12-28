@@ -1,6 +1,6 @@
 const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
-const { RaycastIterator } = require('mineflayer/lib/iterators')
+const { RaycastIterator } = require('prismarine-world').iterators
 const EventEmitter = require('events')
 
 class WorldView extends EventEmitter {
