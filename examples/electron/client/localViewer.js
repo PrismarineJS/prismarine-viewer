@@ -1,8 +1,7 @@
 /* global THREE */
-const { WorldView, Viewer } = require('prismarine-viewer/viewer')
+const { WorldView, Viewer, MapControls } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
-require('three/examples/js/controls/OrbitControls')
 
 class LocalViewer {
   constructor (version, savePath, viewDistance = 4) {
@@ -31,7 +30,10 @@ class LocalViewer {
     this.viewer = new Viewer(this.renderer)
     this.viewer.setVersion(this.version)
     // Attach controls to viewer
-    this.controls = new THREE.OrbitControls(this.viewer.camera, this.renderer.domElement)
+    this.controls = new MapControls(this.viewer.camera, this.renderer.domElement)
+    // Enable damping (inertia) on movement
+    this.controls.enableDamping = true
+    this.controls.dampingFactor = 0.09
 
     // Link WorldView and Viewer
     this.viewer.listen(this.worldView)
