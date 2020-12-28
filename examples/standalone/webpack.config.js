@@ -26,7 +26,7 @@ const config = {
       Buffer: ['buffer', 'Buffer']
     }),
     new webpack.NormalModuleReplacementPlugin(
-      /prismarine-viewer\/viewer\/lib\/utils/,
+      /prismarine-viewer[/|\\]viewer[/|\\]lib[/|\\]utils/,
       './utils.web.js'
     ),
     new CopyPlugin({

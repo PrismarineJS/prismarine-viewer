@@ -16,7 +16,7 @@ const STATE = {
   TOUCH_DOLLY_ROTATE: 6
 }
 
-class CustomControls {
+class MapControls {
   constructor(camera, domElement) {
     this.enabled = true
     this.object = camera
@@ -41,7 +41,7 @@ class CustomControls {
 
     // How far you can dolly in and out ( PerspectiveCamera only )
     this.minDistance = 0
-    this.maxDistance = 100
+    this.maxDistance = Infinity
 
     // How far you can zoom in and out ( OrthographicCamera only )
     this.minZoom = 0
@@ -54,7 +54,7 @@ class CustomControls {
 
     // How far you can orbit horizontally, upper and lower limits.
     // If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
-    this.minAzimuthAngle = - Infinity // radians
+    this.minAzimuthAngle = -Infinity // radians
     this.maxAzimuthAngle = Infinity // radians
 
     // Set to true to enable damping (inertia)
@@ -313,10 +313,9 @@ class CustomControls {
     this.panOffset.add(v)
   }
 
-  // Patch - translate Y and update target
+  // Patch - translate Y
   translateY(delta) {
-    this.object.position.y += delta
-    this.target.add(new THREE.Vector3(0, delta, 0))
+    this.panOffset.y += delta
   }
 
   // deltaX and deltaY are in pixels; right and down are positive
@@ -445,7 +444,7 @@ class CustomControls {
   //#region Mouse/Keyboard handlers
 
   // Called when the cursor location has moved
-  onPointerMove = (event) => {
+  onPointerMove(event) {
     if (!this.enabled || (this.state == STATE.NONE)) return
 
     switch (event.pointerType) {
@@ -458,7 +457,7 @@ class CustomControls {
   }
 
   // Called when the cursor is no longer behind held
-  onPointerUp = (event) => {
+  onPointerUp(event) {
     if (!this.enabled) return
     switch (event.pointerType) {
       case 'mouse':
@@ -470,7 +469,7 @@ class CustomControls {
   }
 
   // On left click or tap
-  onPointerDown = (event) => {
+  onPointerDown(event) {
     if (!this.enabled) return
 
     switch (event.pointerType) {
@@ -566,7 +565,7 @@ class CustomControls {
     this.state = STATE.NONE
   }
 
-  onMouseWheel = (event) => {
+  onMouseWheel(event) {
     if (this.enabled === false || this.enableZoom === false || (this.state !== STATE.NONE && this.state !== STATE.ROTATE)) return
     event.preventDefault()
     event.stopPropagation()
@@ -718,7 +717,7 @@ class CustomControls {
 
   //#endregion
 
-  tickControls = () => {
+  tickControls() {
     const control = this.controlMap
 
     for (var keyCode of this.keyDowns) {
@@ -738,7 +737,7 @@ class CustomControls {
     }
   }
 
-  onKeyDown = (e) => {
+  onKeyDown(e) {
     if (!this.enabled) return
 
     if (e.code && !this.keyDowns.includes(e.code)) {
@@ -747,98 +746,56 @@ class CustomControls {
     }
   }
 
-  onKeyUp = (event) => {
+  onKeyUp(event) {
     // console.log('[control] Key up: ', event.code, this.keyDowns)
     this.keyDowns = this.keyDowns.filter(code => code != event.code)
   }
 
-  onTouchStart = (event) => {
-
+  onTouchStart(event) {
     if (this.enabled === false) return
-
     event.preventDefault() // prevent scrolling
-
     switch (event.touches.length) {
-
       case 1:
-
         switch (this.touches.ONE) {
-
           case THREE.TOUCH.ROTATE:
-
             if (this.enableTouchRotate === false) return
-
             this.handleTouchStartRotate(event)
-
             this.state = STATE.TOUCH_ROTATE
-
             break
-
           case THREE.TOUCH.PAN:
-
             if (this.enableTouchPan === false) return
-
             this.handleTouchStartPan(event)
-
             this.state = STATE.TOUCH_PAN
-
             break
-
           default:
-
             this.state = STATE.NONE
-
         }
-
         break
-
       case 2:
-
         switch (this.touches.TWO) {
-
           case THREE.TOUCH.DOLLY_PAN:
-
             if (this.enableTouchZoom === false && this.enableTouchPan === false) return
-
             this.handleTouchStartDollyPan(event)
-
             this.state = STATE.TOUCH_DOLLY_PAN
-
             break
-
           case THREE.TOUCH.DOLLY_ROTATE:
-
             if (this.enableTouchZoom === false && this.enableTouchRotate === false) return
-
             this.handleTouchStartDollyRotate(event)
-
             this.state = STATE.TOUCH_DOLLY_ROTATE
-
             break
-
           default:
-
             this.state = STATE.NONE
-
         }
-
         break
-
       default:
-
         this.state = STATE.NONE
-
     }
-
     if (this.state !== STATE.NONE) {
-
       this.dispatchEvent(this.startEvent)
-
     }
-
   }
 
-  onTouchMove = (event) => {
+  onTouchMove(event) {
 
     if (this.enabled === false) return
 
@@ -895,7 +852,7 @@ class CustomControls {
 
   }
 
-  onTouchEnd = (event) => {
+  onTouchEnd(event) {
 
     if (this.enabled === false) return
 
@@ -908,24 +865,24 @@ class CustomControls {
   }
 
 
-  onContextMenu = (event) => {
+  onContextMenu(event) {
     // Disable context menu
     if (this.enabled) event.preventDefault()
   }
 
   registerHandlers() {
-    this.element.addEventListener('pointermove', this.onPointerMove, false)
-    this.element.addEventListener('pointerup', this.onPointerUp, false)
-    this.element.addEventListener('pointerdown', this.onPointerDown, false)
-    this.element.addEventListener('wheel', this.onMouseWheel, true)
+    this.element.addEventListener('pointermove', this.onPointerMove.bind(this), false)
+    this.element.addEventListener('pointerup', this.onPointerUp.bind(this), false)
+    this.element.addEventListener('pointerdown', this.onPointerDown.bind(this), false)
+    this.element.addEventListener('wheel', this.onMouseWheel.bind(this), true)
 
-    this.element.addEventListener('touchstart', this.onTouchStart, false)
-    this.element.addEventListener('touchend', this.onTouchEnd, false)
-    this.element.addEventListener('touchmove', this.onTouchMove, false)
+    this.element.addEventListener('touchstart', this.onTouchStart.bind(this), false)
+    this.element.addEventListener('touchend', this.onTouchEnd.bind(this), false)
+    this.element.addEventListener('touchmove', this.onTouchMove.bind(this), false)
 
-    this.element.ownerDocument.addEventListener('contextmenu', this.onContextMenu, false)
-    this.element.ownerDocument.addEventListener('keydown', this.onKeyDown, false)
-    this.element.ownerDocument.addEventListener('keyup', this.onKeyUp, false)
+    this.element.ownerDocument.addEventListener('contextmenu', this.onContextMenu.bind(this), false)
+    this.element.ownerDocument.addEventListener('keydown', this.onKeyDown.bind(this), false)
+    this.element.ownerDocument.addEventListener('keyup', this.onKeyUp.bind(this), false)
     console.log('[controls] registered handlers', this.element)
   }
 
@@ -938,15 +895,15 @@ class CustomControls {
     this.element.removeEventListener('touchstart', this.onTouchStart, false)
     this.element.removeEventListener('touchend', this.onTouchEnd, false)
     this.element.removeEventListener('touchmove', this.onTouchMove, false)
-    
+
     this.element.ownerDocument.removeEventListener('contextmenu', this.onContextMenu, false)
     this.element.ownerDocument.removeEventListener('keydown', this.onKeyDown, false)
     this.element.ownerDocument.removeEventListener('keyup', this.onKeyUp, false)
   }
 
-  dispatchEvent = () => {
+  dispatchEvent() {
     // no-op
   }
 }
 
-module.exports = { CustomControls }
+module.exports = { MapControls }
