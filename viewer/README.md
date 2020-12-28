@@ -110,3 +110,33 @@ emit unload chunk at this position
 #### WorldView.updatePosition(pos)
 
 change the camera position, and emit corresponding events
+
+### MapControls
+
+Default third person controls based on three.js OrbitControls. Refer to the [documentation here](https://threejs.org/docs/#examples/en/controls/OrbitControls). Controls are applied on animation loop, so you need to call `controls.update()` in your render loop.
+
+##### .controlMap
+The keyboard controls to use. You can provide an array for any of the keys that bind to an action. Defaults:
+
+```js
+this.controlMap = {
+  MOVE_FORWARD: ['KeyW', 'KeyZ'],
+  MOVE_BACKWARD: 'KeyS',
+  MOVE_LEFT: ['KeyA', 'KeyQ'],
+  MOVE_RIGHT: 'KeyD',
+  MOVE_DOWN: 'ShiftLeft',
+  MOVE_UP: 'Space'
+}
+```
+
+##### setRotationOrigin(pos: THREE.Vector3)
+Sets the center point for rotations
+
+##### .verticalTranslationSpeed
+How much the y axis is offset for each vertical translation (movement up and down). To control panning speed for the x/z axis, adjust [`.keyPanSpeed`](https://threejs.org/docs/#examples/en/controls/OrbitControls.keyPanSpeed)
+
+##### .enableTouchZoom, .enableTouchRotate, .enableTouchPan
+Booleans to toggle touch interaction
+
+##### .registerHandlers(), .unregisterHandlers()
+Enables and disables DOM event handling. Useful if you only want to programatically adjust the controls.
