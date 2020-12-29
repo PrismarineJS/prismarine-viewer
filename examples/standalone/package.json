@@ -6,13 +6,15 @@
     "scripts": {
         "prepare": "webpack",
         "start": "webpack serve",
-        "prod-start": "http-server public/"
+        "prod-start": "http-server public/",
+        "build-start": "npm run prepare && npm run prod-start"
     },
     "dependencies": {
         "assert": "^2.0.0",
         "browserify-zlib": "^0.2.0",
         "buffer": "^6.0.3",
         "copy-webpack-plugin": "^7.0.0",
+        "diamond-square": "^1.2.0",
         "events": "^3.2.0",
         "prismarine-schematic": "^1.0.0",
         "prismarine-viewer": "file:../../",
