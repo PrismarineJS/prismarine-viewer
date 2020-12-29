@@ -58,18 +58,24 @@ class WorldView extends EventEmitter {
     }
   }
 
-  init (pos) {
+  async init (pos) {
     const [botX, botZ] = chunkPos(pos)
 
-    const l = []
+    const positions = []
     spiral(this.viewDistance * 2, this.viewDistance * 2, (x, z) => {
       const p = new Vec3((botX + x) * 16, 0, (botZ + z) * 16)
-      l.push(p)
+      positions.push(p)
     })
 
-    l.reduce((acc, p) => acc.then(() => new Promise((resolve) => setTimeout(resolve, 0)).then(() => this.loadChunk(p))), Promise.resolve())
-
     this.lastPos.update(pos)
+    await this._loadChunks(positions)
+  }
+
+  async _loadChunks (positions, sliceSize = 5, waitTime = 0) {
+    for (let i = 0; i < positions.length; i += sliceSize) {
+      await new Promise((resolve) => setTimeout(resolve, waitTime))
+      await Promise.all(positions.slice(i, i + sliceSize).map(p => this.loadChunk(p)))
+    }
   }
 
   async loadChunk (pos) {
@@ -91,7 +97,7 @@ class WorldView extends EventEmitter {
     delete this.loadedChunks[`${pos.x},${pos.z}`]
   }
 
-  updatePosition (pos) {
+  async updatePosition (pos) {
     const [lastX, lastZ] = chunkPos(this.lastPos)
     const [botX, botZ] = chunkPos(pos)
     if (lastX !== botX || lastZ !== botZ) {
@@ -104,17 +110,18 @@ class WorldView extends EventEmitter {
           this.unloadChunk(p)
         }
       }
-      const l = []
+      const positions = []
       spiral(this.viewDistance * 2, this.viewDistance * 2, (x, z) => {
         const p = new Vec3((botX + x) * 16, 0, (botZ + z) * 16)
         if (!this.loadedChunks[`${p.x},${p.z}`]) {
-          l.push(p)
+          positions.push(p)
         }
       })
-
-      l.reduce((acc, p) => acc.then(() => new Promise((resolve) => setTimeout(resolve, 0)).then(() => this.loadChunk(p))), Promise.resolve())
+      this.lastPos.update(pos)
+      await this._loadChunks(positions)
+    } else {
+      this.lastPos.update(pos)
     }
-    this.lastPos.update(pos)
   }
 
   async getClickedBlock (viewPos, viewDir, maxDistance = 256) {
