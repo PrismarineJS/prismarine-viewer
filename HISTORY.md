@@ -1,3 +1,6 @@
+### 1.12.0
+* add keyboard controls (@extremeheat)
+
 ### 1.11.1
 * use iterators from pworld
 
