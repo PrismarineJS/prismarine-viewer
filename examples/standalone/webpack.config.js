@@ -3,6 +3,7 @@ const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 
 const config = {
+  mode: 'production',
   entry: path.resolve(__dirname, './index.js'),
   output: {
     path: path.resolve(__dirname, './public'),
@@ -38,7 +39,6 @@ const config = {
       ]
     })
   ],
-
   devServer: {
     contentBase: path.resolve(__dirname, './public'),
     compress: true,
@@ -48,8 +48,7 @@ const config = {
     watchOptions: {
       ignored: /node_modules/
     }
-  },
-  devtool: 'eval-source-map'
+  }
 }
 
 module.exports = config
