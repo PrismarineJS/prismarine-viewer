@@ -4,7 +4,7 @@ const path = require('path')
 
 const indexConfig = {
   entry: './lib/index.js',
-  mode: 'development',
+  mode: 'production',
   output: {
     path: path.resolve(__dirname, './public'),
     filename: './index.js'
@@ -27,7 +27,7 @@ const indexConfig = {
 
 const workerConfig = {
   entry: './viewer/lib/worker.js',
-  mode: 'development',
+  mode: 'production',
   output: {
     path: path.join(__dirname, '/public'),
     filename: './worker.js'
