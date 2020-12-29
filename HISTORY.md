@@ -1,3 +1,8 @@
+### 1.13.0
+
+* make init and updatePosition not blocking for a faster apparent rendering
+* use production mode webpack
+
 ### 1.12.0
 * add keyboard controls (@extremeheat)
 
