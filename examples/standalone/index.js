@@ -1,48 +1,25 @@
-/* global THREE XMLHttpRequest */
+/* global THREE, fetch */
 const { WorldView, Viewer, MapControls } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
+const { Schematic } = require('prismarine-schematic')
 global.THREE = require('three')
 
-const { Schematic } = require('prismarine-schematic')
+async function main () {
+  const version = '1.16.4'
+  const data = await fetch('smallhouse1.schem').then(r => r.arrayBuffer())
+  const schem = await Schematic.read(Buffer.from(data), version)
 
-function getSchematic (url, cb) {
-  const oReq = new XMLHttpRequest()
-  oReq.open('GET', url, true)
-  oReq.responseType = 'arraybuffer'
-  oReq.onload = () => {
-    cb(oReq.response)
-  }
-  oReq.send(null)
-}
-
-// load and paste a schematic
-getSchematic('smallhouse1.schem', async (data) => {
-  const schem = await Schematic.read(Buffer.from(data), '1.16.4')
-
-  const version = schem.version
-  const viewDistance = 6
+  const viewDistance = 20
   const center = new Vec3(0, 90, 0)
 
   const World = require('prismarine-world')(version)
-  const Chunk = require('prismarine-chunk')(version)
 
-  const chunkGenerator = (chunkX, chunkZ) => {
-    const chunk = new Chunk()
-    const p = new Vec3(0, 0, 0)
-    for (p.y = 59; p.y < 60; p.y++) {
-      for (p.x = 0; p.x < 16; p.x++) {
-        for (p.z = 0; p.z < 16; p.z++) {
-          chunk.setBlockStateId(p, 1)
-        }
-      }
-    }
-    return chunk
-  }
-
-  const world = new World(chunkGenerator)
-  const worldView = new WorldView(world, viewDistance, center)
+  const diamondSquare = require('diamond-square')({ version, seed: Math.floor(Math.random() * Math.pow(2, 31)) })
+  const world = new World(diamondSquare)
 
   await schem.paste(world, new Vec3(0, 60, 0))
+
+  const worldView = new WorldView(world, viewDistance, center)
 
   // Create three.js context, add to page
   const renderer = new THREE.WebGLRenderer()
@@ -72,4 +49,5 @@ getSchematic('smallhouse1.schem', async (data) => {
     renderer.render(viewer.scene, viewer.camera)
   }
   animate()
-})
+}
+main()
