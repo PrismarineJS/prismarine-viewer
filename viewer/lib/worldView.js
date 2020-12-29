@@ -60,9 +60,15 @@ class WorldView extends EventEmitter {
 
   init (pos) {
     const [botX, botZ] = chunkPos(pos)
+
+    const l = []
     spiral(this.viewDistance * 2, this.viewDistance * 2, (x, z) => {
-      this.loadChunk(new Vec3((botX + x) * 16, 0, (botZ + z) * 16))
+      const p = new Vec3((botX + x) * 16, 0, (botZ + z) * 16)
+      l.push(p)
     })
+
+    l.reduce((acc, p) => acc.then(() => new Promise((resolve) => setTimeout(resolve, 0)).then(() => this.loadChunk(p))), Promise.resolve())
+
     this.lastPos.update(pos)
   }
 
@@ -98,12 +104,15 @@ class WorldView extends EventEmitter {
           this.unloadChunk(p)
         }
       }
+      const l = []
       spiral(this.viewDistance * 2, this.viewDistance * 2, (x, z) => {
         const p = new Vec3((botX + x) * 16, 0, (botZ + z) * 16)
         if (!this.loadedChunks[`${p.x},${p.z}`]) {
-          this.loadChunk(p)
+          l.push(p)
         }
       })
+
+      l.reduce((acc, p) => acc.then(() => new Promise((resolve) => setTimeout(resolve, 0)).then(() => this.loadChunk(p))), Promise.resolve())
     }
     this.lastPos.update(pos)
   }
