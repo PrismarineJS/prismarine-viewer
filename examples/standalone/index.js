@@ -9,7 +9,7 @@ async function main () {
   const data = await fetch('smallhouse1.schem').then(r => r.arrayBuffer())
   const schem = await Schematic.read(Buffer.from(data), version)
 
-  const viewDistance = 20
+  const viewDistance = 10
   const center = new Vec3(0, 90, 0)
 
   const World = require('prismarine-world')(version)
