@@ -49,6 +49,12 @@ More examples:
 * Record view as video file [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/headless.js)
 * Streaming video to a python script [example](https://github.com/PrismarineJS/prismarine-viewer/tree/master/examples/python)
 * Visualize a world, without a bot [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/standalone.js)
+* Visualize the world coming from a proxy [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/proxy.js)
+* Click to move [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/clickmove.js)
+* Use the core api for viewing worlds [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/core)
+* Create an electron app with viewer [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/electron)
+* Create a fully front end viewer with an in memory world [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/standalone)
+* A minecraft web client example, using mineflayer and a websocket proxy [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/web_client)
 
 ## API
 
