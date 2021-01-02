@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "prismarine-schematic": "^1.1.2"
+    "blob-polyfill": "^4.0.20200601",
+    "filereader": "^0.10.3",
+    "prismarine-schematic": "^1.1.2",
+    "three-stlexporter": "rom1504/three-STLexporter"
   }
 }
