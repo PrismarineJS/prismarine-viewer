@@ -56,13 +56,8 @@ async function main () {
 
     bot.on('move', botPosition)
 
-    bot.on('chunkColumnLoad', () => {
-      console.log('chunkload')
-    })
-
     // Link WorldView and Viewer
     viewer.listen(worldView)
-
     viewer.camera.position.set(center.x, center.y, center.z)
 
     function moveCallback (e) {
@@ -102,6 +97,10 @@ async function main () {
         bot.setControlState('left', true)
       } else if (e.code === 'Space') {
         bot.setControlState('jump', true)
+      } else if (e.code === 'ShiftLeft') {
+        bot.setControlState('sneak', true)
+      } else if (e.code === 'ControlLeft') {
+        bot.setControlState('sprint', true)
       }
     }, false)
     document.addEventListener('keyup', (e) => {
@@ -115,6 +114,10 @@ async function main () {
         bot.setControlState('left', false)
       } else if (e.code === 'Space') {
         bot.setControlState('jump', false)
+      } else if (e.code === 'ShiftLeft') {
+        bot.setControlState('sneak', false)
+      } else if (e.code === 'ControlLeft') {
+        bot.setControlState('sprint', false)
       }
     }, false)
 
