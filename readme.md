@@ -55,6 +55,7 @@ More examples:
 * Create an electron app with viewer [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/electron)
 * Create a fully front end viewer with an in memory world [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/standalone)
 * A minecraft web client example, using mineflayer and a websocket proxy [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/web_client)
+* Export parts of worlds as screenshot or 3d models [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/exporter)
 
 ## API
 
