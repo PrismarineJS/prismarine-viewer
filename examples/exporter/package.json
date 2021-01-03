@@ -1,0 +1,17 @@
+{
+  "name": "exporter",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "prismarine-schematic": "^1.1.2",
+    "three-stlexporter": "rom1504/three-STLexporter",
+    "vblob": "^1.0.2",
+    "three-gltf-exporter": "rom1504/three-gltf-exporter"
+  }
+}
