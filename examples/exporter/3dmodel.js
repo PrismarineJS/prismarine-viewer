@@ -6,7 +6,7 @@ This is an example of using only the core API (.viewer) to implement rendering a
 
 global.THREE = require('three')
 global.Worker = require('worker_threads').Worker
-const { createCanvas } = require('node-canvas-webgl/lib')
+const { createCanvas, ImageData } = require('node-canvas-webgl/lib')
 const { Schematic } = require('prismarine-schematic')
 const fs = require('fs').promises
 const Vec3 = require('vec3').Vec3
@@ -53,15 +53,28 @@ const main = async () => {
   const STLExporter = require('three-stlexporter')
   await fs.writeFile('model.stl', Buffer.from(new STLExporter().parse(viewer.scene)))
 
-  global.Blob = require('blob-polyfill').Blob
-  global.window = { FileReader: require('filereader') }
+  const { Blob, FileReader } = require('vblob')
 
-  /*
-  require('three/examples/js/exporters/GLTFExporter')
-  await fs.writeFile('model.gltf', await new Promise(resolve => new THREE.GLTFExporter().parse(viewer.scene, (a) => console.log(a), {
-    embedImages: false,
-    binary: true
-  }))) */
+  // Patch global scope to imitate browser environment.
+  global.window = global
+  global.Blob = Blob
+  global.FileReader = FileReader
+  global.THREE = THREE
+  global.ImageData = ImageData
+  global.document = {
+    createElement: (nodeName) => {
+      if (nodeName !== 'canvas') throw new Error(`Cannot create node ${nodeName}`)
+      const canvas = createCanvas(256, 256)
+      return canvas
+    }
+  }
+
+  require('three-gltf-exporter')
+  await fs.writeFile('model.gltf', await new Promise(resolve => new THREE.GLTFExporter().parse(viewer.scene, (a) => resolve(JSON.stringify(a)), {
+    embedImages: true,
+    binary: false
+  })))
   console.log('saved')
+  process.exit(0)
 }
 main()
