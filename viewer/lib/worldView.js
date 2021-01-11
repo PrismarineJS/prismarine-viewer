@@ -131,7 +131,7 @@ class WorldView extends EventEmitter {
       const position = new Vec3(pos.x, pos.y, pos.z)
       const block = await this.world.getBlock(position)
       // TODO: Check boundingBox of block
-      if (block && block.type !== 0) {
+      if (block && block.boundingBox !== 'empty') {
         block.position = position
         return { block, face: pos.face }
       }
