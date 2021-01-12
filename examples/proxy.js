@@ -111,8 +111,68 @@ srv.on('login', function (client) {
   })
 
   targetClient.on('chat', (packet) => {
-    console.log(packet.message)
+    // console.log(packet.message)
   })
 
-  mineflayerViewer(bot, { viewDistance: 12, port: 3000 })
+  bot.once('spawn', () => {
+    mineflayerViewer(bot, { viewDistance: 12, port: 3000 })
+
+    let pos1 = null
+    let pos2 = null
+    bot.viewer.on('blockClicked', (block, face, button) => {
+      if (button !== 2) return
+
+      pos2 = pos1
+      pos1 = block.position
+      if (pos1 && pos2) {
+        const start = { x: Math.min(pos1.x, pos2.x), y: Math.min(pos1.y, pos2.y), z: Math.min(pos1.z, pos2.z) }
+        const end = { x: Math.max(pos1.x, pos2.x) + 1, y: Math.max(pos1.y, pos2.y) + 1, z: Math.max(pos1.z, pos2.z) + 1 }
+        bot.viewer.drawBoxGrid('selection', start, end)
+      }
+    })
+
+    const { Schematic } = require('prismarine-schematic')
+    const fs = require('fs').promises
+    const readline = require('readline')
+    const { Vec3 } = require('vec3')
+    const { performance } = require('perf_hooks')
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+    rl.on('line', async (input) => {
+      if (!pos1 || !pos2) {
+        console.log('Select something first.')
+        return
+      }
+      if (input.startsWith('save')) {
+        const file = input.split(' ')[1]
+        console.log(`Saving to: ${file}`)
+
+        const start = new Vec3(Math.min(pos1.x, pos2.x), Math.min(pos1.y, pos2.y), Math.min(pos1.z, pos2.z))
+        const end = new Vec3(Math.max(pos1.x, pos2.x), Math.max(pos1.y, pos2.y), Math.max(pos1.z, pos2.z))
+        const offset = new Vec3(0, 0, 0)
+
+        const t1 = performance.now()
+        const schematic = await Schematic.copy(bot.world, start, end, offset, bot.version)
+        const t2 = performance.now()
+        console.log(`Time: ${t2 - t1} ms`)
+        console.log(schematic.size)
+        await fs.writeFile(file, await schematic.write())
+      } else if (input.startsWith('expand')) {
+        const [, x, y, z] = input.split(' ')
+        const start = new Vec3(Math.min(pos1.x, pos2.x), Math.min(pos1.y, pos2.y), Math.min(pos1.z, pos2.z))
+        const end = new Vec3(Math.max(pos1.x, pos2.x), Math.max(pos1.y, pos2.y), Math.max(pos1.z, pos2.z))
+
+        pos1 = start
+        pos2 = end.offset(parseInt(x, 10), parseInt(y, 10), parseInt(z, 10))
+      } else if (input.startsWith('translate')) {
+        const [, x, y, z] = input.split(' ')
+        pos1 = pos1.offset(parseInt(x, 10), parseInt(y, 10), parseInt(z, 10))
+        pos2 = pos2.offset(parseInt(x, 10), parseInt(y, 10), parseInt(z, 10))
+      }
+
+      const start = { x: Math.min(pos1.x, pos2.x), y: Math.min(pos1.y, pos2.y), z: Math.min(pos1.z, pos2.z) }
+      const end = { x: Math.max(pos1.x, pos2.x) + 1, y: Math.max(pos1.y, pos2.y) + 1, z: Math.max(pos1.z, pos2.z) + 1 }
+      bot.viewer.drawBoxGrid('selection', start, end)
+    })
+  })
 })

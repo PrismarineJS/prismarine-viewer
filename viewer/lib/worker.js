@@ -1,4 +1,4 @@
-/* global postMessage self performance */
+/* global postMessage self */
 
 if (!global.self) {
   // If we are in a node environement, we need to fake some env variables
@@ -59,9 +59,9 @@ setInterval(() => {
   const sections = Object.keys(dirtySections)
 
   if (sections.length === 0) return
-  console.log(sections.length + ' dirty sections')
+  // console.log(sections.length + ' dirty sections')
 
-  const start = performance.now()
+  // const start = performance.now()
   for (const key of sections) {
     let [x, y, z] = key.split(',')
     x = parseInt(x, 10)
@@ -75,6 +75,6 @@ setInterval(() => {
       postMessage({ type: 'geometry', key, geometry }, transferable)
     }
   }
-  const time = performance.now() - start
-  console.log(`Processed ${sections.length} sections in ${time} ms (${time / sections.length} ms/section)`)
+  // const time = performance.now() - start
+  // console.log(`Processed ${sections.length} sections in ${time} ms (${time / sections.length} ms/section)`)
 }, 50)
