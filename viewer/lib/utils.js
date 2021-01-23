@@ -1,5 +1,11 @@
-
-const { loadImage } = require('node-canvas-webgl/lib')
+function safeRequire (path) {
+  try {
+    return require(path)
+  } catch (e) {
+    return {}
+  }
+}
+const { loadImage } = safeRequire('node-canvas-webgl/lib')
 const THREE = require('three')
 const path = require('path')
 
