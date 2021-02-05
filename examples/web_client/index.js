@@ -123,12 +123,16 @@ async function main () {
 
     document.addEventListener('mousedown', (e) => {
       if (e.button === 0) {
-        bot.placeBlock();
+        bot.dig(bot.blockAtCursor());
       } else if (e.button === 1) {
         
       } else if (e.button === 2) {
-        bot.dig();
+        bot.placeBlock(bot.blockAtCursor());
       }
+    }, false)
+
+document.addEventListener('mouseup', (e) => {
+        bot.stopDigging(bot.blockAtCursor());
     }, false)
 
     // Browser animation loop
