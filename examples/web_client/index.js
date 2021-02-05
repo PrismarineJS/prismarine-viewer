@@ -121,7 +121,7 @@ async function main () {
       }
     }, false)
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('mousedown', (e) => {
       if (e.button === 0) {
         bot.placeBlock();
       } else if (e.button === 1) {
