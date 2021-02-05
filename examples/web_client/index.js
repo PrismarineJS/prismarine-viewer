@@ -121,6 +121,16 @@ async function main () {
       }
     }, false)
 
+    document.addEventListener('click', (e) => {
+      if (e.button === 0) {
+        bot.placeBlock();
+      } else if (e.button === 1) {
+        
+      } else if (e.button === 2) {
+        bot.dig();
+      }
+    }, false)
+
     // Browser animation loop
     const animate = () => {
       window.requestAnimationFrame(animate)
