@@ -47,7 +47,7 @@
     "mineflayer-pathfinder": "^1.3.5",
     "prismarine-schematic": "^1.2.0",
     "prismarine-viewer": "file:./",
-    "puppeteer": "^5.5.0",
+    "puppeteer": "^7.0.1",
     "require-self": "^0.2.3",
     "standard": "^16.0.3",
     "webpack": "^5.10.2",
