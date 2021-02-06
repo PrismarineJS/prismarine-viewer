@@ -84,6 +84,7 @@ async function main () {
       renderer.domElement.requestPointerLock()
     })
 
+
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false)
     document.addEventListener('keydown', (e) => {
       console.log(e.code)
@@ -122,11 +123,12 @@ async function main () {
     }, false)
 
     document.addEventListener('mousedown', (e) => {
-      const ButtonBlock = bot.blockAtCursor();
+      let BlockDistance = (bot.gamemode == 1 ) ? 8 : 5;
+      const ButtonBlock = bot.blockAtCursor(BlockDistance);
       if (!ButtonBlock) return;
       if (e.button === 0) {
         if (bot.canDigBlock(ButtonBlock)) {
-             bot.dig(ButtonBlock);
+          bot.dig(ButtonBlock);
         }
       } else if (e.button === 1) {
         
@@ -136,7 +138,7 @@ async function main () {
         const vec  = vecArray[ButtonBlock.face]
 
         bot.placeBlock(ButtonBlock, vec);
-      }
+        }
     }, false)
 
 document.addEventListener('mouseup', (e) => {
