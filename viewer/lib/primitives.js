@@ -31,6 +31,17 @@ function getMesh (primitive, camera) {
     grid.position.y = primitive.start.y + sy / 2
     grid.position.z = primitive.start.z + sz / 2
     return grid
+  } else if (primitive.type === 'points') {
+    const color = primitive.color ? primitive.color : 'aqua'
+    const size = primitive.size ? primitive.size : 5
+    const points = []
+    for (const p of primitive.points) {
+      points.push(p.x, p.y, p.z)
+    }
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3))
+    const material = new THREE.PointsMaterial({ color, size, sizeAttenuation: false })
+    return new THREE.Points(geometry, material)
   }
   return null
 }
