@@ -1,6 +1,5 @@
 const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
-const { RaycastIterator } = require('prismarine-world').iterators
 const EventEmitter = require('events')
 
 class WorldView extends EventEmitter {
@@ -34,8 +33,11 @@ class WorldView extends EventEmitter {
     }
 
     this.emitter.on('mouseClick', async (click) => {
-      const { block, face } = await this.getClickedBlock(click.origin, click.direction)
-      this.emit('blockClicked', block, face, click.button)
+      const ori = new Vec3(click.origin.x, click.origin.y, click.origin.z)
+      const dir = new Vec3(click.direction.x, click.direction.y, click.direction.z)
+      const block = this.world.raycast(ori, dir, 256)
+      if (!block) return
+      this.emit('blockClicked', block, block.face, click.button)
     })
   }
 
@@ -122,22 +124,6 @@ class WorldView extends EventEmitter {
     } else {
       this.lastPos.update(pos)
     }
-  }
-
-  async getClickedBlock (viewPos, viewDir, maxDistance = 256) {
-    const iter = new RaycastIterator(new Vec3(viewPos.x, viewPos.y, viewPos.z), new Vec3(viewDir.x, viewDir.y, viewDir.z), maxDistance)
-    let pos = iter.next()
-    while (pos) {
-      const position = new Vec3(pos.x, pos.y, pos.z)
-      const block = await this.world.getBlock(position)
-      // TODO: Check boundingBox of block
-      if (block && block.boundingBox !== 'empty') {
-        block.position = position
-        return { block, face: pos.face }
-      }
-      pos = iter.next()
-    }
-    return { block: null, face: 0 }
   }
 }
 
