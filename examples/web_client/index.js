@@ -3,130 +3,152 @@
 // Workaround for process.versions.node not existing in the browser
 process.versions.node = '14.0.0'
 
-const mineflayer = require('mineflayer')
-const { WorldView, Viewer } = require('prismarine-viewer/viewer')
-global.THREE = require('three')
+const mineflayer = require('mineflayer');
+const { WorldView, Viewer } = require('prismarine-viewer/viewer');
+const Vec3 = require('vec3').Vec3;
+global.THREE = require('three');
 
 async function main () {
   const viewDistance = 6
-  const host = prompt('Host', '95.111.249.143')
-  const port = parseInt(prompt('Port', '10000'))
-  const username = prompt('Username', 'pviewer_person')
-  let password = prompt('Password (blank for offline)')
+  const host = prompt('Host', '95.111.249.143');
+  const port = parseInt(prompt('Port', '10000'));
+  const username = prompt('Username', 'pviewer_person');
+  let password = prompt('Password (blank for offline)');
   password = password === '' ? undefined : password
-  console.log(`connecting to ${host} ${port} with ${username}`)
+  console.log(`connecting to ${host} ${port} with ${username}`);
 
   const bot = mineflayer.createBot({
     host,
     port,
     username,
     password
-  })
+  });
 
   bot.on('end', () => {
     console.log('disconnected')
-  })
+  });
 
   bot.once('spawn', () => {
-    console.log('bot spawned - starting viewer')
+    console.log('bot spawned - starting viewer');
 
-    const version = bot.version
+    const version = bot.version;
 
-    const center = bot.entity.position
+    const center = bot.entity.position;
 
-    const worldView = new WorldView(bot.world, viewDistance, center)
+    const worldView = new WorldView(bot.world, viewDistance, center);
 
     // Create three.js context, add to page
-    const renderer = new THREE.WebGLRenderer()
-    renderer.setPixelRatio(window.devicePixelRatio || 1)
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    document.body.appendChild(renderer.domElement)
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
     // Create viewer
-    const viewer = new Viewer(renderer)
-    viewer.setVersion(version)
+    const viewer = new Viewer(renderer);
+    viewer.setVersion(version);
 
-    worldView.listenToBot(bot)
-    worldView.init(bot.entity.position)
+    worldView.listenToBot(bot);
+    worldView.init(bot.entity.position);
 
     function botPosition () {
-      viewer.setFirstPersonCamera(bot.entity.position, bot.entity.yaw, bot.entity.pitch)
-      worldView.updatePosition(bot.entity.position)
+      viewer.setFirstPersonCamera(bot.entity.position, bot.entity.yaw, bot.entity.pitch);
+      worldView.updatePosition(bot.entity.position);
     }
 
-    bot.on('move', botPosition)
+    bot.on('move', botPosition);
 
     // Link WorldView and Viewer
-    viewer.listen(worldView)
-    viewer.camera.position.set(center.x, center.y, center.z)
+    viewer.listen(worldView);
+    viewer.camera.position.set(center.x, center.y, center.z);
 
     function moveCallback (e) {
-      bot.entity.pitch -= e.movementY * 0.01
-      bot.entity.yaw -= e.movementX * 0.01
-      viewer.setFirstPersonCamera(bot.entity.position, bot.entity.yaw, bot.entity.pitch)
+      bot.entity.pitch -= e.movementY * 0.01;
+      bot.entity.yaw -= e.movementX * 0.01;
+      viewer.setFirstPersonCamera(bot.entity.position, bot.entity.yaw, bot.entity.pitch);
     }
     function changeCallback () {
       if (document.pointerLockElement === renderer.domElement ||
         document.mozPointerLockElement === renderer.domElement ||
         document.webkitPointerLockElement === renderer.domElement) {
-        document.addEventListener('mousemove', moveCallback, false)
+        document.addEventListener('mousemove', moveCallback, false);
       } else {
-        document.removeEventListener('mousemove', moveCallback, false)
+        document.removeEventListener('mousemove', moveCallback, false);
       }
     }
-    document.addEventListener('pointerlockchange', changeCallback, false)
-    document.addEventListener('mozpointerlockchange', changeCallback, false)
-    document.addEventListener('webkitpointerlockchange', changeCallback, false)
+    document.addEventListener('pointerlockchange', changeCallback, false);
+    document.addEventListener('mozpointerlockchange', changeCallback, false);
+    document.addEventListener('webkitpointerlockchange', changeCallback, false);
     renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock ||
       renderer.domElement.mozRequestPointerLock ||
       renderer.domElement.webkitRequestPointerLock
     document.addEventListener('mousedown', (e) => {
-      renderer.domElement.requestPointerLock()
-    })
+      renderer.domElement.requestPointerLock();
+    });
 
-    document.addEventListener('contextmenu', (e) => e.preventDefault(), false)
+
+    document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
     document.addEventListener('keydown', (e) => {
-      console.log(e.code)
+      console.log(e.code);
       if (e.code === 'KeyW') {
-        bot.setControlState('forward', true)
+        bot.setControlState('forward', true);
       } else if (e.code === 'KeyS') {
-        bot.setControlState('back', true)
+        bot.setControlState('back', true);
       } else if (e.code === 'KeyA') {
-        bot.setControlState('right', true)
+        bot.setControlState('right', true);
       } else if (e.code === 'KeyD') {
-        bot.setControlState('left', true)
+        bot.setControlState('left', true);
       } else if (e.code === 'Space') {
-        bot.setControlState('jump', true)
+        bot.setControlState('jump', true);
       } else if (e.code === 'ShiftLeft') {
-        bot.setControlState('sneak', true)
+        bot.setControlState('sneak', true);
       } else if (e.code === 'ControlLeft') {
-        bot.setControlState('sprint', true)
+        bot.setControlState('sprint', true);
       }
-    }, false)
+    }, false);
     document.addEventListener('keyup', (e) => {
       if (e.code === 'KeyW') {
-        bot.setControlState('forward', false)
+        bot.setControlState('forward', false);
       } else if (e.code === 'KeyS') {
-        bot.setControlState('back', false)
+        bot.setControlState('back', false);
       } else if (e.code === 'KeyA') {
-        bot.setControlState('right', false)
+        bot.setControlState('right', false);
       } else if (e.code === 'KeyD') {
-        bot.setControlState('left', false)
+        bot.setControlState('left', false);
       } else if (e.code === 'Space') {
-        bot.setControlState('jump', false)
+        bot.setControlState('jump', false);
       } else if (e.code === 'ShiftLeft') {
-        bot.setControlState('sneak', false)
+        bot.setControlState('sneak', false);
       } else if (e.code === 'ControlLeft') {
-        bot.setControlState('sprint', false)
+        bot.setControlState('sprint', false);
       }
-    }, false)
+    }, false);
+
+    document.addEventListener('mousedown', (e) => {
+      let BlockDistance = (bot.gamemode == 1 ) ? 8 : 5;
+      const ButtonBlock = bot.blockAtCursor(BlockDistance);
+      if (!ButtonBlock) return;
+      if (e.button === 0) {
+        if (bot.canDigBlock(ButtonBlock)) {
+          bot.dig(ButtonBlock);
+        }
+      } else if (e.button === 2) {
+        const vecArray = [new Vec3(0, -1, 0), new Vec3(0, 1, 0), new Vec3(0, 0, -1), new Vec3(0, 0, 1), new Vec3(-1, 0, 0), new Vec3(1, 0, 0)]; 
+        const vec  = vecArray[ButtonBlock.face];
+
+        bot.placeBlock(ButtonBlock, vec);
+        }
+    }, false);
+
+document.addEventListener('mouseup', (e) => {
+        bot.stopDigging();
+    }, false);
 
     // Browser animation loop
     const animate = () => {
       window.requestAnimationFrame(animate)
       renderer.render(viewer.scene, viewer.camera)
     }
-    animate()
-  })
+    animate();
+  });
 }
-main()
+main();
