@@ -123,7 +123,8 @@ async function main () {
     }, false)
 
     document.addEventListener('mousedown', (e) => {
-      const BlockDistance = (bot.gamemode == 1) ? 8 : 5
+      const BlockDistance = (bot.gamemode == 1) ? 5 : 4.5
+      const vecArray = [new Vec3(0, -1, 0), new Vec3(0, 1, 0), new Vec3(0, 0, -1), new Vec3(0, 0, 1), new Vec3(-1, 0, 0), new Vec3(1, 0, 0)]
       const ButtonBlock = bot.blockAtCursor(BlockDistance)
       if (!ButtonBlock) return
       if (e.button === 0) {
@@ -131,7 +132,6 @@ async function main () {
           bot.dig(ButtonBlock)
         }
       } else if (e.button === 2) {
-        const vecArray = [new Vec3(0, -1, 0), new Vec3(0, 1, 0), new Vec3(0, 0, -1), new Vec3(0, 0, 1), new Vec3(-1, 0, 0), new Vec3(1, 0, 0)]
         const vec = vecArray[ButtonBlock.face]
 
         bot.placeBlock(ButtonBlock, vec)
