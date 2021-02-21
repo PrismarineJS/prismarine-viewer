@@ -15,7 +15,7 @@ class WorldView extends EventEmitter {
     this.listeners = {
       // 'move': botPosition,
       entitySpawn: function (e) {
-        worldView.emitter.emit('entity', { id: e.id, type: e.type, pos: e.position })
+        worldView.emitter.emit('entity', { id: e.id, type: e.type, pos: e.position, width: e.width, height: e.height })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position })
@@ -49,7 +49,7 @@ class WorldView extends EventEmitter {
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e !== bot.entity) {
-        this.emitter.emit('entity', { id: e.id, type: e.type, pos: e.position })
+        this.emitter.emit('entity', { id: e.id, type: e.type, pos: e.position, width: e.width, height: e.height })
       }
     }
   }
