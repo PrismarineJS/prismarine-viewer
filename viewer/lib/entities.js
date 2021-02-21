@@ -2,21 +2,20 @@ const THREE = require('three')
 
 function getEntityMesh (entity) {
   if (entity.type === 'player') {
-    const geometry = new THREE.BoxGeometry(0.6, 1.8, 0.6)
-    geometry.translate(0, 0.9, 0)
+    const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
+    geometry.translate(0, entity.height / 2, 0)
     const material = new THREE.MeshBasicMaterial({ color: 0x0000ff })
     const cube = new THREE.Mesh(geometry, material)
     return cube
   } else if (entity.type === 'object') {
-    const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
-    geometry.translate(0, 0.1, 0)
+    const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
+    geometry.translate(0, entity.height / 2, 0)
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
     const cube = new THREE.Mesh(geometry, material)
     return cube
   }
-  // g(entity.type)
-  const geometry = new THREE.BoxGeometry(1, 1, 1)
-  geometry.translate(0, 0.5, 0)
+  const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
+  geometry.translate(0, entity.height / 2, 0)
   const material = new THREE.MeshBasicMaterial({ color: 0xff00ff })
   const cube = new THREE.Mesh(geometry, material)
   return cube
