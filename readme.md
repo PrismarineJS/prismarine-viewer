@@ -127,6 +127,10 @@ Draw a line passing through all the `points`.
 
 Remove the primitive with the given id from the display.
 
+#### bot.viewer.close ()
+
+Stop the server and disconnect users.
+
 ## Tests
 
 `node_modules/.bin/jest --verbose --runInBand --forceExit -t "1.16.4"`
