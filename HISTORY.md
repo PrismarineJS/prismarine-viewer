@@ -1,3 +1,9 @@
+### 1.14.0
+
+* Add viewer.close()
+* Use real entity height and width
+* Add points primitive
+
 ### 1.13.0
 
 * make init and updatePosition not blocking for a faster apparent rendering
