@@ -9,7 +9,7 @@ Web based viewer for servers and bots
 [![Irc](https://img.shields.io/badge/chat-on%20irc-brightgreen.svg)](https://irc.gitter.im/)
 [![Issue Hunt](https://github.com/BoostIO/issuehunt-materials/blob/master/v1/issuehunt-shield-v1.svg)](https://issuehunt.io/r/PrismarineJS/prismarine-viewer)
 
-[![Try it on gitpod](https://img.shields.io/badge/try-on%20gitpod-brightgreen.svg)](https://gitpod.io/#https://github.com/PrismarineJS/prismarine-viewer)
+[![Try it on gitpod](https://img.shields.io/badge/try-on%20gitpod-brightgreen.svg)](https://gitpod.io/#https://github.com/PrismarineJS/prismarine-viewer) [![Join the chat at https://gitter.im/PrismarineJS/prismarine-viewer](https://badges.gitter.im/PrismarineJS/prismarine-viewer.svg)](https://gitter.im/PrismarineJS/prismarine-viewer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [<img src="https://prismarine.js.org/prismarine-viewer/test_1.16.4.png" alt="viewer" width="300">](https://prismarine.js.org/prismarine-viewer/)
 
