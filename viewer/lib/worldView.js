@@ -18,7 +18,7 @@ class WorldView extends EventEmitter {
         worldView.emitter.emit('entity', { id: e.id, type: e.type, pos: e.position, width: e.width, height: e.height })
       },
       entityMoved: function (e) {
-        worldView.emitter.emit('entity', { id: e.id, pos: e.position })
+        worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
       },
       entityGone: function (e) {
         worldView.emitter.emit('entity', { id: e.id, delete: true })
