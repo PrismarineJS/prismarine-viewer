@@ -1,12 +1,11 @@
 const THREE = require('three')
 
+const Entity = require('./entity/Entity')
+
 function getEntityMesh (entity) {
   if (entity.type === 'player') {
-    const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
-    geometry.translate(0, entity.height / 2, 0)
-    const material = new THREE.MeshBasicMaterial({ color: 0x0000ff })
-    const cube = new THREE.Mesh(geometry, material)
-    return cube
+    const e = new Entity('geometry.humanoid.custom:geometry.humanoid')
+    return e.mesh
   } else if (entity.type === 'object') {
     const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
     geometry.translate(0, entity.height / 2, 0)
@@ -50,6 +49,7 @@ class Entities {
     }
 
     if (entity.pos) e.position.set(entity.pos.x, entity.pos.y, entity.pos.z)
+    if (entity.yaw) e.rotation.y = entity.yaw + Math.PI
   }
 }
 
