@@ -1,4 +1,5 @@
 const THREE = require('three')
+const TWEEN = require('@tweenjs/tween.js')
 
 const Entity = require('./entity/Entity')
 
@@ -53,8 +54,14 @@ class Entities {
       delete this.entities[entity.id]
     }
 
-    if (entity.pos) e.position.set(entity.pos.x, entity.pos.y, entity.pos.z)
-    if (entity.yaw) e.rotation.y = entity.yaw
+    if (entity.pos) {
+      new TWEEN.Tween(e.position).to({ x: entity.pos.x, y: entity.pos.y, z: entity.pos.z }, 50).start()
+    }
+    if (entity.yaw) {
+      const da = (entity.yaw - e.rotation.y) % (Math.PI * 2)
+      const dy = 2 * da % (Math.PI * 2) - da
+      new TWEEN.Tween(e.rotation).to({ y: e.rotation.y + dy }, 50).start()
+    }
   }
 }
 

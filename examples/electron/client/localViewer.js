@@ -48,6 +48,7 @@ class LocalViewer {
       window.requestAnimationFrame(animate)
       if (this.controls) this.controls.update()
       this.worldView.updatePosition(this.controls.target)
+      this.viewer.update()
       this.renderer.render(this.viewer.scene, this.viewer.camera)
     }
     animate()
