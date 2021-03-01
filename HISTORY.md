@@ -1,3 +1,8 @@
+### 1.15.0
+
+* Interpolate movements
+* Add entity models
+
 ### 1.14.0
 
 * Add viewer.close()
