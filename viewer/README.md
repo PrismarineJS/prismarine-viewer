@@ -58,7 +58,7 @@ Updates a primitive
 
 Sets the first person camera
 
-* pos is a Vec3
+* pos is a Vec3 (if pos is null, only yaw and pitch will be updated)
 * yaw is in degrees
 * pitch is in degrees
 
@@ -73,6 +73,10 @@ the emitter should emit these events:
 * blockUpdate({pos, stateId}) ; update a block
 it also listen to these events:
 * mouseClick({ origin, direction, button })
+
+#### update ()
+
+Update the world. This need to be called in the animate function, just before the render.
 
 ### WorldView
 
