@@ -1,5 +1,6 @@
 
 const THREE = require('three')
+const TWEEN = require('@tweenjs/tween.js')
 const { WorldRenderer } = require('./worldrenderer')
 const { Entities } = require('./entities')
 const { Primitives } = require('./primitives')
@@ -57,7 +58,7 @@ class Viewer {
   }
 
   setFirstPersonCamera (pos, yaw, pitch) {
-    this.camera.position.set(pos.x, pos.y + 1.6, pos.z)
+    if (pos) new TWEEN.Tween(this.camera.position).to({ x: pos.x, y: pos.y + 1.6, z: pos.z }, 50).start()
     this.camera.rotation.set(pitch, yaw, 0, 'ZYX')
   }
 
@@ -91,6 +92,10 @@ class Viewer {
       const ray = raycaster.ray
       emitter.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
     })
+  }
+
+  update () {
+    TWEEN.update()
   }
 }
 

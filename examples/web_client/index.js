@@ -63,7 +63,7 @@ async function main () {
     function moveCallback (e) {
       bot.entity.pitch -= e.movementY * 0.01
       bot.entity.yaw -= e.movementX * 0.01
-      viewer.setFirstPersonCamera(bot.entity.position, bot.entity.yaw, bot.entity.pitch)
+      viewer.setFirstPersonCamera(null, bot.entity.yaw, bot.entity.pitch)
     }
     function changeCallback () {
       if (document.pointerLockElement === renderer.domElement ||
@@ -124,6 +124,7 @@ async function main () {
     // Browser animation loop
     const animate = () => {
       window.requestAnimationFrame(animate)
+      viewer.update()
       renderer.render(viewer.scene, viewer.camera)
     }
     animate()

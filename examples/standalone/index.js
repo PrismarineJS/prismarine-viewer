@@ -46,6 +46,7 @@ async function main () {
     window.requestAnimationFrame(animate)
     if (controls) controls.update()
     worldView.updatePosition(controls.target)
+    viewer.update()
     renderer.render(viewer.scene, viewer.camera)
   }
   animate()
