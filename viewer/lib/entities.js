@@ -2,17 +2,22 @@ const THREE = require('three')
 
 const Entity = require('./entity/Entity')
 
-function getEntityMesh (entity) {
-  if (entity.type === 'player') {
-    const e = new Entity('geometry.humanoid.custom:geometry.humanoid')
-    return e.mesh
-  } else if (entity.type === 'object') {
+function getEntityMesh (entity, scene) {
+  if (entity.type === 'object') {
     const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
     geometry.translate(0, entity.height / 2, 0)
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
     const cube = new THREE.Mesh(geometry, material)
     return cube
+  } else if (entity.type) {
+    try {
+      const e = new Entity('1.16.4', entity.type, scene)
+      return e.mesh
+    } catch (err) {
+      console.log(err)
+    }
   }
+
   const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
   geometry.translate(0, entity.height / 2, 0)
   const material = new THREE.MeshBasicMaterial({ color: 0xff00ff })
@@ -35,7 +40,7 @@ class Entities {
 
   update (entity) {
     if (!this.entities[entity.id]) {
-      const mesh = getEntityMesh(entity)
+      const mesh = getEntityMesh(entity, this.scene)
       if (!mesh) return
       this.entities[entity.id] = mesh
       this.scene.add(mesh)
@@ -49,7 +54,7 @@ class Entities {
     }
 
     if (entity.pos) e.position.set(entity.pos.x, entity.pos.y, entity.pos.z)
-    if (entity.yaw) e.rotation.y = entity.yaw + Math.PI
+    if (entity.yaw) e.rotation.y = entity.yaw
   }
 }
 

@@ -24,6 +24,10 @@ for (const version of mcAssets.versions) {
 
   const blocksStates = JSON.stringify(prepareBlocksStates(assets, atlas))
   fs.writeFileSync(path.resolve(blockStatesPath, version + '.json'), blocksStates)
+
+  try {
+    fs.symlinkSync(assets.directory, path.resolve(texturesPath, version))
+  } catch {}
 }
 
 fs.writeFileSync(path.resolve(__dirname, '../public/supportedVersions.json'), '[' + mcAssets.versions.map(v => `"${v}"`).toString() + ']')
