@@ -9,10 +9,16 @@ const { loadImage } = safeRequire('node-canvas-webgl/lib')
 const THREE = require('three')
 const path = require('path')
 
+const textureCache = {}
 function loadTexture (texture, cb) {
-  loadImage(path.resolve(__dirname, '../../public/' + texture)).then(image => {
-    cb(new THREE.CanvasTexture(image))
-  })
+  if (textureCache[texture]) {
+    cb(textureCache[texture])
+  } else {
+    loadImage(path.resolve(__dirname, '../../public/' + texture)).then(image => {
+      textureCache[texture] = new THREE.CanvasTexture(image)
+      cb(textureCache[texture])
+    })
+  }
 }
 
 function loadJSON (json, cb) {
