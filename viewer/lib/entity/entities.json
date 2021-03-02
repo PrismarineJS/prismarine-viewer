@@ -670,7 +670,9 @@
             ],
             "parent": "leftWing"
           }
-        ]
+        ],
+        "texturewidth": 64,
+        "textureheight": 64
       }
     },
     "scripts": {"scale": "0.35"},
@@ -2882,8 +2884,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 128,
-        "textureheight": 128,
+        "texturewidth": 64,
+        "textureheight": 64,
         "bones": [
           {
             "name": "Body",
@@ -5456,7 +5458,7 @@
     },
     "geometry": {
       "default": {
-        "texturewidth": 64,
+        "texturewidth": 48,
         "textureheight": 32,
         "bones": [
           {
@@ -6746,8 +6748,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 128,
-        "textureheight": 128,
+        "texturewidth": 64,
+        "textureheight": 64,
         "bones": [
           {
             "name": "Body",
@@ -7078,7 +7080,7 @@
         "visible_bounds_height": 2.5,
         "visible_bounds_offset": [0, 1.25, 0],
         "texturewidth": 64,
-        "textureheight": 32,
+        "textureheight": 64,
         "bones": [
           {
             "name": "body",
@@ -8042,7 +8044,7 @@
         "visible_bounds_height": 1,
         "visible_bounds_offset": [0, 0.5, 0],
         "texturewidth": 64,
-        "textureheight": 64,
+        "textureheight": 32,
         "bones": [
           {
             "name": "body",
@@ -8490,8 +8492,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 128,
-        "textureheight": 128,
+        "texturewidth": 64,
+        "textureheight": 64,
         "bones": [
           {
             "name": "Body",
@@ -11335,7 +11337,9 @@
               }
             ]
           }
-        ]
+        ],
+        "texturewidth": 64,
+        "textureheight": 64
       },
       "cape": {
         "texturewidth": 64,
@@ -13372,7 +13376,10 @@
     "identifier": "minecraft:sheep",
     "min_engine_version": "1.8.0",
     "materials": {"default": "sheep"},
-    "textures": {"default": "textures/entity/sheep/sheep"},
+    "textures": {
+      "default": "textures/entity/sheep/sheep_fur",
+      "sheared": "textures/entity/sheep/sheep"
+    },
     "geometry": {
       "default": {
         "visible_bounds_width": 2,
@@ -13456,7 +13463,9 @@
               }
             ]
           }
-        ]
+        ],
+        "texturewidth": 64,
+        "textureheight": 32
       },
       "sheared": {
         "visible_bounds_width": 2,
@@ -13505,7 +13514,9 @@
             "pivot": [3, 12, -5],
             "cubes": [{"origin": [1, 0, -7], "size": [4, 12, 4], "uv": [0, 16]}]
           }
-        ]
+        ],
+        "texturewidth": 64,
+        "textureheight": 32
       }
     },
     "animations": {
@@ -14488,8 +14499,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 128,
-        "textureheight": 128,
+        "texturewidth": 64,
+        "textureheight": 64,
         "bones": [
           {
             "name": "Body",
@@ -15026,7 +15037,9 @@
               }
             ]
           }
-        ]
+        ],
+        "texturewidth": 64,
+        "textureheight": 64
       }
     },
     "animations": {
@@ -18016,7 +18029,9 @@
               }
             ]
           }
-        ]
+        ],
+        "texturewidth": 64,
+        "textureheight": 64
       }
     },
     "scripts": {"scale": "0.9375"},
@@ -19433,7 +19448,7 @@
         "visible_bounds_height": 2,
         "visible_bounds_offset": [0, 1, 0],
         "texturewidth": 64,
-        "textureheight": 32,
+        "textureheight": 64,
         "bones": [
           {
             "name": "body",
@@ -19974,8 +19989,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 128,
-        "textureheight": 128,
+        "texturewidth": 64,
+        "textureheight": 64,
         "bones": [
           {
             "name": "Body",
