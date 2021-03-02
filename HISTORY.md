@@ -1,3 +1,8 @@
+### 1.15.1
+
+* Improve entity rendering
+* Fix entity name matching on older versions
+
 ### 1.15.0
 
 * Interpolate movements
