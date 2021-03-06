@@ -197,6 +197,7 @@ class Entity {
     this.mesh = new THREE.Object3D()
     for (const [name, jsonModel] of Object.entries(e.geometry)) {
       const texture = e.textures[name]
+      if (!texture) continue
       // console.log(JSON.stringify(jsonModel, null, 2))
       const mesh = getMesh(texture.replace('textures', 'textures/' + version) + '.png', jsonModel)
       /* const skeletonHelper = new THREE.SkeletonHelper( mesh )
