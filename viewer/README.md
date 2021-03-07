@@ -14,6 +14,10 @@ Build the viewer.
 
 * renderer is a [WebGLRenderer](https://threejs.org/docs/#api/en/renderers/WebGLRenderer) instance
 
+#### version
+
+the currently used minecraft version
+
 #### setVersion(version)
 
 sets the minecraft version
