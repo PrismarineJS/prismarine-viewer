@@ -13,7 +13,7 @@ class WorldRenderer {
     this.scene = scene
     this.loadedChunks = {}
 
-    this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
+    this.material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
     this.workers = []
     for (let i = 0; i < numWorkers; i++) {

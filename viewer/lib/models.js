@@ -199,6 +199,7 @@ function buildRotationMatrix (axis, degree) {
 }
 
 function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift, block) {
+  //doAO = false //HACK more performant render, maybe for larger worlds
   const cullIfIdentical = block.name.indexOf('glass') >= 0
 
   for (const face in element.faces) {

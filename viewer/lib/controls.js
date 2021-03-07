@@ -884,34 +884,34 @@ class MapControls {
   }
 
   registerHandlers() {
-    this.element.addEventListener('pointermove', this.onPointerMove, false)
-    this.element.addEventListener('pointerup', this.onPointerUp, false)
-    this.element.addEventListener('pointerdown', this.onPointerDown, false)
-    this.element.addEventListener('wheel', this.onMouseWheel, true)
+    this.element.addEventListener('pointermove', this.onPointerMove, false, {passive: true})
+    this.element.addEventListener('pointerup', this.onPointerUp, false, {passive: true})
+    this.element.addEventListener('pointerdown', this.onPointerDown, false, {passive: true})
+    this.element.addEventListener('wheel', this.onMouseWheel, true, {passive: true})
 
-    this.element.addEventListener('touchstart', this.onTouchStart, false)
-    this.element.addEventListener('touchend', this.onTouchEnd, false)
-    this.element.addEventListener('touchmove', this.onTouchMove, false)
+    this.element.addEventListener('touchstart', this.onTouchStart, false, {passive: true})
+    this.element.addEventListener('touchend', this.onTouchEnd, false, {passive: true})
+    this.element.addEventListener('touchmove', this.onTouchMove, false, {passive: true})
 
-    this.element.ownerDocument.addEventListener('contextmenu', this.onContextMenu, false)
-    this.element.ownerDocument.addEventListener('keydown', this.onKeyDown, false)
-    this.element.ownerDocument.addEventListener('keyup', this.onKeyUp, false)
+    this.element.ownerDocument.addEventListener('contextmenu', this.onContextMenu, false, {passive: true})
+    this.element.ownerDocument.addEventListener('keydown', this.onKeyDown, false, {passive: true})
+    this.element.ownerDocument.addEventListener('keyup', this.onKeyUp, false, {passive: true})
     console.log('[controls] registered handlers', this.element)
   }
 
   unregisterHandlers() {
-    this.element.removeEventListener('pointermove', this.onPointerMove, false)
-    this.element.removeEventListener('pointerup', this.onPointerUp, false)
-    this.element.removeEventListener('pointerdown', this.onPointerDown, false)
-    this.element.removeEventListener('wheel', this.onMouseWheel, true)
+    this.element.removeEventListener('pointermove', this.onPointerMove, false, {passive: true})
+    this.element.removeEventListener('pointerup', this.onPointerUp, false, {passive: true})
+    this.element.removeEventListener('pointerdown', this.onPointerDown, false, {passive: true})
+    this.element.removeEventListener('wheel', this.onMouseWheel, true, {passive: true})
 
-    this.element.removeEventListener('touchstart', this.onTouchStart, false)
-    this.element.removeEventListener('touchend', this.onTouchEnd, false)
-    this.element.removeEventListener('touchmove', this.onTouchMove, false)
+    this.element.removeEventListener('touchstart', this.onTouchStart, false, {passive: true})
+    this.element.removeEventListener('touchend', this.onTouchEnd, false, {passive: true})
+    this.element.removeEventListener('touchmove', this.onTouchMove, false, {passive: true})
 
-    this.element.ownerDocument.removeEventListener('contextmenu', this.onContextMenu, false)
-    this.element.ownerDocument.removeEventListener('keydown', this.onKeyDown, false)
-    this.element.ownerDocument.removeEventListener('keyup', this.onKeyUp, false)
+    this.element.ownerDocument.removeEventListener('contextmenu', this.onContextMenu, false, {passive: true})
+    this.element.ownerDocument.removeEventListener('keydown', this.onKeyDown, false, {passive: true})
+    this.element.ownerDocument.removeEventListener('keyup', this.onKeyUp, false, {passive: true})
     console.log('[controls] unregistered handlers', this.element)
   }
 
