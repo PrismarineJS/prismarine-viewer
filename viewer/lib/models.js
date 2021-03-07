@@ -1,4 +1,4 @@
-const { Vec3 } = require('vec3')
+const Vec3 = require('vec3').Vec3
 
 const elemFaces = {
   up: {
@@ -69,46 +69,22 @@ const elemFaces = {
   }
 }
 
-function getLiquidRenderHeight (world, block, type) {
-  if (!block || block.type !== type) return 1 / 9
-  if (block.metadata === 0) { // source block
-    const blockAbove = world.getBlock(block.position.offset(0, 1, 0))
-    if (blockAbove && blockAbove.type === type) return 1
-    return 8 / 9
-  }
-  return ((block.metadata >= 8 ? 8 : 7 - block.metadata) + 1) / 9
-}
-
-function renderLiquid (world, cursor, texture, type, block, water, attr) {
-  const heights = []
-  for (let z = -1; z <= 1; z++) {
-    for (let x = -1; x <= 1; x++) {
-      heights.push(getLiquidRenderHeight(world, world.getBlock(cursor.offset(x, 0, z)), type))
-    }
-  }
-  const cornerHeights = [
-    Math.max(Math.max(heights[0], heights[1]), Math.max(heights[3], heights[4])),
-    Math.max(Math.max(heights[1], heights[2]), Math.max(heights[4], heights[5])),
-    Math.max(Math.max(heights[3], heights[4]), Math.max(heights[6], heights[7])),
-    Math.max(Math.max(heights[4], heights[5]), Math.max(heights[7], heights[8]))
-  ]
+function renderLiquid (world, cursor, texture, type, water, attr) {
+  const blockAbove = world.getBlock(cursor.offset(0, 1, 0))
+  const liquidHeight = (blockAbove.type === type ? 16 : 14) / 16
 
   for (const face in elemFaces) {
     const { dir, corners } = elemFaces[face]
-    const isUp = dir[1] === 1
 
     const neighbor = world.getBlock(cursor.offset(...dir))
     if (!neighbor) continue
     if (neighbor.type === type) continue
-    if ((neighbor.isCube && !isUp) || neighbor.material === 'plant' || neighbor.getProperties().waterlogged) continue
+    if (neighbor.isCube || neighbor.material === 'plant' || neighbor.getProperties().waterlogged) continue
     if (neighbor.position.y < 0) continue
 
     let tint = [1, 1, 1]
     if (water) {
-      let m = 1 // Fake lighting to improve lisibility
-      if (Math.abs(dir[0]) > 0) m = 0.6
-      else if (Math.abs(dir[2]) > 0) m = 0.8
-      tint = [0.247 * m, 0.463 * m, 0.894 * m] // TODO: correct tint for the biome
+      tint = [0.247, 0.463, 0.894] // TODO: correct tint for the biome
     }
 
     const u = texture.u
@@ -116,16 +92,24 @@ function renderLiquid (world, cursor, texture, type, block, water, attr) {
     const su = texture.su
     const sv = texture.sv
 
+    const ndx = Math.floor(attr.positions.length / 3)
+
     for (const pos of corners) {
-      const height = cornerHeights[pos[2] * 2 + pos[0]]
-      attr.t_positions.push(
+      attr.positions.push(
         (pos[0] ? 1 : 0) + (cursor.x & 15) - 8,
-        (pos[1] ? height : 0) + (cursor.y & 15) - 8,
+        (pos[1] ? liquidHeight : 0) + (cursor.y & 15) - 8,
         (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
-      attr.t_normals.push(...dir)
-      attr.t_uvs.push(pos[3] * su + u, pos[4] * sv * (pos[1] ? 1 : height) + v)
-      attr.t_colors.push(tint[0], tint[1], tint[2])
+      attr.normals.push(...dir)
+
+      attr.uvs.push(pos[3] * su + u, pos[4] * sv + v)
+
+      attr.colors.push(tint[0], tint[1], tint[2])
     }
+
+    attr.indices.push(
+      ndx, ndx + 1, ndx + 2,
+      ndx + 2, ndx + 1, ndx + 3
+    )
   }
 }
 
@@ -331,10 +315,6 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
     normals: [],
     colors: [],
     uvs: [],
-    t_positions: [],
-    t_normals: [],
-    t_colors: [],
-    t_uvs: [],
     indices: []
   }
 
@@ -351,9 +331,9 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
           if (!variant || !variant.model) continue
 
           if (block.name === 'water') {
-            renderLiquid(world, cursor, variant.model.textures.particle, block.type, block, true, attr)
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, true, attr)
           } else if (block.name === 'lava') {
-            renderLiquid(world, cursor, variant.model.textures.particle, block.type, block, false, attr)
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, false, attr)
           } else {
             let globalMatrix = null
             let globalShift = null
@@ -378,28 +358,6 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
       }
     }
   }
-
-  let ndx = attr.positions.length / 3
-  for (let i = 0; i < attr.t_positions.length / 3; i++) {
-    attr.indices.push(
-      ndx, ndx + 1, ndx + 2,
-      ndx + 2, ndx + 1, ndx + 3,
-      // back face
-      ndx, ndx + 2, ndx + 1,
-      ndx + 2, ndx + 3, ndx + 1
-    )
-    ndx += 4
-  }
-
-  attr.positions.push(...attr.t_positions)
-  attr.normals.push(...attr.t_normals)
-  attr.colors.push(...attr.t_colors)
-  attr.uvs.push(...attr.t_uvs)
-
-  delete attr.t_positions
-  delete attr.t_normals
-  delete attr.t_colors
-  delete attr.t_uvs
 
   attr.positions = new Float32Array(attr.positions)
   attr.normals = new Float32Array(attr.normals)
