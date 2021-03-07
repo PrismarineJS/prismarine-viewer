@@ -1,3 +1,7 @@
+### 1.17.0
+
+* expose version in viewer
+
 ### 1.16.2
 
 * properly fix water bug
