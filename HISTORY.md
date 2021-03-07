@@ -1,3 +1,8 @@
+### 1.16.0
+
+* Fix bugs
+* Improve water rendering
+
 ### 1.15.1
 
 * Improve entity rendering
