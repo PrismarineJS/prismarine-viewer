@@ -1,3 +1,7 @@
+### 1.16.1
+
+* fix rendering bug
+
 ### 1.16.0
 
 * Fix bugs
