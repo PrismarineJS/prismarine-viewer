@@ -1,3 +1,8 @@
+### 1.16.2
+
+* properly fix water bug
+* improve input perfs
+
 ### 1.16.1
 
 * fix rendering bug
