@@ -51,7 +51,7 @@ class WorldView extends EventEmitter {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
         const type = e.type === 'mob' ? e.name.toLowerCase() : e.type
-        this.emitter.emit('entity', { id: e.id, type, pos: e.position, width: e.width, height: e.height })
+        this.emitter.emit('entity', { id: e.id, type, pos: e.position, width: e.width, height: e.height, username: e.username })
       }
     }
   }

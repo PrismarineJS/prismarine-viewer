@@ -14,7 +14,7 @@ function getEntityMesh (entity, scene) {
     try {
       const e = new Entity('1.16.4', entity.type, scene)
 
-      if ((entity.type === 'player')) {
+      if (entity.username !== undefined) {
         const canvas = document.createElement('canvas')
         canvas.width = 500
         canvas.height = 100
@@ -32,7 +32,7 @@ function getEntityMesh (entity, scene) {
         tex.needsUpdate = true
         const spriteMat = new THREE.SpriteMaterial({ map: tex })
         const sprite = new THREE.Sprite(spriteMat)
-        sprite.position.y += 2.2
+        sprite.position.y += entity.height + 0.4
 
         e.mesh.add(sprite)
       }
