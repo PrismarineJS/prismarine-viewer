@@ -13,6 +13,29 @@ function getEntityMesh (entity, scene) {
   } else if (entity.type) {
     try {
       const e = new Entity('1.16.4', entity.type, scene)
+
+      if ((entity.type === 'player')) {
+        const canvas = document.createElement('canvas')
+        canvas.width = 500
+        canvas.height = 100
+
+        const ctx = canvas.getContext('2d')
+        ctx.font = '50pt Arial'
+        ctx.fillStyle = '#000000'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'top'
+
+        const txt = entity.username
+        ctx.fillText(txt, 100, 0)
+
+        const tex = new THREE.Texture(canvas)
+        tex.needsUpdate = true
+        const spriteMat = new THREE.SpriteMaterial({ map: tex })
+        const sprite = new THREE.Sprite(spriteMat)
+        sprite.position.y += 2.2
+
+        e.mesh.add(sprite)
+      }
       return e.mesh
     } catch (err) {
       console.log(err)

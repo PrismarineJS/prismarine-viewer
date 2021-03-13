@@ -16,7 +16,7 @@ class WorldView extends EventEmitter {
       // 'move': botPosition,
       entitySpawn: function (e) {
         const type = e.type === 'mob' ? e.name.toLowerCase() : e.type
-        worldView.emitter.emit('entity', { id: e.id, type, pos: e.position, width: e.width, height: e.height })
+        worldView.emitter.emit('entity', { id: e.id, type, pos: e.position, width: e.width, height: e.height, username: e.username })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
