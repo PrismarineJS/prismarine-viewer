@@ -86,6 +86,8 @@ Options:
 
 [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/bot.js)
 
+This function returns a function to reuse the viewer by calling it on a new bot.
+
 #### standalone
 
 Serve a webserver allowing to visualize a world.
