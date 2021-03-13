@@ -32,7 +32,7 @@ function getEntityMesh (entity, scene) {
         tex.needsUpdate = true
         const spriteMat = new THREE.SpriteMaterial({ map: tex })
         const sprite = new THREE.Sprite(spriteMat)
-        sprite.position.y += entity.height + 0.4
+        sprite.position.y += entity.height + 0.6
 
         e.mesh.add(sprite)
       }
