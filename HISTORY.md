@@ -1,3 +1,7 @@
+### 1.18.0
+
+* Add names above players
+
 ### 1.17.0
 
 * expose version in viewer
