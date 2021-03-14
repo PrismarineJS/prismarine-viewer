@@ -1,3 +1,7 @@
+### 1.18.1
+
+* Fix self ghost entity
+
 ### 1.18.0
 
 * Add names above players
