@@ -1,3 +1,7 @@
+### 1.18.2
+
+* Use entity name correctly
+
 ### 1.18.1
 
 * Fix self ghost entity
