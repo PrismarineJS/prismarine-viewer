@@ -82,20 +82,26 @@ supportedVersions.forEach(function (supportedVersion, i) {
         bot.once('spawn', () => {
           mineflayerViewer(bot, { port: 3000 })
 
+          function exit (err) {
+            bot.viewer.close()
+            bot.end()
+            done(err)
+          }
+
           page.goto('http://localhost:3000').then(() => {
             page.on('console', msg => console.log('PAGE LOG:', msg.text()))
 
             page.on('error', err => {
-              done(err)
+              exit(err)
             })
 
             page.on('pageerror', pageerr => {
-              done(pageerr)
+              exit(pageerr)
             })
             setTimeout(() => {
-              page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => done()).catch(err => done(err))
+              page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => exit()).catch(err => exit(err))
             }, 60000)
-          }).catch(err => done(err))
+          }).catch(err => exit(err))
         })
       }, 120000)
     })
