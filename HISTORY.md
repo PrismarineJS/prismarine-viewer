@@ -1,3 +1,7 @@
+### 1.19.0
+
+* Add tints (thanks @Moondarker)
+
 ### 1.18.2
 
 * Use entity name correctly
