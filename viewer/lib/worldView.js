@@ -11,12 +11,23 @@ class WorldView extends EventEmitter {
     this.lastPos = new Vec3(0, 0, 0).update(position)
     this.emitter = emitter || this
 
+    this.listeners = {}
+    this.emitter.on('mouseClick', async (click) => {
+      const ori = new Vec3(click.origin.x, click.origin.y, click.origin.z)
+      const dir = new Vec3(click.direction.x, click.direction.y, click.direction.z)
+      const block = this.world.raycast(ori, dir, 256)
+      if (!block) return
+      this.emit('blockClicked', block, block.face, click.button)
+    })
+  }
+
+  listenToBot (bot) {
     const worldView = this
-    this.listeners = {
+    this.listeners[bot.username] = {
       // 'move': botPosition,
       entitySpawn: function (e) {
-        const type = e.type === 'mob' ? e.name.toLowerCase() : e.type
-        worldView.emitter.emit('entity', { id: e.id, type, pos: e.position, width: e.width, height: e.height })
+        if (e === bot.entity) return
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
@@ -33,33 +44,23 @@ class WorldView extends EventEmitter {
       }
     }
 
-    this.emitter.on('mouseClick', async (click) => {
-      const ori = new Vec3(click.origin.x, click.origin.y, click.origin.z)
-      const dir = new Vec3(click.direction.x, click.direction.y, click.direction.z)
-      const block = this.world.raycast(ori, dir, 256)
-      if (!block) return
-      this.emit('blockClicked', block, block.face, click.button)
-    })
-  }
-
-  listenToBot (bot) {
-    for (const [evt, listener] of Object.entries(this.listeners)) {
+    for (const [evt, listener] of Object.entries(this.listeners[bot.username])) {
       bot.on(evt, listener)
     }
 
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
-        const type = e.type === 'mob' ? e.name.toLowerCase() : e.type
-        this.emitter.emit('entity', { id: e.id, type, pos: e.position, width: e.width, height: e.height })
+        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username })
       }
     }
   }
 
   removeListenersFromBot (bot) {
-    for (const [evt, listener] of Object.entries(this.listeners)) {
+    for (const [evt, listener] of Object.entries(this.listeners[bot.username])) {
       bot.removeListener(evt, listener)
     }
+    delete this.listeners[bot.username]
   }
 
   async init (pos) {

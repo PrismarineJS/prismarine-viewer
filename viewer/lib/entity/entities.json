@@ -3,7 +3,7 @@
     "identifier": "minecraft:armor_stand",
     "min_engine_version": "1.8.0",
     "materials": {"default": "armor_stand"},
-    "textures": {"default": "textures/entity/armor_stand"},
+    "textures": {"default": "textures/entity/armorstand/wood"},
     "animations": {
       "default_pose": {
         "loop": true,
@@ -539,7 +539,7 @@
   "arrow": {
     "identifier": "minecraft:arrow",
     "materials": {"default": "arrow"},
-    "textures": {"default": "textures/entity/arrows"},
+    "textures": {"default": "textures/entity/arrow"},
     "geometry": {
       "default": {
         "bones": [
@@ -670,9 +670,7 @@
             ],
             "parent": "leftWing"
           }
-        ],
-        "texturewidth": 64,
-        "textureheight": 64
+        ]
       }
     },
     "scripts": {"scale": "0.35"},
@@ -1232,13 +1230,13 @@
   "boat": {
     "identifier": "minecraft:boat",
     "textures": {
-      "default": "textures/entity/boat/boat_acacia",
-      "acacia": "textures/entity/boat/boat_acacia",
-      "birch": "textures/entity/boat/boat_birch",
-      "darkoak": "textures/entity/boat/boat_darkoak",
-      "jungle": "textures/entity/boat/boat_jungle",
-      "oak": "textures/entity/boat/boat_oak",
-      "spruce": "textures/entity/boat/boat_spruce"
+      "default": "textures/entity/boat/acacia",
+      "acacia": "textures/entity/boat/acacia",
+      "birch": "textures/entity/boat/birch",
+      "darkoak": "textures/entity/boat/dark_oak",
+      "jungle": "textures/entity/boat/jungle",
+      "oak": "textures/entity/boat/oak",
+      "spruce": "textures/entity/boat/spruce"
     },
     "geometry": {
       "default": {
@@ -1299,26 +1297,26 @@
     "textures": {
       "white": "textures/entity/cat/white",
       "black": "textures/entity/cat/tuxedo",
-      "red": "textures/entity/cat/redtabby",
-      "siamese": "textures/entity/cat/siamesecat",
-      "british": "textures/entity/cat/britishshorthair",
+      "red": "textures/entity/cat/red",
+      "siamese": "textures/entity/cat/siamese",
+      "british": "textures/entity/cat/british_shorthair",
       "calico": "textures/entity/cat/calico",
       "persian": "textures/entity/cat/persian",
       "ragdoll": "textures/entity/cat/ragdoll",
       "tabby": "textures/entity/cat/tabby",
       "jellie": "textures/entity/cat/jellie",
-      "all_black": "textures/entity/cat/allblackcat",
-      "white_tame": "textures/entity/cat/white_tame",
+      "all_black": "textures/entity/cat/all_black",
+      "white_tame": "textures/entity/cat/white",
       "black_tame": "textures/entity/cat/tuxedo_tame",
-      "red_tame": "textures/entity/cat/redtabby_tame",
-      "siamese_tame": "textures/entity/cat/siamesecat_tame",
-      "british_tame": "textures/entity/cat/britishshorthair_tame",
-      "calico_tame": "textures/entity/cat/calico_tame",
-      "persian_tame": "textures/entity/cat/persian_tame",
-      "ragdoll_tame": "textures/entity/cat/ragdoll_tame",
-      "tabby_tame": "textures/entity/cat/tabby_tame",
-      "all_black_tame": "textures/entity/cat/allblackcat_tame",
-      "jellie_tame": "textures/entity/cat/jellie_tame"
+      "red_tame": "textures/entity/cat/red",
+      "siamese_tame": "textures/entity/cat/siamese",
+      "british_tame": "textures/entity/cat/british_shorthair",
+      "calico_tame": "textures/entity/cat/calico",
+      "persian_tame": "textures/entity/cat/persian",
+      "ragdoll_tame": "textures/entity/cat/ragdoll",
+      "tabby_tame": "textures/entity/cat/tabby",
+      "all_black_tame": "textures/entity/cat/all_black",
+      "jellie_tame": "textures/entity/cat/jellie"
     },
     "geometry": {
       "default": {
@@ -2884,8 +2882,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 64,
-        "textureheight": 64,
+        "texturewidth": 128,
+        "textureheight": 128,
         "bones": [
           {
             "name": "Body",
@@ -3208,7 +3206,7 @@
   "dragon_fireball": {
     "identifier": "minecraft:dragon_fireball",
     "materials": {"default": "fireball"},
-    "textures": {"default": "textures/items/dragon_fireball"},
+    "textures": {"default": "textures/entity/enderdragon/dragon_fireball"},
     "geometry": {
       "default": {
         "bones": [
@@ -4267,9 +4265,9 @@
   "ender_dragon": {
     "identifier": "minecraft:ender_dragon",
     "textures": {
-      "default": "textures/entity/dragon/dragon",
-      "exploding": "textures/entity/dragon/dragon_exploding",
-      "beam": "textures/entity/endercrystal/endercrystal_beam"
+      "default": "textures/entity/enderdragon/dragon",
+      "exploding": "textures/entity/enderdragon/dragon_exploding",
+      "beam": "textures/entity/end_crystal/end_crystal_beam"
     },
     "geometry": {
       "default": {
@@ -4930,7 +4928,7 @@
   "evoker_fangs": {
     "identifier": "minecraft:evocation_fang",
     "materials": {"default": "fang"},
-    "textures": {"default": "textures/entity/illager/fangs"},
+    "textures": {"default": "textures/entity/illager/evoker_fangs"},
     "geometry": {
       "default": {
         "visible_bounds_width": 1.5,
@@ -5315,7 +5313,7 @@
   "fireball": {
     "identifier": "minecraft:fireball",
     "materials": {"default": "fireball"},
-    "textures": {"default": "textures/items/fireball"},
+    "textures": {"default": "textures/items/fire_charge"},
     "geometry": {
       "default": {
         "bones": [
@@ -5404,7 +5402,7 @@
   "fishing_bobber": {
     "identifier": "minecraft:fishing_hook",
     "materials": {"default": "fishing_hook"},
-    "textures": {"default": "textures/entity/fishhook"},
+    "textures": {"default": "textures/entity/fishing_hook"},
     "geometry": {
       "default": {
         "bones": [
@@ -5454,11 +5452,11 @@
     "materials": {"default": "fox"},
     "textures": {
       "red": "textures/entity/fox/fox",
-      "arctic": "textures/entity/fox/arctic_fox"
+      "arctic": "textures/entity/fox/snow_fox"
     },
     "geometry": {
       "default": {
-        "texturewidth": 48,
+        "texturewidth": 64,
         "textureheight": 32,
         "bones": [
           {
@@ -6748,8 +6746,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 64,
-        "textureheight": 64,
+        "texturewidth": 128,
+        "textureheight": 128,
         "bones": [
           {
             "name": "Body",
@@ -7080,7 +7078,7 @@
         "visible_bounds_height": 2.5,
         "visible_bounds_offset": [0, 1.25, 0],
         "texturewidth": 64,
-        "textureheight": 64,
+        "textureheight": 32,
         "bones": [
           {
             "name": "body",
@@ -7594,7 +7592,7 @@
   "iron_golem": {
     "identifier": "minecraft:iron_golem",
     "materials": {"default": "iron_golem"},
-    "textures": {"default": "textures/entity/iron_golem"},
+    "textures": {"default": "textures/entity/iron_golem/iron_golem"},
     "geometry": {
       "default": {
         "visible_bounds_width": 3,
@@ -7862,28 +7860,28 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "llama"},
     "textures": {
-      "creamy": "textures/entity/llama/llama_creamy",
-      "white": "textures/entity/llama/llama_white",
-      "brown": "textures/entity/llama/llama_brown",
-      "gray": "textures/entity/llama/llama_gray",
+      "creamy": "textures/entity/llama/creamy",
+      "white": "textures/entity/llama/white",
+      "brown": "textures/entity/llama/brown",
+      "gray": "textures/entity/llama/gray",
       "decor_none": "textures/entity/llama/decor/decor_none",
-      "decor_white": "textures/entity/llama/decor/decor_white",
-      "decor_orange": "textures/entity/llama/decor/decor_orange",
-      "decor_magenta": "textures/entity/llama/decor/decor_magenta",
-      "decor_light_blue": "textures/entity/llama/decor/decor_light_blue",
-      "decor_yellow": "textures/entity/llama/decor/decor_yellow",
-      "decor_lime": "textures/entity/llama/decor/decor_lime",
-      "decor_pink": "textures/entity/llama/decor/decor_pink",
-      "decor_gray": "textures/entity/llama/decor/decor_gray",
-      "decor_silver": "textures/entity/llama/decor/decor_silver",
-      "decor_cyan": "textures/entity/llama/decor/decor_cyan",
-      "decor_purple": "textures/entity/llama/decor/decor_purple",
-      "decor_blue": "textures/entity/llama/decor/decor_blue",
-      "decor_brown": "textures/entity/llama/decor/decor_brown",
-      "decor_green": "textures/entity/llama/decor/decor_green",
-      "decor_red": "textures/entity/llama/decor/decor_red",
-      "decor_black": "textures/entity/llama/decor/decor_black",
-      "decor_wandering_trader": "textures/entity/llama/decor/trader_llama_decor"
+      "decor_white": "textures/entity/llama/decor/white",
+      "decor_orange": "textures/entity/llama/decor/orange",
+      "decor_magenta": "textures/entity/llama/decor/magenta",
+      "decor_light_blue": "textures/entity/llama/decor/light_blue",
+      "decor_yellow": "textures/entity/llama/decor/yellow",
+      "decor_lime": "textures/entity/llama/decor/lime",
+      "decor_pink": "textures/entity/llama/decor/pink",
+      "decor_gray": "textures/entity/llama/decor/gray",
+      "decor_silver": "textures/entity/llama/decor/light_gray",
+      "decor_cyan": "textures/entity/llama/decor/cyan",
+      "decor_purple": "textures/entity/llama/decor/purple",
+      "decor_blue": "textures/entity/llama/decor/blue",
+      "decor_brown": "textures/entity/llama/decor/brown",
+      "decor_green": "textures/entity/llama/decor/green",
+      "decor_red": "textures/entity/llama/decor/red",
+      "decor_black": "textures/entity/llama/decor/black",
+      "decor_wandering_trader": "textures/entity/llama/decor/trader_llama"
     },
     "geometry": {
       "default": {
@@ -8044,7 +8042,7 @@
         "visible_bounds_height": 1,
         "visible_bounds_offset": [0, 0.5, 0],
         "texturewidth": 64,
-        "textureheight": 32,
+        "textureheight": 64,
         "bones": [
           {
             "name": "body",
@@ -8330,7 +8328,7 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "mooshroom"},
     "textures": {
-      "default": "textures/entity/cow/mooshroom",
+      "default": "textures/entity/cow/red_mooshroom",
       "brown": "textures/entity/cow/brown_mooshroom"
     },
     "geometry": {
@@ -8492,8 +8490,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 64,
-        "textureheight": 64,
+        "texturewidth": 128,
+        "textureheight": 128,
         "bones": [
           {
             "name": "Body",
@@ -8818,7 +8816,7 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "ocelot"},
     "textures": {
-      "black": "textures/entity/cat/blackcat",
+      "black": "textures/entity/cat/black",
       "red": "textures/entity/cat/red",
       "siamese": "textures/entity/cat/siamese",
       "wild": "textures/entity/cat/ocelot"
@@ -9135,12 +9133,12 @@
     "materials": {"default": "panda"},
     "textures": {
       "default": "textures/entity/panda/panda",
-      "lazy": "textures/entity/panda/panda_lazy",
-      "worried": "textures/entity/panda/panda_worried",
-      "playful": "textures/entity/panda/panda_playful",
-      "brown": "textures/entity/panda/panda_brown",
-      "weak": "textures/entity/panda/panda_sneezy",
-      "aggressive": "textures/entity/panda/panda_aggressive"
+      "lazy": "textures/entity/panda/lazy_panda",
+      "worried": "textures/entity/panda/worried_panda",
+      "playful": "textures/entity/panda/playful_panda",
+      "brown": "textures/entity/panda/brown_panda",
+      "weak": "textures/entity/panda/weak_panda",
+      "aggressive": "textures/entity/panda/aggressive_panda"
     },
     "geometry": {
       "default": {
@@ -10809,7 +10807,7 @@
   "pillager": {
     "identifier": "minecraft:pillager",
     "materials": {"default": "pillager"},
-    "textures": {"default": "textures/entity/pillager"},
+    "textures": {"default": "textures/entity/illager/pillager"},
     "geometry": {
       "default": {
         "visible_bounds_width": 1.5,
@@ -11337,9 +11335,7 @@
               }
             ]
           }
-        ],
-        "texturewidth": 64,
-        "textureheight": 64
+        ]
       },
       "cape": {
         "texturewidth": 64,
@@ -12242,7 +12238,7 @@
   "polar_bear": {
     "identifier": "minecraft:polar_bear",
     "materials": {"default": "polar_bear"},
-    "textures": {"default": "textures/entity/polarbear"},
+    "textures": {"default": "textures/entity/bear/polarbear"},
     "geometry": {
       "default": {
         "visible_bounds_width": 3,
@@ -12779,7 +12775,7 @@
     "textures": {
       "brown": "textures/entity/rabbit/brown",
       "white": "textures/entity/rabbit/white",
-      "black": "textures/entity/rabbit/blackrabbit",
+      "black": "textures/entity/rabbit/black",
       "white_splotched": "textures/entity/rabbit/white_splotched",
       "gold": "textures/entity/rabbit/gold",
       "salt": "textures/entity/rabbit/salt",
@@ -13463,9 +13459,7 @@
               }
             ]
           }
-        ],
-        "texturewidth": 64,
-        "textureheight": 32
+        ]
       },
       "sheared": {
         "visible_bounds_width": 2,
@@ -13514,9 +13508,7 @@
             "pivot": [3, 12, -5],
             "cubes": [{"origin": [1, 0, -7], "size": [4, 12, 4], "uv": [0, 16]}]
           }
-        ],
-        "texturewidth": 64,
-        "textureheight": 32
+        ]
       }
     },
     "animations": {
@@ -13626,7 +13618,7 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "shulker"},
     "textures": {
-      "undyed": "textures/entity/shulker/shulker_undyed",
+      "undyed": "textures/entity/shulker/shulker",
       "white": "textures/entity/shulker/shulker_white",
       "orange": "textures/entity/shulker/shulker_orange",
       "magenta": "textures/entity/shulker/shulker_magenta",
@@ -13635,7 +13627,7 @@
       "lime": "textures/entity/shulker/shulker_lime",
       "pink": "textures/entity/shulker/shulker_pink",
       "gray": "textures/entity/shulker/shulker_gray",
-      "silver": "textures/entity/shulker/shulker_silver",
+      "silver": "textures/entity/shulker/shulker_light_gray",
       "cyan": "textures/entity/shulker/shulker_cyan",
       "purple": "textures/entity/shulker/shulker_purple",
       "blue": "textures/entity/shulker/shulker_blue",
@@ -14499,8 +14491,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 64,
-        "textureheight": 64,
+        "texturewidth": 128,
+        "textureheight": 128,
         "bones": [
           {
             "name": "Body",
@@ -14922,7 +14914,7 @@
   "small_fireball": {
     "identifier": "minecraft:small_fireball",
     "materials": {"default": "fireball"},
-    "textures": {"default": "textures/items/fireball"},
+    "textures": {"default": "textures/items/fire_charge"},
     "geometry": {
       "default": {
         "bones": [
@@ -15037,9 +15029,7 @@
               }
             ]
           }
-        ],
-        "texturewidth": 64,
-        "textureheight": 64
+        ]
       }
     },
     "animations": {
@@ -16157,9 +16147,9 @@
     "materials": {"default": "strider"},
     "textures": {
       "default": "textures/entity/strider/strider",
-      "saddled": "textures/entity/strider/strider_saddled",
-      "suffocated": "textures/entity/strider/strider_suffocated",
-      "suffocated_saddled": "textures/entity/strider/strider_suffocated_saddled"
+      "saddled": "textures/entity/strider/strider",
+      "suffocated": "textures/entity/strider/strider_cold",
+      "suffocated_saddled": "textures/entity/strider/strider_cold"
     },
     "geometry": {
       "default": {
@@ -16404,7 +16394,7 @@
     "identifier": "minecraft:thrown_trident",
     "textures": {
       "default": "textures/entity/trident",
-      "loyalty_rope": "textures/entity/loyalty_rope"
+      "loyalty_rope": "textures/entity/lead_knot"
     },
     "geometry": {
       "default": {
@@ -16707,7 +16697,7 @@
   "turtle": {
     "identifier": "minecraft:turtle",
     "materials": {"default": "turtle"},
-    "textures": {"default": "textures/entity/sea_turtle"},
+    "textures": {"default": "textures/entity/turtle/big_sea_turtle"},
     "geometry": {
       "default": {
         "texturewidth": 128,
@@ -16916,8 +16906,8 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "vex"},
     "textures": {
-      "default": "textures/entity/vex/vex",
-      "charging": "textures/entity/vex/vex_charging"
+      "default": "textures/entity/illager/vex",
+      "charging": "textures/entity/illager/vex_charging"
     },
     "geometry": {
       "default": {
@@ -17461,11 +17451,11 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "villager"},
     "textures": {
-      "farmer": "textures/entity/villager/farmer",
-      "librarian": "textures/entity/villager/librarian",
-      "priest": "textures/entity/villager/priest",
-      "smith": "textures/entity/villager/smith",
-      "butcher": "textures/entity/villager/butcher"
+      "farmer": "textures/entity/villager/profession/farmer",
+      "librarian": "textures/entity/villager/profession/librarian",
+      "priest": "textures/entity/villager/profession/cleric",
+      "smith": "textures/entity/villager/profession/weaponsmith",
+      "butcher": "textures/entity/villager/profession/butcher"
     },
     "geometry": {
       "default": {
@@ -17600,7 +17590,7 @@
     "identifier": "minecraft:vindicator",
     "min_engine_version": "1.8.0",
     "materials": {"default": "vindicator"},
-    "textures": {"default": "textures/entity/vindicator"},
+    "textures": {"default": "textures/entity/illager/vindicator"},
     "geometry": {
       "default": {
         "visible_bounds_width": 1.5,
@@ -18029,9 +18019,7 @@
               }
             ]
           }
-        ],
-        "texturewidth": 64,
-        "textureheight": 64
+        ]
       }
     },
     "scripts": {"scale": "0.9375"},
@@ -18257,10 +18245,10 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "wither_boss", "armor": "wither_boss_armor"},
     "textures": {
-      "default": "textures/entity/wither_boss/wither",
-      "armor_white": "textures/entity/wither_boss/wither_armor_white",
-      "armor_blue": "textures/entity/wither_boss/wither_armor_blue",
-      "invulnerable": "textures/entity/wither_boss/wither_invulnerable"
+      "default": "textures/entity/wither/wither",
+      "armor_white": "textures/entity/wither/wither_armor",
+      "armor_blue": "textures/entity/wither/wither_armor",
+      "invulnerable": "textures/entity/wither/wither_invulnerable"
     },
     "geometry": {
       "default": {
@@ -18975,7 +18963,7 @@
   "wither_skull": {
     "identifier": "minecraft:wither_skull",
     "materials": {"default": "wither_skull"},
-    "textures": {"default": "textures/entity/wither_boss/wither"},
+    "textures": {"default": "textures/entity/wither/wither"},
     "geometry": {
       "default": {
         "bones": [
@@ -19307,7 +19295,7 @@
   "zoglin": {
     "identifier": "minecraft:zoglin",
     "materials": {"default": "zoglin"},
-    "textures": {"default": "textures/entity/zoglin/zoglin"},
+    "textures": {"default": "textures/entity/hoglin/zoglin"},
     "geometry": {
       "default": {
         "bones": [
@@ -19448,7 +19436,7 @@
         "visible_bounds_height": 2,
         "visible_bounds_offset": [0, 1, 0],
         "texturewidth": 64,
-        "textureheight": 64,
+        "textureheight": 32,
         "bones": [
           {
             "name": "body",
@@ -19989,8 +19977,8 @@
         "visible_bounds_width": 2,
         "visible_bounds_height": 3,
         "visible_bounds_offset": [0, 1, 0],
-        "texturewidth": 64,
-        "textureheight": 64,
+        "texturewidth": 128,
+        "textureheight": 128,
         "bones": [
           {
             "name": "Body",
@@ -20314,7 +20302,7 @@
     "identifier": "minecraft:zombie_pigman",
     "min_engine_version": "1.8.0",
     "materials": {"default": "zombie"},
-    "textures": {"default": "textures/entity/piglin/zombie_piglin"},
+    "textures": {"default": "textures/entity/piglin/zombified_piglin"},
     "geometry": {
       "default": {
         "bones": [
@@ -20920,11 +20908,11 @@
     "min_engine_version": "1.8.0",
     "materials": {"default": "zombie_villager"},
     "textures": {
-      "smith": "textures/entity/zombie_villager/zombie_smith",
-      "butcher": "textures/entity/zombie_villager/zombie_butcher",
-      "librarian": "textures/entity/zombie_villager/zombie_librarian",
-      "priest": "textures/entity/zombie_villager/zombie_priest",
-      "farmer": "textures/entity/zombie_villager/zombie_farmer"
+      "smith": "textures/entity/zombie_villager/profession/weaponsmith",
+      "butcher": "textures/entity/zombie_villager/profession/butcher",
+      "librarian": "textures/entity/zombie_villager/profession/librarian",
+      "priest": "textures/entity/zombie_villager/profession/cleric",
+      "farmer": "textures/entity/zombie_villager/profession/farmer"
     },
     "geometry": {
       "default": {

@@ -1,3 +1,32 @@
+### 1.19.0
+
+* Add tints (thanks @Moondarker)
+
+### 1.18.2
+
+* Use entity name correctly
+
+### 1.18.1
+
+* Fix self ghost entity
+
+### 1.18.0
+
+* Add names above players
+
+### 1.17.0
+
+* expose version in viewer
+
+### 1.16.2
+
+* properly fix water bug
+* improve input perfs
+
+### 1.16.1
+
+* fix rendering bug
+
 ### 1.16.0
 
 * Fix bugs

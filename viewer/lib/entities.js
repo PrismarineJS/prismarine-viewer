@@ -4,15 +4,32 @@ const TWEEN = require('@tweenjs/tween.js')
 const Entity = require('./entity/Entity')
 
 function getEntityMesh (entity, scene) {
-  if (entity.type === 'object') {
-    const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
-    geometry.translate(0, entity.height / 2, 0)
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-    const cube = new THREE.Mesh(geometry, material)
-    return cube
-  } else if (entity.type) {
+  if (entity.name) {
     try {
-      const e = new Entity('1.16.4', entity.type, scene)
+      const e = new Entity('1.16.4', entity.name, scene)
+
+      if (entity.username !== undefined) {
+        const canvas = document.createElement('canvas')
+        canvas.width = 500
+        canvas.height = 100
+
+        const ctx = canvas.getContext('2d')
+        ctx.font = '50pt Arial'
+        ctx.fillStyle = '#000000'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'top'
+
+        const txt = entity.username
+        ctx.fillText(txt, 100, 0)
+
+        const tex = new THREE.Texture(canvas)
+        tex.needsUpdate = true
+        const spriteMat = new THREE.SpriteMaterial({ map: tex })
+        const sprite = new THREE.Sprite(spriteMat)
+        sprite.position.y += entity.height + 0.6
+
+        e.mesh.add(sprite)
+      }
       return e.mesh
     } catch (err) {
       console.log(err)
