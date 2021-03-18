@@ -884,9 +884,9 @@ class MapControls {
   }
 
   registerHandlers() {
-    this.element.addEventListener('pointermove', this.onPointerMove, {passive: true})
-    this.element.addEventListener('pointerup', this.onPointerUp, {passive: true})
-    this.element.addEventListener('pointerdown', this.onPointerDown, {passive: true})
+    this.element.addEventListener('pointermove', this.onPointerMove, false, {passive: true})
+    this.element.addEventListener('pointerup', this.onPointerUp, false, {passive: true})
+    this.element.addEventListener('pointerdown', this.onPointerDown, false, {passive: true})
     this.element.addEventListener('wheel', this.onMouseWheel, true, {passive: true})
 
     this.element.addEventListener('touchstart', this.onTouchStart, false, {passive: true})
