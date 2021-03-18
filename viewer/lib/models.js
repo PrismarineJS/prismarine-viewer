@@ -341,7 +341,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
         // TODO: correctly interpolate ao light based on pos (evaluate once for each corner of the block)
 
         const ao = (side1Block && side2Block) ? 0 : (3 - (side1Block + side2Block + cornerBlock))
-        light = ao / 3
+        light = (ao + 1) / 4
         aos.push(ao)
       }
 
