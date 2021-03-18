@@ -1,4 +1,5 @@
 const Chunks = require('prismarine-chunk')
+const mcData = require('minecraft-data')
 
 function columnKey (x, z) {
   return `${x},${z}`
@@ -22,6 +23,7 @@ class World {
     this.Chunk = Chunks(version)
     this.columns = {}
     this.blockCache = {}
+    this.biomeCache = mcData(version).biomes
   }
 
   addColumn (x, z, json) {
@@ -69,6 +71,7 @@ class World {
 
     const block = this.blockCache[stateId]
     block.position = loc
+    block.biome = this.biomeCache[column.getBiome(locInChunk)]
     return block
   }
 }

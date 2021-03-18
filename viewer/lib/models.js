@@ -1,5 +1,34 @@
 const { Vec3 } = require('vec3')
 
+const tints = require('minecraft-data')('1.16.2').tints
+
+for (const key of Object.keys(tints)) {
+  tints[key] = prepareTints(tints[key])
+}
+
+function prepareTints (tints) {
+  const map = new Map()
+  const defaultValue = tintToGl(tints.default)
+  for (let { keys, color } of tints.data) {
+    color = tintToGl(color)
+    for (const key of keys) {
+      map.set(`${key}`, color)
+    }
+  }
+  return new Proxy(map, {
+    get: (target, key) => {
+      return target.has(key) ? target.get(key) : defaultValue
+    }
+  })
+}
+
+function tintToGl (tint) {
+  const r = (tint >> 16) & 0xff
+  const g = (tint >> 8) & 0xff
+  const b = tint & 0xff
+  return [r / 255, g / 255, b / 255]
+}
+
 const elemFaces = {
   up: {
     dir: [0, 1, 0],
@@ -108,7 +137,8 @@ function renderLiquid (world, cursor, texture, type, block, water, attr) {
       let m = 1 // Fake lighting to improve lisibility
       if (Math.abs(dir[0]) > 0) m = 0.6
       else if (Math.abs(dir[2]) > 0) m = 0.8
-      tint = [0.247 * m, 0.463 * m, 0.894 * m] // TODO: correct tint for the biome
+      tint = tints.water[block.biome.name]
+      tint = [tint[0] * m, tint[1] * m, tint[2] * m]
     }
 
     const u = texture.u
@@ -231,7 +261,17 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
     let tint = [1, 1, 1]
     if (eFace.tintindex !== undefined) {
       if (eFace.tintindex === 0) {
-        tint = [0.568, 0.741, 0.349] // TODO: correct tint for each block
+        if (block.name === 'redstone_wire') {
+          tint = tints.redstone[`${block.getProperties().power}`]
+        } else if (block.name === 'birch_leaves' ||
+                   block.name === 'spruce_leaves' ||
+                   block.name === 'lily_pad') {
+          tint = tints.constant[block.name]
+        } else if (block.name.includes('leaves') || block.name === 'vine') {
+          tint = tints.foliage[block.biome.name]
+        } else {
+          tint = tints.grass[block.biome.name]
+        }
       }
     }
 
@@ -380,7 +420,7 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
   }
 
   let ndx = attr.positions.length / 3
-  for (let i = 0; i < attr.t_positions.length / 3; i++) {
+  for (let i = 0; i < attr.t_positions.length / 12; i++) {
     attr.indices.push(
       ndx, ndx + 1, ndx + 2,
       ndx + 2, ndx + 1, ndx + 3,
