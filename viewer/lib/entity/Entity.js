@@ -89,6 +89,12 @@ function dot (a, b) {
 }
 
 function addCube (attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
+  const cubeRotation = new THREE.Euler(0, 0, 0)
+  if (cube.rotation) {
+    cubeRotation.x = -cube.rotation[0] * Math.PI / 180
+    cubeRotation.y = -cube.rotation[1] * Math.PI / 180
+    cubeRotation.z = -cube.rotation[2] * Math.PI / 180
+  }
   for (const { dir, corners, u0, v0, u1, v1 } of Object.values(elemFaces)) {
     const ndx = Math.floor(attr.positions.length / 3)
 
@@ -103,6 +109,7 @@ function addCube (attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
         cube.origin[2] + pos[2] * cube.size[2] + (pos[2] ? inflate : -inflate)
       )
 
+      vecPos = vecPos.applyEuler(cubeRotation)
       vecPos = vecPos.sub(bone.position)
       vecPos = vecPos.applyEuler(bone.rotation)
       vecPos = vecPos.add(bone.position)
@@ -144,6 +151,10 @@ function getMesh (texture, jsonModel) {
       bone.rotation.x = -jsonBone.bind_pose_rotation[0] * Math.PI / 180
       bone.rotation.y = -jsonBone.bind_pose_rotation[1] * Math.PI / 180
       bone.rotation.z = -jsonBone.bind_pose_rotation[2] * Math.PI / 180
+    } else if (jsonBone.rotation) {
+      bone.rotation.x = -jsonBone.rotation[0] * Math.PI / 180
+      bone.rotation.y = -jsonBone.rotation[1] * Math.PI / 180
+      bone.rotation.z = -jsonBone.rotation[2] * Math.PI / 180
     }
     bones[jsonBone.name] = bone
 
