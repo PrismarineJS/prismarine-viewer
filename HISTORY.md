@@ -1,3 +1,9 @@
+### 1.19.1
+
+* Lighten ao slightly
+* Fix some missing rotations
+* Fix some entity texture paths
+
 ### 1.19.0
 
 * Add tints (thanks @Moondarker)
