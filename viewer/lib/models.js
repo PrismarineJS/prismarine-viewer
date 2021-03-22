@@ -108,7 +108,7 @@ function getLiquidRenderHeight (world, block, type) {
   return ((block.metadata >= 8 ? 8 : 7 - block.metadata) + 1) / 9
 }
 
-function renderLiquid (world, cursor, texture, type, block, water, attr) {
+function renderLiquid (world, cursor, texture, type, biome, water, attr) {
   const heights = []
   for (let z = -1; z <= 1; z++) {
     for (let x = -1; x <= 1; x++) {
@@ -137,7 +137,7 @@ function renderLiquid (world, cursor, texture, type, block, water, attr) {
       let m = 1 // Fake lighting to improve lisibility
       if (Math.abs(dir[0]) > 0) m = 0.6
       else if (Math.abs(dir[2]) > 0) m = 0.8
-      tint = tints.water[block.biome.name]
+      tint = tints.water[biome]
       tint = [tint[0] * m, tint[1] * m, tint[2] * m]
     }
 
@@ -228,7 +228,7 @@ function buildRotationMatrix (axis, degree) {
   return matrix
 }
 
-function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift, block) {
+function renderElement (world, cursor, element, doAO, attr, globalMatrix, globalShift, block, biome) {
   const cullIfIdentical = block.name.indexOf('glass') >= 0
 
   for (const face in element.faces) {
@@ -268,9 +268,9 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
                    block.name === 'lily_pad') {
           tint = tints.constant[block.name]
         } else if (block.name.includes('leaves') || block.name === 'vine') {
-          tint = tints.foliage[block.biome.name]
+          tint = tints.foliage[biome]
         } else {
-          tint = tints.grass[block.biome.name]
+          tint = tints.grass[biome]
         }
       }
     }
@@ -383,6 +383,7 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
     for (cursor.z = sz; cursor.z < sz + 16; cursor.z++) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
         const block = world.getBlock(cursor)
+        const biome = block.biome.name
         if (block.variant === undefined) {
           block.variant = getModelVariants(block, blocksStates)
         }
@@ -391,9 +392,9 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
           if (!variant || !variant.model) continue
 
           if (block.name === 'water') {
-            renderLiquid(world, cursor, variant.model.textures.particle, block.type, block, true, attr)
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, biome, true, attr)
           } else if (block.name === 'lava') {
-            renderLiquid(world, cursor, variant.model.textures.particle, block.type, block, false, attr)
+            renderLiquid(world, cursor, variant.model.textures.particle, block.type, biome, false, attr)
           } else {
             let globalMatrix = null
             let globalShift = null
@@ -411,7 +412,7 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
             }
 
             for (const element of variant.model.elements) {
-              renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift, block)
+              renderElement(world, cursor, element, variant.model.ao, attr, globalMatrix, globalShift, block, biome)
             }
           }
         }
