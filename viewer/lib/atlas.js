@@ -2,11 +2,22 @@ const fs = require('fs')
 const { Canvas, Image } = require('canvas')
 const path = require('path')
 
+function nextPowerOfTwo (n) {
+  if (n === 0) return 1
+  n--
+  n |= n >> 1
+  n |= n >> 2
+  n |= n >> 4
+  n |= n >> 8
+  n |= n >> 16
+  return n + 1
+}
+
 function makeTextureAtlas (mcAssets) {
   const blocksTexturePath = path.join(mcAssets.directory, '/blocks')
   const textureFiles = fs.readdirSync(blocksTexturePath).filter(file => file.endsWith('.png'))
 
-  const texSize = Math.ceil(Math.sqrt(textureFiles.length))
+  const texSize = nextPowerOfTwo(Math.ceil(Math.sqrt(textureFiles.length)))
   const tileSize = 16
 
   const imgSize = texSize * tileSize
