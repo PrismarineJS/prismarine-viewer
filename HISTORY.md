@@ -1,3 +1,7 @@
+### 1.19.2
+
+* biome cache bug fix
+
 ### 1.19.1
 
 * Lighten ao slightly
