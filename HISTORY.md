@@ -1,3 +1,7 @@
+### 1.19.3
+
+* Fix standalone
+
 ### 1.19.2
 
 * biome cache bug fix
