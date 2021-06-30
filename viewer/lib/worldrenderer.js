@@ -13,6 +13,7 @@ class WorldRenderer {
     this.scene = scene
     this.loadedChunks = {}
     this.renderedChunks = {}
+    this.renderFinished = false
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
@@ -44,6 +45,10 @@ class WorldRenderer {
           this.sectionMeshs[data.key] = mesh
           this.scene.add(mesh)
           this.renderedChunks[chunkCoords[0] + ',' + chunkCoords[2]] = true
+        } else if (data.type === 'progress') {
+          if (data.value === 1) {
+            this.renderFinished = true
+          }
         }
       }
       if (worker.on) worker.on('message', (data) => { worker.onmessage({ data }) })
@@ -126,15 +131,18 @@ class WorldRenderer {
   }
 
   async waitForChunksToRender() {
-    const areLoaded = () => {
-      for (const c of this.renderedChunks) {
-        if (c !== true) return false
-      }
-      return true
-    }
+    // This does not work as some chunks never load (???)
+    // const areLoaded = () => {
+    //   for (const i in this.renderedChunks) {
+    //     if (this.renderedChunks[i] !== true) return false
+    //   }
+    //   return true
+    // }
 
-    while (!areLoaded()) {
-      await new Promise(r => setTimeout(r, 100))
+    // Wait for the next pass off workers to confirm there is no more work to be done
+    this.renderFinished = false
+    while (!this.renderFinished) {
+      await new Promise(r => setTimeout(r, 1000))
     }
     return
   }
