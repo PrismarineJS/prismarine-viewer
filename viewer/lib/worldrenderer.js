@@ -97,7 +97,7 @@ class WorldRenderer {
 
   removeColumn (x, z) {
     delete this.loadedChunks[`${x},${z}`]
-    delete this.renderedChunks[`${x},${z}`] 
+    delete this.renderedChunks[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
@@ -130,7 +130,7 @@ class WorldRenderer {
     this.workers[hash].postMessage({ type: 'dirty', x: pos.x, y: pos.y, z: pos.z, value })
   }
 
-  async waitForChunksToRender() {
+  async waitForChunksToRender () {
     // This does not work as some chunks never load (???)
     // const areLoaded = () => {
     //   for (const i in this.renderedChunks) {
@@ -142,9 +142,8 @@ class WorldRenderer {
     // Wait for the next pass off workers to confirm there is no more work to be done
     this.renderFinished = false
     while (!this.renderFinished) {
-      await new Promise(r => setTimeout(r, 1000))
+      await new Promise(resolve => setTimeout(resolve, 1000))
     }
-    return
   }
 }
 

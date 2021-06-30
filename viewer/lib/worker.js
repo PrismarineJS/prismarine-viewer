@@ -59,7 +59,7 @@ setInterval(() => {
   const sections = Object.keys(dirtySections)
 
   if (sections.length === 0) {
-    postMessage({type: 'progress', value: 1})
+    postMessage({ type: 'progress', value: 1 })
     return
   }
   // console.log(sections.length + ' dirty sections')
