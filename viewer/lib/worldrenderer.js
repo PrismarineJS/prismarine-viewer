@@ -12,6 +12,7 @@ class WorldRenderer {
     this.sectionMeshs = {}
     this.scene = scene
     this.loadedChunks = {}
+    this.renderedChunks = {}
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
@@ -42,6 +43,7 @@ class WorldRenderer {
           mesh.position.set(data.geometry.sx, data.geometry.sy, data.geometry.sz)
           this.sectionMeshs[data.key] = mesh
           this.scene.add(mesh)
+          this.renderedChunks[chunkCoords[0] + ',' + chunkCoords[2]] = true
         }
       }
       if (worker.on) worker.on('message', (data) => { worker.onmessage({ data }) })
@@ -74,6 +76,7 @@ class WorldRenderer {
 
   addColumn (x, z, chunk) {
     this.loadedChunks[`${x},${z}`] = true
+    this.renderedChunks[`${x},${z}`] = 'loading'
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
@@ -89,6 +92,7 @@ class WorldRenderer {
 
   removeColumn (x, z) {
     delete this.loadedChunks[`${x},${z}`]
+    delete this.renderedChunks[`${x},${z}`] 
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
@@ -119,6 +123,20 @@ class WorldRenderer {
     // is always dispatched to the same worker
     const hash = mod(Math.floor(pos.x / 16) + Math.floor(pos.y / 16) + Math.floor(pos.z / 16), this.workers.length)
     this.workers[hash].postMessage({ type: 'dirty', x: pos.x, y: pos.y, z: pos.z, value })
+  }
+
+  async waitForChunksToRender() {
+    const areLoaded = () => {
+      for (const c of this.renderedChunks) {
+        if (c !== true) return false
+      }
+      return true
+    }
+
+    while (!areLoaded()) {
+      await new Promise(r => setTimeout(r, 100))
+    }
+    return
   }
 }
 
