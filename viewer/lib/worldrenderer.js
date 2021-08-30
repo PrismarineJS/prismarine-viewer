@@ -2,6 +2,7 @@
 const THREE = require('three')
 const Vec3 = require('vec3').Vec3
 const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
+const { EventEmitter } = require('events')
 
 function mod (x, n) {
   return ((x % n) + n) % n
@@ -11,7 +12,8 @@ class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
     this.scene = scene
-    this.loadedChunks = {}
+    this.sectionsOutstanding = new Set()
+    this.renderUpdateEmitter = new EventEmitter()
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
@@ -28,9 +30,6 @@ class WorldRenderer {
           let mesh = this.sectionMeshs[data.key]
           if (mesh) this.scene.remove(mesh)
 
-          const chunkCoords = data.key.split(',')
-          if (!this.loadedChunks[chunkCoords[0] + ',' + chunkCoords[2]]) return
-
           const geometry = new THREE.BufferGeometry()
           geometry.setAttribute('position', new THREE.BufferAttribute(data.geometry.positions, 3))
           geometry.setAttribute('normal', new THREE.BufferAttribute(data.geometry.normals, 3))
@@ -42,6 +41,9 @@ class WorldRenderer {
           mesh.position.set(data.geometry.sx, data.geometry.sy, data.geometry.sz)
           this.sectionMeshs[data.key] = mesh
           this.scene.add(mesh)
+        } else if (data.type === 'sectionFinished') {
+          this.sectionsOutstanding.delete(data.key)
+          this.renderUpdateEmitter.emit('update')
         }
       }
       if (worker.on) worker.on('message', (data) => { worker.onmessage({ data }) })
@@ -73,7 +75,6 @@ class WorldRenderer {
   }
 
   addColumn (x, z, chunk) {
-    this.loadedChunks[`${x},${z}`] = true
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
@@ -88,7 +89,6 @@ class WorldRenderer {
   }
 
   removeColumn (x, z) {
-    delete this.loadedChunks[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
@@ -119,6 +119,26 @@ class WorldRenderer {
     // is always dispatched to the same worker
     const hash = mod(Math.floor(pos.x / 16) + Math.floor(pos.y / 16) + Math.floor(pos.z / 16), this.workers.length)
     this.workers[hash].postMessage({ type: 'dirty', x: pos.x, y: pos.y, z: pos.z, value })
+    this.sectionsOutstanding.add(`${Math.floor(pos.x / 16) * 16},${Math.floor(pos.y / 16) * 16},${Math.floor(pos.z / 16) * 16}`)
+  }
+
+  // Listen for chunk rendering updates emitted if a worker finished a render and resolve if the number
+  // of sections not rendered are 0
+  waitForChunksToRender () {
+    return new Promise((resolve, reject) => {
+      if (Array.from(this.sectionsOutstanding).length === 0) {
+        resolve()
+        return
+      }
+
+      const updateHandler = () => {
+        if (this.sectionsOutstanding.size === 0) {
+          this.renderUpdateEmitter.removeListener('update', updateHandler)
+          resolve()
+        }
+      }
+      this.renderUpdateEmitter.on('update', updateHandler)
+    })
   }
 }
 

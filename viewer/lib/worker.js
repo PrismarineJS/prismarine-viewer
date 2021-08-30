@@ -31,8 +31,11 @@ function setSectionDirty (pos, value = true) {
   const key = sectionKey(x, y, z)
   if (!value) {
     delete dirtySections[key]
+    postMessage({ type: 'sectionFinished', key })
   } else if (chunk && chunk.sections[Math.floor(y / 16)]) {
     dirtySections[key] = value
+  } else {
+    postMessage({ type: 'sectionFinished', key })
   }
 }
 
@@ -74,6 +77,7 @@ setInterval(() => {
       const transferable = [geometry.positions.buffer, geometry.normals.buffer, geometry.colors.buffer, geometry.uvs.buffer]
       postMessage({ type: 'geometry', key, geometry }, transferable)
     }
+    postMessage({ type: 'sectionFinished', key })
   }
   // const time = performance.now() - start
   // console.log(`Processed ${sections.length} sections in ${time} ms (${time / sections.length} ms/section)`)

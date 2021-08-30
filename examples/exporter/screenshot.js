@@ -9,6 +9,7 @@ global.Worker = require('worker_threads').Worker
 const { createCanvas } = require('node-canvas-webgl/lib')
 const { Schematic } = require('prismarine-schematic')
 const fs = require('fs').promises
+const path = require('path')
 const Vec3 = require('vec3').Vec3
 
 const { Viewer, WorldView, getBufferFromStream } = require('../..').viewer
@@ -24,7 +25,7 @@ const main = async () => {
   const canvas = createCanvas(width, height)
   const renderer = new THREE.WebGLRenderer({ canvas })
   const viewer = new Viewer(renderer)
-  const data = await fs.readFile('../standalone/public/smallhouse1.schem')
+  const data = await fs.readFile('./examples/standalone/public/smallhouse1.schem')
   const schem = await Schematic.read(data, version)
 
   const world = new World(() => new Chunk())
@@ -44,7 +45,7 @@ const main = async () => {
   viewer.camera.lookAt(point)
 
   await worldView.init(center)
-  await new Promise(resolve => setTimeout(resolve, 6000))
+  await viewer.world.waitForChunksToRender()
   renderer.render(viewer.scene, viewer.camera)
 
   const imageStream = canvas.createJPEGStream({
@@ -53,7 +54,9 @@ const main = async () => {
     progressive: false
   })
   const buf = await getBufferFromStream(imageStream)
-  await fs.writeFile('test.jpg', buf)
+  await fs.mkdir('screenshots/', { recursive: true })
+  await fs.writeFile('screenshots/test.jpg', buf)
   console.log('saved')
+  process.exit(0)
 }
 main()
