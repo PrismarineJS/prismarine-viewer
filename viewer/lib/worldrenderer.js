@@ -12,6 +12,7 @@ class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
     this.scene = scene
+    this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
     this.renderUpdateEmitter = new EventEmitter()
 
@@ -29,6 +30,9 @@ class WorldRenderer {
         if (data.type === 'geometry') {
           let mesh = this.sectionMeshs[data.key]
           if (mesh) this.scene.remove(mesh)
+
+          const chunkCoords = data.key.split(',')
+          if (!this.loadedChunks[chunkCoords[0] + ',' + chunkCoords[2]]) return
 
           const geometry = new THREE.BufferGeometry()
           geometry.setAttribute('position', new THREE.BufferAttribute(data.geometry.positions, 3))
@@ -75,6 +79,7 @@ class WorldRenderer {
   }
 
   addColumn (x, z, chunk) {
+    this.loadedChunks[`${x},${z}`] = true
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
@@ -89,6 +94,7 @@ class WorldRenderer {
   }
 
   removeColumn (x, z) {
+    delete this.loadedChunks[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
