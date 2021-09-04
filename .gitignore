@@ -12,3 +12,4 @@ examples/standalone/public/worker.js
 examples/standalone/public/supportedVersions.json
 examples/standalone/public/textures/
 examples/standalone/public/blocksStates/
+*.DS_Store
