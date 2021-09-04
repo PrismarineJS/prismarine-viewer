@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:14
 
 # Install OpenJDK-8
 RUN apt-get update && \
