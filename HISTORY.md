@@ -1,3 +1,7 @@
+### 1.20.0
+
+* 1.17.1 support
+
 ### 1.19.3
 
 * Fix standalone
