@@ -13,7 +13,11 @@ jobs:
     strategy:
       matrix:
         node-version: [14.x]
+        javaVersion: [1.8]
         mcVersionIndex: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        include:
+         - javaVersion: 16
+           mcVersionIndex: 10
 
     steps:
     - uses: actions/checkout@v2
@@ -24,12 +28,12 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: ${{ matrix.javaVersion }}
         java-package: jre
     - run: npm install
     - env:
         CIRCLE_NODE_INDEX: ${{ matrix.mcVersionIndex }}
-        CIRCLE_NODE_TOTAL: 10
+        CIRCLE_NODE_TOTAL: 11
       run: npm test
     - uses: actions/upload-artifact@v2
       with:
