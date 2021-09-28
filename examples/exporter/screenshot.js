@@ -25,7 +25,7 @@ const main = async () => {
   const canvas = createCanvas(width, height)
   const renderer = new THREE.WebGLRenderer({ canvas })
   const viewer = new Viewer(renderer)
-  const data = await fs.readFile('./examples/standalone/public/smallhouse1.schem')
+  const data = await fs.readFile(path.join(__dirname, '../standalone/public/smallhouse1.schem'))
   const schem = await Schematic.read(data, version)
 
   const world = new World(() => new Chunk())
@@ -54,8 +54,8 @@ const main = async () => {
     progressive: false
   })
   const buf = await getBufferFromStream(imageStream)
-  await fs.mkdir('screenshots/', { recursive: true })
-  await fs.writeFile('screenshots/test.jpg', buf)
+  await fs.mkdir(path.join(__dirname, 'screenshots/'), { recursive: true })
+  await fs.writeFile(path.join(__dirname, 'screenshots/test.jpg'), buf)
   console.log('saved')
   process.exit(0)
 }
