@@ -26,7 +26,10 @@ class WorldRenderer {
       worker.onmessage = ({ data }) => {
         if (data.type === 'geometry') {
           let mesh = this.sectionMeshs[data.key]
-          if (mesh) this.scene.remove(mesh)
+          if (mesh) {
+            this.scene.remove(mesh)
+            mesh.geometry.dispose()
+          }
 
           const chunkCoords = data.key.split(',')
           if (!this.loadedChunks[chunkCoords[0] + ',' + chunkCoords[2]]) return
