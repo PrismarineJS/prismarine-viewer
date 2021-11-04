@@ -98,7 +98,7 @@ class WorldRenderer {
       const mesh = this.sectionMeshs[key]
       if (mesh) {
         this.scene.remove(mesh)
-        mesh.geometry.dispose();
+        mesh.geometry.dispose()
       }
     }
   }
