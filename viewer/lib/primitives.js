@@ -56,6 +56,8 @@ class Primitives {
   clear () {
     for (const mesh of Object.values(this.primitives)) {
       this.scene.remove(mesh)
+      mesh.geometry.dispose()
+      mesh.material.dispose()
     }
     this.primitives = {}
   }
@@ -63,6 +65,8 @@ class Primitives {
   update (primitive) {
     if (this.primitives[primitive.id]) {
       this.scene.remove(this.primitives[primitive.id])
+      this.primitives[primitive.id].geometry.dispose()
+      this.primitives[primitive.id].material.dispose()
       delete this.primitives[primitive.id]
     }
 
