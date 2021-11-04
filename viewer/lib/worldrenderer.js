@@ -96,7 +96,10 @@ class WorldRenderer {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]
-      if (mesh) this.scene.remove(mesh)
+      if (mesh) {
+        this.scene.remove(mesh)
+        mesh.geometry.dispose();
+      }
     }
   }
 
