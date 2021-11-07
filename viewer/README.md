@@ -82,6 +82,10 @@ it also listen to these events:
 
 Update the world. This need to be called in the animate function, just before the render.
 
+#### waitForChunksToRender ()
+
+Returns a promise that resolve once all sections marked dirty have been rendered by the worker threads. Can be used to wait for chunks to 'appear'.
+
 ### WorldView
 
 WorldView represents the world from a player/camera point of view

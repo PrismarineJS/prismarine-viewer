@@ -98,6 +98,10 @@ class Viewer {
   update () {
     TWEEN.update()
   }
+
+  async waitForChunksToRender () {
+    await this.world.waitForChunksToRender()
+  }
 }
 
 module.exports = { Viewer }
