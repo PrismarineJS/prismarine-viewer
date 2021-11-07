@@ -52,6 +52,8 @@ class Entities {
   clear () {
     for (const mesh of Object.values(this.entities)) {
       this.scene.remove(mesh)
+      if (mesh.geometry) mesh.geometry.dispose()
+      if (mesh.material) mesh.material.dispose()
     }
     this.entities = {}
   }
@@ -68,6 +70,8 @@ class Entities {
 
     if (entity.delete) {
       this.scene.remove(e)
+      if (e.geometry) e.geometry.dispose()
+      if (e.material) e.material.dispose()
       delete this.entities[entity.id]
     }
 
