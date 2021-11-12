@@ -1,4 +1,4 @@
-/* eslint-env jest */
+/* eslint-env mocha */
 /* global page */
 
 const supportedVersions = require('../').supportedVersions
@@ -30,17 +30,22 @@ supportedVersions.forEach(function (supportedVersion, i) {
   })
 
   describe('client ' + version.minecraftVersion, function () {
-    beforeAll(download.bind(null, version.minecraftVersion, MC_SERVER_JAR), 3 * 60 * 1000)
+    before(function (done) {
+      this.timeout(3 * 60 * 1000)
+      download(version.minecraftVersion, MC_SERVER_JAR)
+    })
 
-    afterAll(function (done) {
+    after(function (done) {
+      this.timeout(3 * 60 * 1000)
       wrap.deleteServerData(function (err) {
         if (err) { console.log(err) }
         done(err)
       })
-    }, 3 * 60 * 1000)
+    })
 
     describe('offline', function () {
-      beforeAll(function (done) {
+      before(function (done) {
+        this.timeout(3 * 60 * 1000)
         console.log(new Date() + 'starting server ' + version.minecraftVersion)
         wrap.startServer({
           'online-mode': 'false',
@@ -52,16 +57,17 @@ supportedVersions.forEach(function (supportedVersion, i) {
           console.log(new Date() + 'started server ' + version.minecraftVersion)
           done(err)
         })
-      }, 3 * 60 * 1000)
+      })
 
-      afterAll(function (done) {
+      after(function (done) {
+        this.timeout(3 * 60 * 1000)
         console.log(new Date() + 'stopping server' + version.minecraftVersion)
         wrap.stopServer(function (err) {
           if (err) { console.log(err) }
           console.log(new Date() + 'stopped server ' + version.minecraftVersion)
           done(err)
         })
-      }, 3 * 60 * 1000)
+      })
 
       it('doesn\'t crash', function (done) {
         console.log('test')
@@ -103,7 +109,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
             }, 60000)
           }).catch(err => exit(err))
         })
-      }, 120000)
+      }).timeout(120000)
     })
   })
 })

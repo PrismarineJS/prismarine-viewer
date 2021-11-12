@@ -1,12 +1,16 @@
-/* eslint-env jest */
+/* eslint-env mocha */
 /* global page */
 
-describe('Google', () => {
-  beforeAll(async () => {
-    await page.goto('https://google.com')
-  }, 20000)
+const expect = require('expect')
 
-  it('should display "google" text on page', async () => {
+describe('Google', () => {
+  before(async function () {
+    this.timeout(20000)
+    await page.goto('https://google.com')
+  })
+
+  it('should display "google" text on page', async function () {
+    this.timeout(20000)
     await expect(page).toMatch('google')
-  }, 20000)
+  })
 })
