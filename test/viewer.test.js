@@ -32,7 +32,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
   describe('client ' + version.minecraftVersion, function () {
     before(function (done) {
       this.timeout(3 * 60 * 1000)
-      download(version.minecraftVersion, MC_SERVER_JAR)
+      download(version.minecraftVersion, MC_SERVER_JAR, done)
     })
 
     after(function (done) {
