@@ -1,3 +1,10 @@
+### 1.20.1
+
+* Dependency bumb
+* Pin three dependency
+* Fixed a few memory leaks
+* Add waitForChunksToRender() function
+
 ### 1.20.0
 
 * 1.17.1 support
