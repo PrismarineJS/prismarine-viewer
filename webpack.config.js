@@ -11,7 +11,7 @@ const indexConfig = {
   },
   resolve: {
     fallback: {
-      'zlib': false
+      zlib: false
     }
   },
   plugins: [
@@ -39,7 +39,7 @@ const workerConfig = {
   },
   resolve: {
     fallback: {
-      'zlib': false
+      zlib: false
     }
   },
   plugins: [
