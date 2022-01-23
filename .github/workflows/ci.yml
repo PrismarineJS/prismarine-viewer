@@ -37,7 +37,7 @@ jobs:
     - run: npm install
     - env:
         CIRCLE_NODE_INDEX: ${{ matrix.mcVersionIndex }}
-        CIRCLE_NODE_TOTAL: 11
+        CIRCLE_NODE_TOTAL: 12
       run: npm test
     - uses: actions/upload-artifact@v2
       with:
