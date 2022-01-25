@@ -9,6 +9,11 @@ const indexConfig = {
     path: path.resolve(__dirname, './public'),
     filename: './index.js'
   },
+  resolve: {
+    fallback: {
+      zlib: false
+    }
+  },
   plugins: [
     // fix "process is not defined" error:
     new webpack.ProvidePlugin({
@@ -31,6 +36,11 @@ const workerConfig = {
   output: {
     path: path.join(__dirname, '/public'),
     filename: './worker.js'
+  },
+  resolve: {
+    fallback: {
+      zlib: false
+    }
   },
   plugins: [
     // fix "process is not defined" error:
