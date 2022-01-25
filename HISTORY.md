@@ -1,3 +1,7 @@
+### 1.22.0
+
+* support 1.18.0
+
 ### 1.21.0
 
 * Dependency bumb
