@@ -100,7 +100,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
             })
             setTimeout(() => {
               page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => exit()).catch(err => exit(err))
-            }, 60000)
+            }, 120000)
           }).catch(err => exit(err))
         })
       }, 120000)
