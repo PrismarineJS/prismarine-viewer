@@ -71,7 +71,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
       it('starts the viewer', function (done) {
         const mineflayer = require('mineflayer')
         const mineflayerViewer = require('../').mineflayer
-        setTimeout(() => done(new Error('too slow !!!')), 120000)
+        setTimeout(() => done(new Error('too slow !!!')), 180000)
 
         const bot = mineflayer.createBot({
           username: 'Bot',
@@ -103,7 +103,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
             }, 120000)
           }).catch(err => exit(err))
         })
-      }, 120000)
+      }, 180000)
     })
   })
 })
