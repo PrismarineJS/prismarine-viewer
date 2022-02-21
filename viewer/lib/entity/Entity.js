@@ -272,12 +272,11 @@ function getPlayerMesh (texture, jsonModel) {
   return mesh
 }
 
-function httpGet(theUrl)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-    xmlHttp.send( null );
-    return JSON.parse(xmlHttp.responseText);
+function httpGet (theUrl) {
+  const xmlHttp = new XMLHttpRequest()
+  xmlHttp.open('GET', theUrl, false) // false for synchronous request
+  xmlHttp.send(null)
+  return JSON.parse(xmlHttp.responseText)
 }
 
 class Entity {
@@ -287,8 +286,8 @@ class Entity {
 
     this.mesh = new THREE.Object3D()
 
-    if (entity.name == "player") {      
-      const uuid = httpGet("https://api.ashcon.app/mojang/v2/user/" + entity.username);
+    if (entity.name === 'player') {
+      const uuid = httpGet('https://api.ashcon.app/mojang/v2/user/' + entity.username)
       if (!uuid) {
         for (const [name, jsonModel] of Object.entries(e.geometry)) {
           const texture = e.textures[name]
@@ -302,9 +301,9 @@ class Entity {
           return
         }
       }
-      const mesh = getPlayerMesh("/getGraphics?url="+uuid.textures.skin.url, entities[entity.name].geometry)
+      const mesh = getPlayerMesh('/getGraphics?url=' + uuid.textures.skin.url, entities[entity.name].geometry)
       this.mesh.add(mesh)
-      return;
+      return
     }
 
     for (const [name, jsonModel] of Object.entries(e.geometry)) {
