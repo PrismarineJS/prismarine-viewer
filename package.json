@@ -3,6 +3,7 @@
   "version": "1.22.0",
   "description": "Web based viewer",
   "main": "index.js",
+  "types": "types.d.ts",
   "scripts": {
     "test": "jest --verbose --runInBand --forceExit",
     "pretest": "npm run lint",
