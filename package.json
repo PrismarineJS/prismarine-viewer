@@ -45,7 +45,7 @@
     "jest-puppeteer": "^6.0.0",
     "minecraft-wrap": "^1.3.0",
     "mineflayer": "^4.0.0",
-    "mineflayer-pathfinder": "^1.6.1",
+    "mineflayer-pathfinder": "^2.0.0",
     "prismarine-schematic": "^1.2.0",
     "minecrafthawkeye": "^1.2.5",
     "prismarine-viewer": "file:./",
