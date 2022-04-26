@@ -41,7 +41,7 @@
     "process": "^0.11.10",
     "node-canvas-webgl": "^0.2.6",
     "minecraft-assets": "^1.9.0",
-    "jest": "^27.0.4",
+    "jest": "^28.0.0",
     "jest-puppeteer": "^6.0.0",
     "minecraft-wrap": "^1.3.0",
     "mineflayer": "^4.0.0",
