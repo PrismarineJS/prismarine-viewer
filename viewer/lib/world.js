@@ -1,5 +1,5 @@
 const Chunks = require('prismarine-chunk')
-const mcData = require('minecraft-data')
+const registry = require('prismarine-registry')
 
 function columnKey (x, z) {
   return `${x},${z}`
@@ -23,7 +23,7 @@ class World {
     this.Chunk = Chunks(version)
     this.columns = {}
     this.blockCache = {}
-    this.biomeCache = mcData(version).biomes
+    this.biomeCache = registry(version).biomes
   }
 
   addColumn (x, z, json) {

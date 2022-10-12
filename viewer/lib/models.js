@@ -1,6 +1,6 @@
 const { Vec3 } = require('vec3')
 
-const tints = require('minecraft-data')('1.16.2').tints
+const tints = require('prismarine-registry')('1.16.2').tints
 
 for (const key of Object.keys(tints)) {
   tints[key] = prepareTints(tints[key])

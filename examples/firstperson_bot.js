@@ -21,8 +21,7 @@ bot.once('spawn', () => {
     }
   })
 
-  const mcData = require('minecraft-data')(bot.version)
-  const defaultMove = new Movements(bot, mcData)
+  const defaultMove = new Movements(bot, bot.registry)
   bot.pathfinder.setMovements(defaultMove)
   bot.pathfinder.setGoal(new GoalXZ(1000, 0))
 })

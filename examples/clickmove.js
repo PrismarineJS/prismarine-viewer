@@ -23,8 +23,7 @@ bot.once('spawn', () => {
     bot.viewer.drawLine('path', path, 0xff00ff)
   })
 
-  const mcData = require('minecraft-data')(bot.version)
-  const defaultMove = new Movements(bot, mcData)
+  const defaultMove = new Movements(bot, bot.registry)
 
   bot.viewer.on('blockClicked', (block, face, button) => {
     if (button !== 2) return // only right click
