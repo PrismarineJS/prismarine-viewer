@@ -17,8 +17,8 @@ supportedVersions.forEach(function (supportedVersion, i) {
   if (!(i >= firstVersion && i <= lastVersion)) { return }
 
   const PORT = Math.round(30000 + Math.random() * 20000)
-  const mcData = require('minecraft-data')(supportedVersion)
-  const version = mcData.version
+  const registry = require('prismarine-registry')(supportedVersion)
+  const version = registry.version
   const MC_SERVER_JAR_DIR = process.env.MC_SERVER_JAR_DIR || os.tmpdir()
   const MC_SERVER_JAR = MC_SERVER_JAR_DIR + '/minecraft_server.' + version.minecraftVersion + '.jar'
   const wrap = new Wrap(MC_SERVER_JAR, MC_SERVER_PATH + '_' + supportedVersion, {
