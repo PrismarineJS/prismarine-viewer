@@ -20,7 +20,7 @@ function isCube (shapes) {
 class World {
   constructor (registryOrVersion) {
     const registry = typeof registryOrVersion === 'string' ? require('prismarine-registry')(registryOrVersion) : registryOrVersion
-    this.Chunk = Chunks(version)
+    this.Chunk = Chunks(registry)
     this.columns = {}
     this.blockCache = {}
     this.biomeCache = registry.biomes
