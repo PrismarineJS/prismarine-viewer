@@ -1,5 +1,4 @@
 const Chunks = require('prismarine-chunk')
-const registry = require('prismarine-registry')
 
 function columnKey (x, z) {
   return `${x},${z}`
@@ -19,11 +18,12 @@ function isCube (shapes) {
 }
 
 class World {
-  constructor (version) {
+  constructor (registryOrVersion) {
+    const registry = typeof registryOrVersion === 'string' ? require('prismarine-registry')(registryOrVersion) : registryOrVersion
     this.Chunk = Chunks(version)
     this.columns = {}
     this.blockCache = {}
-    this.biomeCache = registry(version).biomes
+    this.biomeCache = registry.biomes
   }
 
   addColumn (x, z, json) {
