@@ -1,7 +1,7 @@
 /* global THREE */
 
-const entities = require("./entities.json")
-const { loadTexture } = globalThis.isElectron ? require("../utils.electron.js") : require("../utils")
+const entities = require('./entities.json')
+const { loadTexture } = globalThis.isElectron ? require('../utils.electron.js') : require('../utils')
 
 const elemFaces = {
   up: {
@@ -14,8 +14,8 @@ const elemFaces = {
       [0, 1, 1, 0, 0],
       [1, 1, 1, 1, 0],
       [0, 1, 0, 0, 1],
-      [1, 1, 0, 1, 1],
-    ],
+      [1, 1, 0, 1, 1]
+    ]
   },
   down: {
     dir: [0, -1, 0],
@@ -27,8 +27,8 @@ const elemFaces = {
       [1, 0, 1, 0, 0],
       [0, 0, 1, 1, 0],
       [1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1],
-    ],
+      [0, 0, 0, 1, 1]
+    ]
   },
   east: {
     dir: [1, 0, 0],
@@ -40,8 +40,8 @@ const elemFaces = {
       [1, 1, 1, 0, 0],
       [1, 0, 1, 0, 1],
       [1, 1, 0, 1, 0],
-      [1, 0, 0, 1, 1],
-    ],
+      [1, 0, 0, 1, 1]
+    ]
   },
   west: {
     dir: [-1, 0, 0],
@@ -53,8 +53,8 @@ const elemFaces = {
       [0, 1, 0, 0, 0],
       [0, 0, 0, 0, 1],
       [0, 1, 1, 1, 0],
-      [0, 0, 1, 1, 1],
-    ],
+      [0, 0, 1, 1, 1]
+    ]
   },
   north: {
     dir: [0, 0, -1],
@@ -66,8 +66,8 @@ const elemFaces = {
       [1, 0, 0, 0, 1],
       [0, 0, 0, 1, 1],
       [1, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0],
-    ],
+      [0, 1, 0, 1, 0]
+    ]
   },
   south: {
     dir: [0, 0, 1],
@@ -79,16 +79,16 @@ const elemFaces = {
       [0, 0, 1, 0, 1],
       [1, 0, 1, 1, 1],
       [0, 1, 1, 0, 0],
-      [1, 1, 1, 1, 0],
-    ],
-  },
+      [1, 1, 1, 1, 0]
+    ]
+  }
 }
 
-function dot(a, b) {
+function dot (a, b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 }
 
-function addCube(attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
+function addCube (attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
   const cubeRotation = new THREE.Euler(0, 0, 0)
   if (cube.rotation) {
     cubeRotation.x = (-cube.rotation[0] * Math.PI) / 180
@@ -125,7 +125,7 @@ function addCube(attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
   }
 }
 
-function getMesh(texture, jsonModel) {
+function getMesh (texture, jsonModel) {
   const bones = {}
 
   const geoData = {
@@ -134,7 +134,7 @@ function getMesh(texture, jsonModel) {
     uvs: [],
     indices: [],
     skinIndices: [],
-    skinWeights: [],
+    skinWeights: []
   }
   let i = 0
   for (const jsonBone of jsonModel.bones) {
@@ -172,11 +172,11 @@ function getMesh(texture, jsonModel) {
   const skeleton = new THREE.Skeleton(Object.values(bones))
 
   const geometry = new THREE.BufferGeometry()
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(geoData.positions, 3))
-  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(geoData.normals, 3))
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(geoData.uvs, 2))
-  geometry.setAttribute("skinIndex", new THREE.Uint16BufferAttribute(geoData.skinIndices, 4))
-  geometry.setAttribute("skinWeight", new THREE.Float32BufferAttribute(geoData.skinWeights, 4))
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(geoData.positions, 3))
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(geoData.normals, 3))
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(geoData.uvs, 2))
+  geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(geoData.skinIndices, 4))
+  geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(geoData.skinWeights, 4))
   geometry.setIndex(geoData.indices)
 
   const material = new THREE.MeshLambertMaterial({ transparent: true, skinning: true, alphaTest: 0.1 })
@@ -198,7 +198,7 @@ function getMesh(texture, jsonModel) {
 }
 
 class Entity {
-  constructor(version, entity, scene) {
+  constructor (version, entity, scene) {
     const e = entities[entity.name]
     if (!e) throw new Error(`Unknown entity ${entity.name}`)
 
@@ -208,9 +208,9 @@ class Entity {
     // Someone with more understanding of how the meshes are getting loaded can maybe add cape support
     // For now, I will filter out the geometry of the cape
     for (const [name, jsonModel] of Object.entries(e.geometry)) {
-      if (entity.name === "player" && name === "cape") continue
+      if (entity.name === 'player' && name === 'cape') continue
       const texture = e.textures[name]
-      let textureUrl = entity.name === "player" ? "/skin?username=" + entity.username : texture.replace("textures", "textures/" + version) + ".png"
+      const textureUrl = entity.name === 'player' ? '/skin?username=' + entity.username : texture.replace('textures', 'textures/' + version) + '.png'
       if (!texture) continue
       const mesh = getMesh(textureUrl, jsonModel)
       this.mesh.add(mesh)

@@ -1,23 +1,23 @@
-const THREE = require("three")
-const TWEEN = require("@tweenjs/tween.js")
+const THREE = require('three')
+const TWEEN = require('@tweenjs/tween.js')
 
-const Entity = require("./entity/Entity")
+const Entity = require('./entity/Entity')
 
-function getEntityMesh(entity, scene) {
+function getEntityMesh (entity, scene) {
   if (entity.name) {
     try {
-      const e = new Entity("1.16.4", entity, scene)
+      const e = new Entity('1.16.4', entity, scene)
 
       if (entity.username !== undefined) {
-        const canvas = document.createElement("canvas")
+        const canvas = document.createElement('canvas')
         canvas.width = 500
         canvas.height = 100
 
-        const ctx = canvas.getContext("2d")
-        ctx.font = "50pt Arial"
-        ctx.fillStyle = "#000000"
-        ctx.textAlign = "left"
-        ctx.textBaseline = "top"
+        const ctx = canvas.getContext('2d')
+        ctx.font = '50pt Arial'
+        ctx.fillStyle = '#000000'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'top'
 
         const txt = entity.username
         ctx.fillText(txt, 100, 0)
@@ -44,12 +44,12 @@ function getEntityMesh(entity, scene) {
 }
 
 class Entities {
-  constructor(scene) {
+  constructor (scene) {
     this.scene = scene
     this.entities = {}
   }
 
-  clear() {
+  clear () {
     for (const mesh of Object.values(this.entities)) {
       this.scene.remove(mesh)
       if (mesh.geometry) mesh.geometry.dispose()
@@ -58,7 +58,7 @@ class Entities {
     this.entities = {}
   }
 
-  update(entity) {
+  update (entity) {
     if (!this.entities[entity.id]) {
       const mesh = getEntityMesh(entity, this.scene)
       if (!mesh) return
