@@ -49,10 +49,10 @@
     "prismarine-schematic": "^1.2.0",
     "minecrafthawkeye": "^1.2.5",
     "prismarine-viewer": "file:./",
-    "puppeteer": "^11.0.0",
+    "puppeteer": "^16.0.0",
     "standard": "^17.0.0",
     "webpack": "^5.10.2",
     "webpack-cli": "^4.2.0",
-    "fs-extra": "^10.0.1"
+    "fs-extra": "^11.0.0"
   }
 }
