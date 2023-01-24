@@ -1,3 +1,10 @@
+### 1.23.0
+
+* Bumb Mineflayer to 4.x
+* Bumb Mineflayer-pathfinder to 2.x
+* Bumb fs-extra to 10.x
+* Bumb minecraft-data to 3.x
+
 ### 1.22.0
 
 * support 1.18.0
