@@ -212,7 +212,7 @@ function getPlayerMesh (texture, jsonModel) {
     skinWeights: []
   }
   let i = 0
-  jsonModel.default.bones.forEach(async jsonBone => {
+  jsonModel.default.bones.forEach(jsonBone => {
     const bone = new THREE.Bone()
     if (jsonBone.pivot) {
       bone.position.x = jsonBone.pivot[0]
@@ -231,7 +231,7 @@ function getPlayerMesh (texture, jsonModel) {
     bones[jsonBone.name] = bone
 
     if (jsonBone.cubes) {
-      jsonBone.cubes.forEach(async cube => {
+      jsonBone.cubes.forEach(cube => {
         addCube(geoData, i, bone, cube, jsonModel.texturewidth, jsonModel.textureheight)
       })
     }
@@ -239,7 +239,7 @@ function getPlayerMesh (texture, jsonModel) {
   })
 
   const rootBones = []
-  jsonModel.default.bones.forEach(async jsonBone => {
+  jsonModel.default.bones.forEach(jsonBone => {
     if (jsonBone.parent) bones[jsonBone.parent].add(bones[jsonBone.name])
     else rootBones.push(bones[jsonBone.name])
   })
