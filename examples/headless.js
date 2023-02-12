@@ -1,5 +1,5 @@
 // You must install node-canvas-webgl to use the headless examples.
-try { require('node-canvas-webgl') } catch (e) { throw Error('node-canvas-webgl is not installed, you can install it with `npm install node-canvas-webgl`') }
+try { require('node-canvas-webgl') } catch (e) { throw Error('node-canvas-webgl is not installed, you can install it with `npm install PrismarineJS/node-canvas-webgl`') }
 
 const mineflayer = require('mineflayer')
 const mineflayerViewer = require('prismarine-viewer').headless
