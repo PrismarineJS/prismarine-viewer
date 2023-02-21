@@ -7,7 +7,7 @@
     "test": "jest --verbose --runInBand --forceExit",
     "pretest": "npm run lint",
     "lint": "standard",
-    "prepare": "node viewer/prerender.js && webpack",
+    "build": "node viewer/prerender.js && webpack",
     "fix": "standard --fix"
   },
   "author": "PrismarineJS",
