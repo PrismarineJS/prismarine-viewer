@@ -1,3 +1,7 @@
+### 1.24.0
+
+* 1.19 support
+
 ### 1.23.0
 
 * Bumb Mineflayer to 4.x
