@@ -1,6 +1,10 @@
 ### 1.24.0
 
-* 1.19 support
+* Bump standard from 16.0.4 to 17.0.0
+* Bump puppeteer from 11.0.0 to 16.0.0
+* Bump fs-extra from 10.1.0 to 11.0.0
+* Add 1.19.1 as a supported version
+* Fix CI failing on node-canvas-webgl
 
 ### 1.23.0
 
