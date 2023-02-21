@@ -1,4 +1,4 @@
-### 1.24.0
+### 1.23.1
 
 * Bump standard from 16.0.4 to 17.0.0
 * Bump puppeteer from 11.0.0 to 16.0.0
