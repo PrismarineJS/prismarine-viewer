@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
         javaVersion: [1.8]
         mcVersionIndex: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         include:
