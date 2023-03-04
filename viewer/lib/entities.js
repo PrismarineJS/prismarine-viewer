@@ -2,6 +2,7 @@ const THREE = require('three')
 const TWEEN = require('@tweenjs/tween.js')
 
 const Entity = require('./entity/Entity')
+const { dispose3 } = require('./dispose')
 
 function getEntityMesh (entity, scene) {
   if (entity.name) {
@@ -52,8 +53,7 @@ class Entities {
   clear () {
     for (const mesh of Object.values(this.entities)) {
       this.scene.remove(mesh)
-      if (mesh.geometry) mesh.geometry.dispose()
-      if (mesh.material) mesh.material.dispose()
+      dispose3(mesh)
     }
     this.entities = {}
   }
@@ -70,8 +70,7 @@ class Entities {
 
     if (entity.delete) {
       this.scene.remove(e)
-      if (e.geometry) e.geometry.dispose()
-      if (e.material) e.material.dispose()
+      dispose3(e)
       delete this.entities[entity.id]
     }
 
