@@ -20,6 +20,8 @@ jobs:
            mcVersionIndex: 10
          - javaVersion: 17
            mcVersionIndex: 11
+         - javaVersion: 17
+           mcVersionIndex: 12
 
     steps:
     - uses: actions/checkout@v2
