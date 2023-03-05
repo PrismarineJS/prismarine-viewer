@@ -12,12 +12,13 @@ class Viewer {
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color('lightblue')
 
-    const ambientLight = new THREE.AmbientLight(0xcccccc)
-    this.scene.add(ambientLight)
+    this.ambientLight = new THREE.AmbientLight(0xcccccc)
+    this.scene.add(this.ambientLight)
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-    directionalLight.position.set(1, 1, 0.5).normalize()
-    this.scene.add(directionalLight)
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+    this.directionalLight.position.set(1, 1, 0.5).normalize()
+    this.directionalLight.castShadow = true
+    this.scene.add(this.directionalLight)
 
     const size = renderer.getSize(new THREE.Vector2())
     this.camera = new THREE.PerspectiveCamera(75, size.x / size.y, 0.1, 1000)

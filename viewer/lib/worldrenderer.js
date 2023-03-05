@@ -3,6 +3,7 @@ const THREE = require('three')
 const Vec3 = require('vec3').Vec3
 const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
 const { EventEmitter } = require('events')
+const { dispose3 } = require('./dispose')
 
 function mod (x, n) {
   return ((x % n) + n) % n
@@ -31,7 +32,8 @@ class WorldRenderer {
           let mesh = this.sectionMeshs[data.key]
           if (mesh) {
             this.scene.remove(mesh)
-            mesh.geometry.dispose()
+            dispose3(mesh)
+            delete this.sectionMeshs[data.key]
           }
 
           const chunkCoords = data.key.split(',')
@@ -107,8 +109,9 @@ class WorldRenderer {
       const mesh = this.sectionMeshs[key]
       if (mesh) {
         this.scene.remove(mesh)
-        mesh.geometry.dispose()
+        dispose3(mesh)
       }
+      delete this.sectionMeshs[key]
     }
   }
 

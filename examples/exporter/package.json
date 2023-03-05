@@ -11,7 +11,7 @@
   "dependencies": {
     "prismarine-schematic": "^1.1.2",
     "three-stlexporter": "rom1504/three-STLexporter",
-    "vblob": "^1.0.2",
+    "vblob": "1.0.2",
     "three-gltf-exporter": "rom1504/three-gltf-exporter"
   }
 }
