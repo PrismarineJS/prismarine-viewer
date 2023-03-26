@@ -470,7 +470,7 @@ function matchProperties (block, properties) {
     return properties.OR.some((or) => matchProperties(block, or))
   }
   for (const prop in blockProps) {
-    if (typeof properties[prop] === 'string' && !properties[prop].split('|').some((value) => value === blockProps[prop])) {
+    if (typeof properties[prop] === 'string' && !properties[prop].split('|').some((value) => value === blockProps[prop] + "")) {
       return false
     }
   }
