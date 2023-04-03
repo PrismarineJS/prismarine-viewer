@@ -21,7 +21,7 @@
     ]
   },
   "dependencies": {
-    "@tweenjs/tween.js": "^18.6.4",
+    "@tweenjs/tween.js": "^19.0.0",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "minecraft-data": "^3.0.0",
