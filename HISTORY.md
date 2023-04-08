@@ -1,3 +1,7 @@
+### 1.25.0
+
+* Remove unused mc-data from bundle
+
 ### 1.24.0
 
 * Fix threejs disposal
