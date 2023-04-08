@@ -33,7 +33,7 @@ const config = {
     new CopyPlugin({
       patterns: [
         { from: '../../public/blocksStates/', to: './blocksStates/' },
-        { from: '../../public/textures/', to: './textures/' },
+        { from: '../../public/textures/*.png', to: './textures/' },
         { from: '../../public/worker.js', to: './' },
         { from: '../../public/supportedVersions.json', to: './' }
       ]
@@ -48,7 +48,21 @@ const config = {
     watchOptions: {
       ignored: /node_modules/
     }
-  }
+  },
+  externals: [
+    // This removes some large unnecessary data from the bundle
+    function (req, cb) {
+      if (req.context.includes('minecraft-data') && req.request.endsWith('.json')) {
+         const fileName = req.request.split('/').pop().replace('.json', '')
+        const blocked = ['blocksB2J', 'blocksJ2B', 'blockMappings', 'steve', 'recipes']
+        if (blocked.includes(fileName)) {
+          cb(null, [])
+          return
+        }
+      }
+      cb()
+    }
+  ]
 }
 
 module.exports = config
