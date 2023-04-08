@@ -6,7 +6,7 @@ const path = require('path')
 // Minify the index.js by removing unused minecraft data. Since the worker only needs to do meshing,
 // we can remove all the other data unrelated to meshing.
 const blockedIndexFiles = ['blocksB2J', 'blocksJ2B', 'blockMappings', 'steve', 'recipes']
-const allowedWorkerFiles = ['blocks', 'blockCollisionShapes', 'tints', 'blockStates', 
+const allowedWorkerFiles = ['blocks', 'blockCollisionShapes', 'tints', 'blockStates',
   'biomes', 'features', 'version', 'legacy', 'versions', 'version', 'protocolVersions']
 
 const indexConfig = {
