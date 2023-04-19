@@ -57,11 +57,6 @@ More examples:
 * A minecraft web client example, using mineflayer and a websocket proxy [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/web_client)
 * Export parts of worlds as screenshot or 3d models [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/exporter)
 
-## Projects using prismarine-viewer
-
-* [prismarine-web-client](https://github.com/PrismarineJS/prismarine-web-client) A minecraft client in your browser
-
-
 ## API
 
 ### prismarine-viewer
