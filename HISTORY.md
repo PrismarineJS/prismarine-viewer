@@ -1,3 +1,12 @@
+### 1.25.0
+
+* Remove unused mc-data from bundle
+
+### 1.24.0
+
+* Fix threejs disposal
+* Expose ambientLight and directionalLight
+
 ### 1.23.0
 
 * Bumb Mineflayer to 4.x
