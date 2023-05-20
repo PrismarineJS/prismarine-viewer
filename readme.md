@@ -59,7 +59,7 @@ More examples:
 
 ## Projects using prismarine-viewer
 
-* [prismarine-web-client](https://github.com/PrismarineJS/prismarine-web-client) A minecraft client in your browser
+* [prismarine-web-client](https://gitlab.com/PrismarineJS/prismarine-web-client) A minecraft client in your browser
 
 
 ## API
