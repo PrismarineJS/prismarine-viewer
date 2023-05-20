@@ -466,8 +466,11 @@ function matchProperties (block, properties) {
 
   properties = parseProperties(properties)
   const blockProps = block.getProperties()
+  if (properties.OR) {
+    return properties.OR.some((or) => matchProperties(block, or))
+  }
   for (const prop in blockProps) {
-    if (properties[prop] !== undefined && (blockProps[prop] + '') !== properties[prop]) {
+    if (typeof properties[prop] === 'string' && !properties[prop].split('|').some((value) => value === blockProps[prop] + '')) {
       return false
     }
   }
