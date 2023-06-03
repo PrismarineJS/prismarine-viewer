@@ -5,7 +5,7 @@ const bot = mineflayer.createBot({
   username: 'Bot'
 })
 
-const streamServer = 'cdg.contribute.live-video.net' // see https://stream.twitch.tv/ingests for list, choose the closest to you
+const streamServer = 'cdg.contribute.live-video.net' // see https://help.twitch.tv/s/twitch-ingest-recommendation for list, choose the closest to you
 const streamKey = '' // your streaming key
 
 bot.once('spawn', () => {
