@@ -8,13 +8,13 @@ const Chunk = require('prismarine-chunk')(version)
 
 // Create a flat world with only 1 layer of stone at y=0
 function worldGenerator (x, y, z) {
-  if (y > 0) return 0
+  if (y > -64) return 0
   return 1
 }
 
 const world = new World((chunkX, chunkZ) => {
   const chunk = new Chunk()
-  for (let y = 0; y < 256; y++) {
+  for (let y = -64; y < 320; y++) {
     for (let x = 0; x < 16; x++) {
       for (let z = 0; z < 16; z++) {
         chunk.setBlockStateId(new Vec3(x, y, z), worldGenerator(chunkX * 16 + x, y, chunkZ * 16 + z))
