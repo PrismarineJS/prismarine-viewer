@@ -15,7 +15,7 @@ class WorldView extends EventEmitter {
     this.emitter.on('mouseClick', async (click) => {
       const ori = new Vec3(click.origin.x, click.origin.y, click.origin.z)
       const dir = new Vec3(click.direction.x, click.direction.y, click.direction.z)
-      const block = this.world.raycast(ori, dir, 256)
+      const block = this.world.raycast(ori, dir, 320)
       if (!block) return
       this.emit('blockClicked', block, block.face, click.button)
     })
