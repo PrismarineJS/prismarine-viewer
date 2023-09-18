@@ -1,4 +1,3 @@
-
 const THREE = require('three')
 const TWEEN = require('@tweenjs/tween.js')
 const { WorldRenderer } = require('./worldrenderer')

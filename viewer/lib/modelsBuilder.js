@@ -95,19 +95,19 @@ function resolveModel (name, blocksModels, texturesJson) {
 
 function prepareBlocksStates (mcAssets, atlas) {
   const blocksStates = mcAssets.blocksStates
-  mcAssets.blocksStates["missing_texture"] = {
-    "variants": {
-      "normal": {
-        "model": "missing_texture"
+  mcAssets.blocksStates.missing_texture = {
+    variants: {
+      normal: {
+        model: 'missing_texture'
       }
     }
-  },
-    mcAssets.blocksModels["missing_texture"] = {
-      "parent": "block/cube_all",
-      "textures": {
-        "all": "blocks/missing_texture"
-      }
+  }
+  mcAssets.blocksModels.missing_texture = {
+    parent: 'block/cube_all',
+    textures: {
+      all: 'blocks/missing_texture'
     }
+  }
   for (const block of Object.values(blocksStates)) {
     if (!block) continue
     if (block.variants) {
