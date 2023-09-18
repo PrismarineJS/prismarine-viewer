@@ -5,14 +5,14 @@ const mcAssets = require('minecraft-assets')
 const fs = require('fs-extra')
 
 const texturesPath = path.resolve(__dirname, '../public/textures')
-if (!fs.existsSync(texturesPath)) {
-  fs.mkdirSync(texturesPath)
+if (fs.existsSync(texturesPath) && !process.argv.includes('-f')) {
+  console.log('textures folder already exists, skipping...')
+  process.exit(0)
 }
+fs.mkdirSync(texturesPath, { recursive: true })
 
 const blockStatesPath = path.resolve(__dirname, '../public/blocksStates')
-if (!fs.existsSync(blockStatesPath)) {
-  fs.mkdirSync(blockStatesPath)
-}
+fs.mkdirSync(blockStatesPath, { recursive: true })
 
 for (const version of mcAssets.versions) {
   const assets = mcAssets(version)
