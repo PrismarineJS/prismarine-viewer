@@ -10,7 +10,12 @@ const THREE = require('three')
 const path = require('path')
 
 const textureCache = {}
+// todo not ideal, export different functions for browser and node
 function loadTexture (texture, cb) {
+  if (process.platform === 'browser') {
+    return require('./utils.web').loadTexture(texture, cb)
+  }
+
   if (textureCache[texture]) {
     cb(textureCache[texture])
   } else {
@@ -22,6 +27,9 @@ function loadTexture (texture, cb) {
 }
 
 function loadJSON (json, cb) {
+  if (process.platform === 'browser') {
+    return require('./utils.web').loadJSON(json, cb)
+  }
   cb(require(path.resolve(__dirname, '../../public/' + json)))
 }
 
