@@ -18,6 +18,8 @@ class WorldRenderer {
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
     this.renderUpdateEmitter = new EventEmitter()
+    this.blockStatesData = undefined
+    this.texturesDataUrl = undefined
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
@@ -81,14 +83,24 @@ class WorldRenderer {
       worker.postMessage({ type: 'version', version })
     }
 
-    loadTexture(`textures/${version}.png`, texture => {
+    this.updateTexturesData()
+  }
+
+  updateTexturesData () {
+    loadTexture(this.texturesDataUrl || `textures/${this.version}.png`, texture => {
       texture.magFilter = THREE.NearestFilter
       texture.minFilter = THREE.NearestFilter
       texture.flipY = false
       this.material.map = texture
     })
 
-    loadJSON(`blocksStates/${version}.json`, blockStates => {
+    const loadBlockStates = () => {
+      return new Promise(resolve => {
+        if (this.blockStatesData) return resolve(this.blockStatesData)
+        return loadJSON(`blocksStates/${this.version}.json`, resolve)
+      })
+    }
+    loadBlockStates().then((blockStates) => {
       for (const worker of this.workers) {
         worker.postMessage({ type: 'blockStates', json: blockStates })
       }
