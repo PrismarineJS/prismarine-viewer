@@ -12,6 +12,8 @@ function mod (x, n) {
 class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
+    this.active = false
+    this.version = undefined
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
@@ -60,11 +62,21 @@ class WorldRenderer {
     }
   }
 
-  setVersion (version) {
+  resetWorld () {
+    this.active = false
     for (const mesh of Object.values(this.sectionMeshs)) {
       this.scene.remove(mesh)
     }
     this.sectionMeshs = {}
+    for (const worker of this.workers) {
+      worker.postMessage({ type: 'reset' })
+    }
+  }
+
+  setVersion (version) {
+    this.version = version
+    this.resetWorld()
+    this.active = true
     for (const worker of this.workers) {
       worker.postMessage({ type: 'version', version })
     }
