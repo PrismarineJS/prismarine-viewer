@@ -13,9 +13,18 @@ function nextPowerOfTwo (n) {
   return n + 1
 }
 
+function readTexture (basePath, name) {
+  if (name === 'missing_texture.png') {
+    // grab ./missing_texture.png
+    basePath = __dirname
+  }
+  return fs.readFileSync(path.join(basePath, name), 'base64')
+}
+
 function makeTextureAtlas (mcAssets) {
   const blocksTexturePath = path.join(mcAssets.directory, '/blocks')
   const textureFiles = fs.readdirSync(blocksTexturePath).filter(file => file.endsWith('.png'))
+  textureFiles.unshift('missing_texture.png')
 
   const texSize = nextPowerOfTwo(Math.ceil(Math.sqrt(textureFiles.length)))
   const tileSize = 16
@@ -35,7 +44,7 @@ function makeTextureAtlas (mcAssets) {
     texturesIndex[name] = { u: x / imgSize, v: y / imgSize, su: tileSize / imgSize, sv: tileSize / imgSize }
 
     const img = new Image()
-    img.src = 'data:image/png;base64,' + fs.readFileSync(path.join(blocksTexturePath, textureFiles[i]), 'base64')
+    img.src = 'data:image/png;base64,' + readTexture(blocksTexturePath, textureFiles[i])
     g.drawImage(img, 0, 0, 16, 16, x, y, 16, 16)
   }
 
