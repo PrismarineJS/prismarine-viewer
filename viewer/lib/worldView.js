@@ -57,8 +57,8 @@ class WorldView extends EventEmitter {
     }
 
     this._timecycleUpdateInterval = setInterval(() => {
-      this.emit('timecycleUpdate', { timeOfDay: bot.time.timeOfDay, moonPhase: bot.time.moonPhase })
-    }, 750)
+      this.emitter.emit('timecycleUpdate', { timeOfDay: bot.time.timeOfDay, moonPhase: bot.time.moonPhase })
+    }, 1000)
   }
 
   removeListenersFromBot (bot) {

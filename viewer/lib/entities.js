@@ -7,7 +7,9 @@ const { dispose3 } = require('./dispose')
 function getEntityMesh (entity, scene) {
   if (entity.name) {
     try {
-      const e = new Entity('1.16.4', entity.name, scene)
+      // Old versions of minecraft use titlecase entity names (e.g. 'Zombie' instead of 'zombie')
+      // TODO old version name support. "entityhorse" instead of "horse" in some versions, causing a pink box to render instead
+      const e = new Entity('1.16.4', entity.name.toLowerCase(), scene)
 
       if (entity.username !== undefined) {
         const canvas = document.createElement('canvas')
