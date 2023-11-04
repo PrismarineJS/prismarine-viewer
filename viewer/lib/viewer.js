@@ -100,13 +100,13 @@ class Viewer {
     })
   }
 
-  updateTimecycleLighting(timeOfDay, moonPhase) {
+  updateTimecycleLighting (timeOfDay, moonPhase) {
     if (timeOfDay === undefined) { return }
     const lightIntensity = this.calculateIntensity(timeOfDay)
-    const skyColor = scene.background.getHexString()
+    const skyColor = this.scene.background.getHexString()
     const newSkyColor = `#${this.darkenSkyColour(skyColor, lightIntensity).padStart(6, 0)}`
 
-    function timeToRads(time) {
+    function timeToRads (time) {
       return time * (Math.PI / 12000)
     }
 
@@ -121,7 +121,7 @@ class Viewer {
     ).normalize()
   }
 
-  calculateIntensity(timeOfDay) {
+  calculateIntensity (timeOfDay) {
     if ((timeOfDay >= 13000) && (timeOfDay <= 23000)) {
       return 0
     } else if ((timeOfDay <= 12000) && (timeOfDay >= 0)) {
@@ -136,7 +136,7 @@ class Viewer {
   }
 
   // Darken by factor (0 to black, 0.5 half as bright, 1 unchanged)
-  darkenSkyColour(skyColour, factor) {
+  darkenSkyColour (skyColour, factor) {
     skyColour = parseInt(skyColour, 16)
     return (Math.round((skyColour & 0x0000FF) * factor) |
       (Math.round(((skyColour >> 8) & 0x00FF) * factor) << 8) |
