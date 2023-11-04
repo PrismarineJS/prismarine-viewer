@@ -10,6 +10,7 @@ class WorldView extends EventEmitter {
     this.loadedChunks = {}
     this.lastPos = new Vec3(0, 0, 0).update(position)
     this.emitter = emitter || this
+    this._timecycleUpdateInterval = null
 
     this.listeners = {}
     this.emitter.on('mouseClick', async (click) => {
@@ -54,6 +55,10 @@ class WorldView extends EventEmitter {
         this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username })
       }
     }
+
+    this._timecycleUpdateInterval = setInterval(() => {
+      this.emit('timecycleUpdate', { timeOfDay: bot.time.timeOfDay, moonPhase: bot.time.moonPhase })
+    }, 750)
   }
 
   removeListenersFromBot (bot) {
@@ -61,6 +66,9 @@ class WorldView extends EventEmitter {
       bot.removeListener(evt, listener)
     }
     delete this.listeners[bot.username]
+
+    clearInterval(this._timecycleUpdateInterval)
+    this._timecycleUpdateInterval = null
   }
 
   async init (pos) {

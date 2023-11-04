@@ -85,6 +85,10 @@ class Viewer {
       this.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
     })
 
+    emitter.on('timecycleUpdate', ({ timeOfDay, moonPhase }) => {
+      this.updateTimecycleLighting(timeOfDay, moonPhase)
+    })
+
     this.domElement.addEventListener('pointerdown', (evt) => {
       const raycaster = new THREE.Raycaster()
       const mouse = new THREE.Vector2()
@@ -94,6 +98,49 @@ class Viewer {
       const ray = raycaster.ray
       emitter.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
     })
+  }
+
+  updateTimecycleLighting(timeOfDay, moonPhase) {
+    if (timeOfDay === undefined) { return }
+    const lightIntensity = this.calculateIntensity(timeOfDay)
+    const skyColor = scene.background.getHexString()
+    const newSkyColor = `#${this.darkenSkyColour(skyColor, lightIntensity).padStart(6, 0)}`
+
+    function timeToRads(time) {
+      return time * (Math.PI / 12000)
+    }
+
+    // Update colours
+    this.scene.background = new THREE.Color(newSkyColor)
+    this.ambientLight.itensity = ((lightIntensity < 0.25) ? 0.25 : lightIntensity) + (0.07 - (moonPhase / 100))
+    this.directionalLight.intensity = lightIntensity + (0.07 - (moonPhase / 100))
+    this.directionalLight.position.set(
+      Math.cos(timeToRads(timeOfDay)),
+      Math.sin(timeToRads(timeOfDay)),
+      0.2
+    ).normalize()
+  }
+
+  calculateIntensity(timeOfDay) {
+    if ((timeOfDay >= 13000) && (timeOfDay <= 23000)) {
+      return 0
+    } else if ((timeOfDay <= 12000) && (timeOfDay >= 0)) {
+      return 0.75
+    } else if ((timeOfDay < 13000) && (timeOfDay > 12000)) {
+      const transition = timeOfDay - 12000
+      return (0.75 - (0.75 * transition / 1000))
+    } else {
+      const transition = timeOfDay - 23000
+      return (0.75 * transition / 1000)
+    }
+  }
+
+  // Darken by factor (0 to black, 0.5 half as bright, 1 unchanged)
+  darkenSkyColour(skyColour, factor) {
+    skyColour = parseInt(skyColour, 16)
+    return (Math.round((skyColour & 0x0000FF) * factor) |
+      (Math.round(((skyColour >> 8) & 0x00FF) * factor) << 8) |
+      (Math.round((skyColour >> 16) * factor) << 16)).toString(16)
   }
 
   update () {
