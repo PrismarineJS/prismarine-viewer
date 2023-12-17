@@ -13,6 +13,8 @@ const { firstVersion, lastVersion } = require('./parallel')
 const { getPort } = require('./common/util')
 
 const download = require('minecraft-wrap').download
+const TIMEOUT = 5 * 60 * 1000
+const TIMEOUT_SCREENSHOT = 2 * 60 * 1000
 
 supportedVersions.forEach(function (supportedVersion, i) {
   if (!(i >= firstVersion && i <= lastVersion)) { return }
@@ -29,8 +31,6 @@ supportedVersions.forEach(function (supportedVersion, i) {
   wrap.on('line', function (line) {
     console.log(line)
   })
-
-  const TIMEOUT = 5 * 60 * 1000
 
   describe('client ' + version.minecraftVersion, function () {
     beforeAll(async () => {
@@ -121,7 +121,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
             })
             setTimeout(() => {
               page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => exit()).catch(err => exit(err))
-            }, TIMEOUT)
+            }, TIMEOUT_SCREENSHOT)
           }).catch(err => exit(err))
         })
       }, TIMEOUT)
