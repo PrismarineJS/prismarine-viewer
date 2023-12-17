@@ -44,7 +44,7 @@ async function main () {
 
     // Create viewer
     const viewer = new Viewer(renderer)
-    if (viewer.setVersion(version)) {
+    if (!viewer.setVersion(version)) {
       return false
     }
 
