@@ -14,7 +14,7 @@ if (!fs.existsSync(blockStatesPath)) {
   fs.mkdirSync(blockStatesPath)
 }
 
-const supportedVersions = require('./').supportedVersions
+const supportedVersions = require('./lib/version').supportedVersions
 
 for (const version of supportedVersions) {
   const assets = mcAssets(version)
@@ -29,5 +29,3 @@ for (const version of supportedVersions) {
 
   fs.copySync(assets.directory, path.resolve(texturesPath, version), { overwrite: true })
 }
-
-fs.writeFileSync(path.resolve(__dirname, '../public/supportedVersions.json'), '[' + supportedVersions.map(v => `"${v}"`).toString() + ']')
