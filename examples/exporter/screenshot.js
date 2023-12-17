@@ -32,7 +32,7 @@ const main = async () => {
 
   await schem.paste(world, new Vec3(0, 60, 0))
 
-  if (viewer.setVersion(version)) {
+  if (!viewer.setVersion(version)) {
     return false
   }
 
