@@ -19,7 +19,8 @@ jobs:
          - javaVersion: 16
            mcVersionIndex: 10
          - javaVersion: 17
-           mcVersionIndex: 11
+           mcVersionIndex: 11  
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
