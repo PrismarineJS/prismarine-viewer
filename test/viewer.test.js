@@ -2,6 +2,7 @@
 /* global page */
 
 const supportedVersions = require('../').supportedVersions
+const fs = require('fs')
 
 const path = require('path')
 const MC_SERVER_PATH = path.join(__dirname, 'server')
@@ -117,7 +118,15 @@ supportedVersions.forEach(function (supportedVersion) {
               exit(pageerr)
             })
             setTimeout(() => {
-              page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => exit()).catch(err => exit(err))
+              const fileName = path.join(__dirname, `test_${supportedVersion}.png`)
+              page.screenshot({ path: fileName }).then(() => {
+                const fileSize = fs.statSync(fileName).size
+                if (fileSize < 100000) {
+                  exit(new Error(`The file size of ${fileName} is ${fileSize}. This is less than 100KB, and is likely an empty render.`))
+                } else {
+                  exit()
+                }
+              }).catch(err => exit(err))
             }, TIMEOUT_SCREENSHOT)
           }).catch(err => exit(err))
         })
