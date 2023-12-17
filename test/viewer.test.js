@@ -118,8 +118,8 @@ supportedVersions.forEach(function (supportedVersion) {
               exit(pageerr)
             })
             setTimeout(() => {
-              const fileName = `test_${supportedVersion}.png`
-              page.screenshot({ path: path.join(__dirname, fileName) }).then(() => {
+              const fileName = path.join(__dirname, `test_${supportedVersion}.png`)
+              page.screenshot({ path: fileName }).then(() => {
                 const fileSize = fs.statSync(fileName).size
                 if (fileSize < 100000) {
                   exit(new Error(`The file size of ${fileName} is ${fileSize}. This is less than 100KB, and is likely an empty render.`))
