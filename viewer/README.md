@@ -24,6 +24,8 @@ sets the minecraft version
 
 * version is a string such as "1.16.4"
 
+Returns false and stop there if the version is not supported
+
 #### addColumn (x, z, chunk)
 
 Adds a column

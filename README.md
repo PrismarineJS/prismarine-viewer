@@ -3,7 +3,7 @@
 Web based viewer for servers and bots
 
 [![NPM version](https://img.shields.io/npm/v/prismarine-viewer.svg)](http://npmjs.com/package/prismarine-viewer)
-[![Build Status](https://github.com/PrismarineJS/prismarine-viewer/workflows/CI/badge.svg)](https://github.com/PrismarineJS/prismarine-viewer/actions?query=workflow%3A%22CI%22)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/PrismarineJS/prismarine-viewer/ci.yml.svg?label=CI&logo=github&logoColor=lightgrey)](https://github.com/PrismarineJS/prismarine-viewer/actions?query=workflow%3A%22CI%22)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-brightgreen.svg)](https://discord.gg/GsEFRM8)
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-brightgreen.svg)](https://gitter.im/PrismarineJS/general)
 [![Irc](https://img.shields.io/badge/chat-on%20irc-brightgreen.svg)](https://irc.gitter.im/)
@@ -11,7 +11,9 @@ Web based viewer for servers and bots
 
 [![Try it on gitpod](https://img.shields.io/badge/try-on%20gitpod-brightgreen.svg)](https://gitpod.io/#https://github.com/PrismarineJS/prismarine-viewer)
 
-[<img src="https://prismarine.js.org/prismarine-viewer/test_1.18.1.png" alt="viewer" width="300">](https://prismarine.js.org/prismarine-viewer/)
+[<img src="https://prismarinejs.github.io/prismarine-viewer/test_1.18.1.png" alt="viewer" width="300">](https://prismarinejs.github.io/prismarine-viewer/)
+
+Supports versions 1.8.8, 1.9.4, 1.10.2, 1.11.2, 1.12.2, 1.13.2, 1.14.4, 1.15.2, 1.16.1, 1.16.4, 1.17.1, 1.18.1, 1.19.1, 1.20.1.
 
 ## Install
 
@@ -138,4 +140,4 @@ Stop the server and disconnect users.
 
 ## Tests
 
-`node_modules/.bin/jest --verbose --runInBand --forceExit -t "1.16.4"`
+`npm run jestTest -- -t "1.9.4"`

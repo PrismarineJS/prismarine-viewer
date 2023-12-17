@@ -31,7 +31,9 @@ const main = async () => {
 
   await schem.paste(world, new Vec3(0, 60, 0))
 
-  viewer.setVersion(version)
+  if (viewer.setVersion(version)) {
+    return false
+  }
 
   // Load world
   const worldView = new WorldView(world, viewDistance, center)
