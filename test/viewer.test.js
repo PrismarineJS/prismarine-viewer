@@ -29,15 +29,17 @@ supportedVersions.forEach(function (supportedVersion, i) {
     console.log(line)
   })
 
+  const TIMEOUT = 5 * 60 * 1000
+
   describe('client ' + version.minecraftVersion, function () {
-    beforeAll(download.bind(null, version.minecraftVersion, MC_SERVER_JAR), 3 * 60 * 1000)
+    beforeAll(download.bind(null, version.minecraftVersion, MC_SERVER_JAR), TIMEOUT)
 
     afterAll(function (done) {
       wrap.deleteServerData(function (err) {
         if (err) { console.log(err) }
         done(err)
       })
-    }, 3 * 60 * 1000)
+    }, TIMEOUT)
 
     describe('offline', function () {
       beforeAll(function (done) {
@@ -52,7 +54,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
           console.log(new Date() + 'started server ' + version.minecraftVersion)
           done(err)
         })
-      }, 3 * 60 * 1000)
+      }, TIMEOUT)
 
       afterAll(function (done) {
         console.log(new Date() + 'stopping server' + version.minecraftVersion)
@@ -61,7 +63,7 @@ supportedVersions.forEach(function (supportedVersion, i) {
           console.log(new Date() + 'stopped server ' + version.minecraftVersion)
           done(err)
         })
-      }, 3 * 60 * 1000)
+      }, TIMEOUT)
 
       it('doesn\'t crash', function (done) {
         console.log('test')
@@ -100,10 +102,10 @@ supportedVersions.forEach(function (supportedVersion, i) {
             })
             setTimeout(() => {
               page.screenshot({ path: path.join(__dirname, `test_${supportedVersion}.png`) }).then(() => exit()).catch(err => exit(err))
-            }, 120000)
+            }, TIMEOUT)
           }).catch(err => exit(err))
         })
-      }, 180000)
+      }, TIMEOUT)
     })
   })
 })
