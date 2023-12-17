@@ -1,3 +1,8 @@
+### 1.26.0
+
+* Fix redstone_wire rendering (@nova-27)
+* Improve version support and add support for 1.19 and 1.20. (@rom1504)
+
 ### 1.25.0
 
 * Remove unused mc-data from bundle
