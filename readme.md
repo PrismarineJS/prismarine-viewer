@@ -138,4 +138,4 @@ Stop the server and disconnect users.
 
 ## Tests
 
-`node_modules/.bin/jest --verbose --runInBand --forceExit -t "1.16.4"`
+`npm run jestTest -- -t "1.9.4"`

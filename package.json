@@ -4,7 +4,8 @@
   "description": "Web based viewer",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose --runInBand --forceExit",
+    "jestTest": "jest --verbose --runInBand --forceExit",
+    "test": "npm run test",
     "pretest": "npm run lint",
     "lint": "standard",
     "prepare": "node viewer/prerender.js && webpack",

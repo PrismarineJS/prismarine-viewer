@@ -9,16 +9,13 @@ const os = require('os')
 
 const Wrap = require('minecraft-wrap').Wrap
 
-const { firstVersion, lastVersion } = require('./parallel')
 const { getPort } = require('./common/util')
 
 const download = require('minecraft-wrap').download
 const TIMEOUT = 5 * 60 * 1000
 const TIMEOUT_SCREENSHOT = 2 * 60 * 1000
 
-supportedVersions.forEach(function (supportedVersion, i) {
-  if (!(i >= firstVersion && i <= lastVersion)) { return }
-
+supportedVersions.forEach(function (supportedVersion) {
   let PORT = null
   const mcData = require('minecraft-data')(supportedVersion)
   const version = mcData.version
