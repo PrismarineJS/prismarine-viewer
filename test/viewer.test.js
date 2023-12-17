@@ -10,13 +10,14 @@ const os = require('os')
 const Wrap = require('minecraft-wrap').Wrap
 
 const { firstVersion, lastVersion } = require('./parallel')
+const { getPort } = require('./common/util')
 
 const download = require('minecraft-wrap').download
 
 supportedVersions.forEach(function (supportedVersion, i) {
   if (!(i >= firstVersion && i <= lastVersion)) { return }
 
-  const PORT = Math.round(30000 + Math.random() * 20000)
+  let PORT = null
   const mcData = require('minecraft-data')(supportedVersion)
   const version = mcData.version
   const MC_SERVER_JAR_DIR = process.env.MC_SERVER_JAR_DIR || os.tmpdir()
@@ -29,10 +30,13 @@ supportedVersions.forEach(function (supportedVersion, i) {
     console.log(line)
   })
 
-  const TIMEOUT = 5 * 60 * 1000
+  const TIMEOUT = 2 * 60 * 1000
 
   describe('client ' + version.minecraftVersion, function () {
-    beforeAll(download.bind(null, version.minecraftVersion, MC_SERVER_JAR), TIMEOUT)
+    beforeAll(async () => {
+      download(version.minecraftVersion, MC_SERVER_JAR)
+      PORT = await getPort()
+    }, TIMEOUT)
 
     afterAll(function (done) {
       wrap.deleteServerData(function (err) {
