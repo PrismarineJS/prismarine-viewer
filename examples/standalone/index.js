@@ -29,7 +29,9 @@ async function main () {
 
   // Create viewer
   const viewer = new Viewer(renderer)
-  viewer.setVersion(version)
+  if (viewer.setVersion(version)) {
+    return false
+  }
   // Attach controls to viewer
   const controls = new MapControls(viewer.camera, renderer.domElement)
 

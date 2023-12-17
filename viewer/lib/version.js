@@ -1,4 +1,4 @@
-const supportedVersions = require('../../public/supportedVersions.json')
+const supportedVersions = ['1.8.8', '1.9.4', '1.10.2', '1.11.2', '1.12.2', '1.13.2', '1.14.4', '1.15.2', '1.16.1', '1.16.4', '1.17.1', '1.18.1', '1.19.1', '1.20.2']
 
 const lastOfMajor = {}
 for (const version of supportedVersions) {
@@ -24,7 +24,11 @@ function minor (version) {
 
 function getVersion (version) {
   if (supportedVersions.indexOf(version) !== -1) return version
+  const major = toMajor(version)
+  if (lastOfMajor[major] === undefined) {
+    return null
+  }
   return lastOfMajor[toMajor(version)]
 }
 
-module.exports = { getVersion }
+module.exports = { getVersion, supportedVersions }

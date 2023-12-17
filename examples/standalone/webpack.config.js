@@ -35,7 +35,6 @@ const config = {
         { from: '../../public/blocksStates/', to: './blocksStates/' },
         { from: '../../public/textures/*.png', to: './textures/' },
         { from: '../../public/worker.js', to: './' },
-        { from: '../../public/supportedVersions.json', to: './' }
       ]
     })
   ],

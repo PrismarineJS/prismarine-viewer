@@ -28,7 +28,9 @@ class LocalViewer {
 
     // Create viewer
     this.viewer = new Viewer(this.renderer)
-    this.viewer.setVersion(this.version)
+    if (!this.viewer.setVersion(this.version)) {
+      return false
+    }
     // Attach controls to viewer
     this.controls = new MapControls(this.viewer.camera, this.renderer.domElement)
     // Enable damping (inertia) on movement
