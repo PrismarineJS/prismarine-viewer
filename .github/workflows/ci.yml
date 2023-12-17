@@ -6,39 +6,40 @@ on:
   pull_request:
 
 jobs:
+  Lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v1.4.4
+      with:
+        node-version: 18.x
+    - run: npm i && npm run lint
   build:
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x]
-        javaVersion: [1.8]
-        mcVersionIndex: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        include:
-         - javaVersion: 16
-           mcVersionIndex: 10
-         - javaVersion: 17
-           mcVersionIndex: 11
+        mcVersion: ['1.8.8', '1.9.4', '1.10.2', '1.11.2', '1.12.2', '1.13.2', '1.14.4', '1.15.2', '1.16.1', '1.16.4', '1.17.1', '1.18.1', '1.19.1', '1.20.1']
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 18.x
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 18.x
     - name: Setup Java JDK
       uses: actions/setup-java@v1
       with:
-        java-version: ${{ matrix.javaVersion }}
+        java-version: 17
         java-package: jre
     - name: Install xi
       run: sudo apt-get install -y libxi-dev libglu1-mesa-dev
     - run: npm install
-    - env:
-        CIRCLE_NODE_INDEX: ${{ matrix.mcVersionIndex }}
-        CIRCLE_NODE_TOTAL: 12
-      run: npm test
+    - run: npm run jestTest -- -t ${{ matrix.mcVersion }}
     - uses: actions/upload-artifact@v2
       with:
         name: test_picture

@@ -4,12 +4,10 @@ package-lock.json
 versions/
 public/index.js*
 public/worker.js*
-public/supportedVersions.json
 public/textures/
 public/blocksStates/
 examples/standalone/public/index.js
 examples/standalone/public/worker.js
-examples/standalone/public/supportedVersions.json
 examples/standalone/public/textures/
 examples/standalone/public/blocksStates/
 *.DS_Store

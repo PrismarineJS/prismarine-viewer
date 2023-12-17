@@ -17,7 +17,9 @@ const start = (bot, { viewDistance = 6, output = 'output.mp4', frames = 200, wid
   const renderer = new THREE.WebGLRenderer({ canvas })
   const viewer = new Viewer(renderer)
 
-  viewer.setVersion(bot.version)
+  if (!viewer.setVersion(bot.version)) {
+    return false
+  }
   viewer.setFirstPersonCamera(bot.entity.position, bot.entity.yaw, bot.entity.pitch)
 
   // Load world
