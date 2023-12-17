@@ -1,3 +1,7 @@
+### 1.26.1
+
+* Fix version check.
+
 ### 1.26.0
 
 * Fix redstone_wire rendering (@nova-27)
