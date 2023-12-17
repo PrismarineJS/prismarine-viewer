@@ -22,7 +22,6 @@ jobs:
 
     strategy:
       matrix:
-        javaVersion: [17]
         mcVersion: ['1.8.8', '1.9.4', '1.10.2', '1.11.2', '1.12.2', '1.13.2', '1.14.4', '1.15.2', '1.16.1', '1.16.4', '1.17.1', '1.18.1']
       fail-fast: false
 
@@ -35,7 +34,7 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v1
       with:
-        java-version: ${{ matrix.javaVersion }}
+        java-version: 17
         java-package: jre
     - name: Install xi
       run: sudo apt-get install -y libxi-dev libglu1-mesa-dev
