@@ -30,11 +30,11 @@ supportedVersions.forEach(function (supportedVersion, i) {
     console.log(line)
   })
 
-  const TIMEOUT = 2 * 60 * 1000
+  const TIMEOUT = 5 * 60 * 1000
 
   describe('client ' + version.minecraftVersion, function () {
     beforeAll(async () => {
-      download(version.minecraftVersion, MC_SERVER_JAR)
+      await new Promise(resolve => download(version.minecraftVersion, MC_SERVER_JAR, resolve))
       PORT = await getPort()
     }, TIMEOUT)
 
@@ -95,7 +95,21 @@ supportedVersions.forEach(function (supportedVersion, i) {
           }
 
           page.goto('http://localhost:3000').then(() => {
-            page.on('console', msg => console.log('PAGE LOG:', msg.text()))
+            // https://github.com/puppeteer/puppeteer/issues/3397
+            page.on('console', async (message) => {
+              if (message.text() !== 'JSHandle@error') {
+                to_print = `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`
+              } else {
+                const messages = await Promise.all(message.args().map((arg) => {
+                  return arg.getProperty('message')
+                }))
+
+                to_print = `${message.type().substring(0, 3).toUpperCase()} ${messages.filter(Boolean)}`
+              }
+              if (!to_print.includes('Unknown entity')) {
+                console.log(to_print)
+              }
+            })
 
             page.on('error', err => {
               exit(err)
