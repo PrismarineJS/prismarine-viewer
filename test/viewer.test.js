@@ -97,17 +97,18 @@ supportedVersions.forEach(function (supportedVersion, i) {
           page.goto('http://localhost:3000').then(() => {
             // https://github.com/puppeteer/puppeteer/issues/3397
             page.on('console', async (message) => {
+              let toPrint = ''
               if (message.text() !== 'JSHandle@error') {
-                to_print = `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`
+                toPrint = `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`
               } else {
                 const messages = await Promise.all(message.args().map((arg) => {
                   return arg.getProperty('message')
                 }))
 
-                to_print = `${message.type().substring(0, 3).toUpperCase()} ${messages.filter(Boolean)}`
+                toPrint = `${message.type().substring(0, 3).toUpperCase()} ${messages.filter(Boolean)}`
               }
-              if (!to_print.includes('Unknown entity')) {
-                console.log(to_print)
+              if (!toPrint.includes('Unknown entity')) {
+                console.log(toPrint)
               }
             })
 
