@@ -13,6 +13,8 @@ Web based viewer for servers and bots
 
 [<img src="https://prismarinejs.github.io/prismarine-viewer/test_1.18.1.png" alt="viewer" width="300">](https://prismarinejs.github.io/prismarine-viewer/)
 
+Supports versions 1.8 to 1.20.
+
 ## Install
 
 ```bash

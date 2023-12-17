@@ -31,11 +31,18 @@ class Viewer {
 
   setVersion (version) {
     version = getVersion(version)
+    if (version === null) {
+      const msg = `${version} is not supported`
+      window.alert(msg)
+      console.log(msg)
+      return false
+    }
     console.log('Using version: ' + version)
     this.version = version
     this.world.setVersion(version)
     this.entities.clear()
     this.primitives.clear()
+    return true
   }
 
   addColumn (x, z, chunk) {
