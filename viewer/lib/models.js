@@ -264,8 +264,8 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
         if (block.name === 'redstone_wire') {
           tint = tints.redstone[`${block.getProperties().power}`]
         } else if (block.name === 'birch_leaves' ||
-                   block.name === 'spruce_leaves' ||
-                   block.name === 'lily_pad') {
+          block.name === 'spruce_leaves' ||
+          block.name === 'lily_pad') {
           tint = tints.constant[block.name]
         } else if (block.name.includes('leaves') || block.name === 'vine') {
           tint = tints.foliage[biome]
@@ -478,7 +478,9 @@ function matchProperties (block, properties) {
 }
 
 function getModelVariants (block, blockStates) {
-  const state = blockStates[block.name]
+  // air, cave_air, void_air and so on...
+  if (block.name.includes('air')) return []
+  const state = blockStates[block.name] ?? blockStates.missing_texture
   if (!state) return []
   if (state.variants) {
     for (const [properties, variant] of Object.entries(state.variants)) {

@@ -102,10 +102,10 @@ class WorldView extends EventEmitter {
     delete this.loadedChunks[`${pos.x},${pos.z}`]
   }
 
-  async updatePosition (pos) {
+  async updatePosition (pos, force = false) {
     const [lastX, lastZ] = chunkPos(this.lastPos)
     const [botX, botZ] = chunkPos(pos)
-    if (lastX !== botX || lastZ !== botZ) {
+    if (lastX !== botX || lastZ !== botZ || force) {
       const newView = new ViewRect(botX, botZ, this.viewDistance)
       for (const coords of Object.keys(this.loadedChunks)) {
         const x = parseInt(coords.split(',')[0])

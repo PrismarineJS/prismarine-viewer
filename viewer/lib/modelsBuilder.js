@@ -34,6 +34,7 @@ function getModel (name, blocksModels) {
 }
 
 function prepareModel (model, texturesJson) {
+  // resolve texture names eg west: #all -> blocks/stone
   for (const tex in model.textures) {
     let root = model.textures[tex]
     while (root.charAt(0) === '#') {
@@ -94,6 +95,19 @@ function resolveModel (name, blocksModels, texturesJson) {
 
 function prepareBlocksStates (mcAssets, atlas) {
   const blocksStates = mcAssets.blocksStates
+  mcAssets.blocksStates.missing_texture = {
+    variants: {
+      normal: {
+        model: 'missing_texture'
+      }
+    }
+  }
+  mcAssets.blocksModels.missing_texture = {
+    parent: 'block/cube_all',
+    textures: {
+      all: 'blocks/missing_texture'
+    }
+  }
   for (const block of Object.values(blocksStates)) {
     if (!block) continue
     if (block.variants) {
