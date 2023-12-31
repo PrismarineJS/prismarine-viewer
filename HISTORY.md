@@ -1,3 +1,6 @@
+### 1.28.0
+* [Handle missing biome data.](https://github.com/PrismarineJS/prismarine-viewer/commit/853d226615526f6cd0ba2296eb88958d78aee175) (thanks @rom1504)
+
 ### 1.27.0
 * [World rendering improvements (#408)](https://github.com/PrismarineJS/prismarine-viewer/commit/4265ad7e6daf8d8b9388d59a0656e3b23a355661) (thanks @zardoy)
 
