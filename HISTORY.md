@@ -1,3 +1,6 @@
+### 1.27.0
+* [World rendering improvements (#408)](https://github.com/PrismarineJS/prismarine-viewer/commit/4265ad7e6daf8d8b9388d59a0656e3b23a355661) (thanks @zardoy)
+
 ### 1.26.2
 * [Roll back/update tweenjs to 19.0.0 (latest working version) (#415)](https://github.com/PrismarineJS/prismarine-viewer/commit/f5f44852e9dd59730d3aa798a2e6c73f5f335613) (thanks @SilkePilon)
 
