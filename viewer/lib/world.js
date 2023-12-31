@@ -72,6 +72,9 @@ class World {
     const block = this.blockCache[stateId]
     block.position = loc
     block.biome = this.biomeCache[column.getBiome(locInChunk)]
+    if (block.biome === undefined) {
+      block.biome = this.biomeCache[1]
+    }
     return block
   }
 }
