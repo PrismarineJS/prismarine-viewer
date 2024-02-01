@@ -1,3 +1,25 @@
+### 1.28.0
+* [Handle missing biome data.](https://github.com/PrismarineJS/prismarine-viewer/commit/853d226615526f6cd0ba2296eb88958d78aee175) (thanks @rom1504)
+
+### 1.27.0
+* [World rendering improvements (#408)](https://github.com/PrismarineJS/prismarine-viewer/commit/4265ad7e6daf8d8b9388d59a0656e3b23a355661) (thanks @zardoy)
+
+### 1.26.2
+* [Roll back/update tweenjs to 19.0.0 (latest working version) (#415)](https://github.com/PrismarineJS/prismarine-viewer/commit/f5f44852e9dd59730d3aa798a2e6c73f5f335613) (thanks @SilkePilon)
+
+### 1.26.1
+
+* Fix version check.
+
+### 1.26.0
+
+* Fix redstone_wire rendering (@nova-27)
+* Improve version support and add support for 1.19 and 1.20. (@rom1504)
+
+### 1.25.0
+
+* Remove unused mc-data from bundle
+
 ### 1.24.0
 
 * Fix threejs disposal

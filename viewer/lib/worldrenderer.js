@@ -12,10 +12,14 @@ function mod (x, n) {
 class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
+    this.active = false
+    this.version = undefined
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
     this.renderUpdateEmitter = new EventEmitter()
+    this.blockStatesData = undefined
+    this.texturesDataUrl = undefined
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
 
@@ -60,23 +64,43 @@ class WorldRenderer {
     }
   }
 
-  setVersion (version) {
+  resetWorld () {
+    this.active = false
     for (const mesh of Object.values(this.sectionMeshs)) {
       this.scene.remove(mesh)
     }
     this.sectionMeshs = {}
     for (const worker of this.workers) {
+      worker.postMessage({ type: 'reset' })
+    }
+  }
+
+  setVersion (version) {
+    this.version = version
+    this.resetWorld()
+    this.active = true
+    for (const worker of this.workers) {
       worker.postMessage({ type: 'version', version })
     }
 
-    loadTexture(`textures/${version}.png`, texture => {
+    this.updateTexturesData()
+  }
+
+  updateTexturesData () {
+    loadTexture(this.texturesDataUrl || `textures/${this.version}.png`, texture => {
       texture.magFilter = THREE.NearestFilter
       texture.minFilter = THREE.NearestFilter
       texture.flipY = false
       this.material.map = texture
     })
 
-    loadJSON(`blocksStates/${version}.json`, blockStates => {
+    const loadBlockStates = () => {
+      return new Promise(resolve => {
+        if (this.blockStatesData) return resolve(this.blockStatesData)
+        return loadJSON(`blocksStates/${this.version}.json`, resolve)
+      })
+    }
+    loadBlockStates().then((blockStates) => {
       for (const worker of this.workers) {
         worker.postMessage({ type: 'blockStates', json: blockStates })
       }

@@ -44,7 +44,9 @@ async function main () {
 
     // Create viewer
     const viewer = new Viewer(renderer)
-    viewer.setVersion(version)
+    if (!viewer.setVersion(version)) {
+      return false
+    }
 
     worldView.listenToBot(bot)
     worldView.init(bot.entity.position)

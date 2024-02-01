@@ -5,16 +5,18 @@ const mcAssets = require('minecraft-assets')
 const fs = require('fs-extra')
 
 const texturesPath = path.resolve(__dirname, '../public/textures')
-if (!fs.existsSync(texturesPath)) {
-  fs.mkdirSync(texturesPath)
+if (fs.existsSync(texturesPath) && !process.argv.includes('-f')) {
+  console.log('textures folder already exists, skipping...')
+  process.exit(0)
 }
+fs.mkdirSync(texturesPath, { recursive: true })
 
 const blockStatesPath = path.resolve(__dirname, '../public/blocksStates')
-if (!fs.existsSync(blockStatesPath)) {
-  fs.mkdirSync(blockStatesPath)
-}
+fs.mkdirSync(blockStatesPath, { recursive: true })
 
-for (const version of mcAssets.versions) {
+const supportedVersions = require('./lib/version').supportedVersions
+
+for (const version of supportedVersions) {
   const assets = mcAssets(version)
   const atlas = makeTextureAtlas(assets)
   const out = fs.createWriteStream(path.resolve(texturesPath, version + '.png'))
@@ -27,5 +29,3 @@ for (const version of mcAssets.versions) {
 
   fs.copySync(assets.directory, path.resolve(texturesPath, version), { overwrite: true })
 }
-
-fs.writeFileSync(path.resolve(__dirname, '../public/supportedVersions.json'), '[' + mcAssets.versions.map(v => `"${v}"`).toString() + ']')
