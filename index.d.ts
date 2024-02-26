@@ -12,6 +12,7 @@ import type {PointsMaterialParameters} from 'three'
 
 interface BotViewerEvents {
     blockClicked: (block: Block, face: number, button: number) => void;
+    onRender: (fps: number) => void;
 }
 
 interface BotViewer {
