@@ -1,5 +1,6 @@
 node_modules
 package-lock.json
+yarn.lock
 /test/*.png
 versions/
 public/index.js*
