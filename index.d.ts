@@ -1,13 +1,10 @@
 import type {Bot} from "mineflayer";
 
-// TODO: BlockFace should be from here (0 to 6)
+// TODO: BlockFace should be from here (0 to 5)
 import { Block } from "prismarine-block";
-import type {Vec3} from "vec3";
+import type { Vec3 } from "vec3";
 
 import type {PointsMaterialParameters} from 'three'
-
-
-// reference information from /lib/mineflayer.js
 
 
 interface BotViewerEvents {
