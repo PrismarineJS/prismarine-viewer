@@ -83,7 +83,6 @@ class Viewer {
   }
 
   listen (emitter) {
-    console.log('listening to emitter!')
     emitter.on('entity', (e) => {
       this.updateEntity(e)
     })
