@@ -138,6 +138,14 @@ Remove the primitive with the given id from the display.
 
 Stop the server and disconnect users.
 
+#### bot.viewer.on('onRender', (fps) => void)
+
+Provides an approximation of the current highest fps of any client connected to the server.
+
+Use this event for events that should be fired at least once per render cycle.
+
+
+
 ## Tests
 
 `npm run jestTest -- -t "1.9.4"`
