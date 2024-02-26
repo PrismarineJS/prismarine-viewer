@@ -27,7 +27,7 @@ class Viewer {
     this.primitives = new Primitives(this.scene, this.camera)
 
     this.domElement = renderer.domElement
-    this.playerHeight = 1.6
+    this.playerHeight = 1.62
     this.isSneaking = false
   }
 
@@ -83,6 +83,7 @@ class Viewer {
   }
 
   listen (emitter) {
+    console.log('listening to emitter!')
     emitter.on('entity', (e) => {
       this.updateEntity(e)
     })
