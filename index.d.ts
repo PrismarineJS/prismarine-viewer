@@ -50,6 +50,7 @@ declare module 'mineflayer' {
 			drawBoxGrid: (id: string, start: Vec3, end: Vec3, color?: string) => void;
 			drawLine: (id: string, points: Vec3[], color?: number) => void;
 			drawPoints: (id: string, points: Vec3[], color?: number, size?: number) => void;
+			focusPoint: (position: Vec3) => void;
 			close: () => void;
 			on(event: 'blockClicked', listener: (block: any, face: any, button: any) => void): this;
 			emit(event: 'blockClicked', block: any, face: any, button: any): boolean;

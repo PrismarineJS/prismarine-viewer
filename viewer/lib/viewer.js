@@ -82,6 +82,31 @@ class Viewer {
     this.camera.rotation.set(pitch, yaw, 0, 'ZYX')
   }
 
+  focusOnPosition(pos, controls) {
+    if(controls) {
+      // Calculate the initial offset between the camera (controls.object) and its current target
+      const initialOffset = new THREE.Vector3().subVectors(controls.object.position, controls.target);
+
+      // Set the end position for the target
+      const newTarget = new THREE.Vector3(pos.x, pos.y, pos.z);
+
+      // Start a tween for the target
+      new TWEEN.Tween(controls.target)
+          .to({x: newTarget.x, y: newTarget.y, z: newTarget.z}, 800)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .onUpdate(() => {
+              // As the target moves, calculate the new position for the camera using the updated target and the initial offset
+              controls.object.position.x = controls.target.x + initialOffset.x;
+              controls.object.position.y = controls.target.y + initialOffset.y;
+              controls.object.position.z = controls.target.z + initialOffset.z;
+
+              // Optional: Update the controls in each frame if needed
+              controls.update();
+          })
+          .start();
+    }
+  }
+
   listen (emitter) {
     emitter.on('entity', (e) => {
       this.updateEntity(e)
