@@ -12,10 +12,6 @@ function getEntityMesh (entity, scene) {
       const e = new Entity('1.16.4', entity.name, scene)
 
       if (entity.username !== undefined) {
-        // Referencing document breaks headless
-        // const canvas = document.createElement('canvas')
-        // canvas.width = 500
-        // canvas.height = 100
         const canvas = createCanvas(500, 100)
 
         const ctx = canvas.getContext('2d')
