@@ -54,11 +54,9 @@ function prepareModel (model, texturesJson) {
       if (face.texture.charAt(0) === '#') {
         face.texture = JSON.parse(JSON.stringify(model.textures[face.texture.substr(1)]))
       } else {
-        console.log(face)
+        console.log(texturesJson)
         let name = face.texture
-        console.log(name)
         name = cleanupBlockName(name)
-        console.log(name)
         face.texture = JSON.parse(JSON.stringify(texturesJson[name]))
       }
 
