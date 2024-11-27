@@ -18,15 +18,7 @@ const supportedVersions = require('./lib/version').supportedVersions
 
 for (const version of supportedVersions) {
   const assets = mcAssets(version)
-  // Check if assets is null or undefined
-  if (!assets) {
-    console.log('Error: assets is null or undefined')
-  }
   const atlas = makeTextureAtlas(assets)
-  // Check if atlas is null or undefined
-  if (!atlas) {
-    console.log('Error: atlas is null or undefined')
-  }
   const out = fs.createWriteStream(path.resolve(texturesPath, version + '.png'))
   const stream = atlas.canvas.pngStream()
   stream.on('data', (chunk) => out.write(chunk))

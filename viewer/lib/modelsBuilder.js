@@ -56,6 +56,10 @@ function prepareModel (model, texturesJson) {
       } else {
         let name = face.texture
         name = cleanupBlockName(name)
+        console.log(name)
+        if (!texturesJson[name]) {
+          console.log('missing texture', name)
+        }
         face.texture = JSON.parse(JSON.stringify(texturesJson[name]))
       }
 
