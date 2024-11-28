@@ -1,4 +1,32 @@
-import {Bot} from "mineflayer";
+import type {Bot} from "mineflayer";
+
+// TODO: BlockFace should be from here (0 to 5)
+import { Block } from "prismarine-block";
+import type { Vec3 } from "vec3";
+
+import type {PointsMaterialParameters} from 'three'
+
+
+interface BotViewerEvents {
+    blockClicked: (block: Block, face: number, button: number) => void;
+    onRender: (fps: number) => void;
+}
+
+interface BotViewer {
+    erase: (id: string) => void;
+    drawBoxGrid: (id: string, start: Vec3, end: Vec3, color: PointsMaterialParameters) => void;
+    drawLine: (id: string, points: Vec3[], color?: PointsMaterialParameters) => void;
+    drawPoints: (id: string, points: Vec3[], color?: PointsMaterialParameters, size?: number) => void;
+    close: () => void;
+}
+
+
+declare module 'mineflayer' {
+    interface Bot {
+        viewer: BotViewer;
+    }
+}
+
 
 export function mineflayer(bot: Bot, settings: {
     viewDistance?: number;
