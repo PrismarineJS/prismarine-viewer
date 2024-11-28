@@ -10,6 +10,7 @@ class Viewer {
   constructor (renderer) {
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color('lightblue')
+    this.skyColour = this.scene.background.getHexString()
 
     this.ambientLight = new THREE.AmbientLight(0xcccccc)
     this.scene.add(this.ambientLight)
@@ -103,6 +104,10 @@ class Viewer {
       this.setBlockStateId(new Vec3(pos.x, pos.y, pos.z), stateId)
     })
 
+    emitter.on('timecycleUpdate', ({ timeOfDay, moonPhase }) => {
+      this.updateTimecycleLighting(timeOfDay, moonPhase)
+    })
+
     this.domElement.addEventListener('pointerdown', (evt) => {
       const raycaster = new THREE.Raycaster()
       const mouse = new THREE.Vector2()
@@ -112,6 +117,53 @@ class Viewer {
       const ray = raycaster.ray
       emitter.emit('mouseClick', { origin: ray.origin, direction: ray.direction, button: evt.button })
     })
+  }
+
+  updateTimecycleLighting (timeOfDay, moonPhase) {
+    if (timeOfDay === undefined) { return }
+    const lightIntensity = this.calculateIntensity(timeOfDay)
+    const newSkyColor = `#${this.darkenSkyColour(lightIntensity).padStart(6, 0)}`
+
+    function timeToRads (time) {
+      return time * (Math.PI / 12000)
+    }
+
+    // Update colours
+    this.scene.background = new THREE.Color(newSkyColor)
+    const newAmbientIntensity = Math.min(0.43, lightIntensity * 0.75) + (0.04 - (moonPhase / 100))
+    const newDirectionalIntensity = Math.min(0.63, lightIntensity) + (0.06 - (moonPhase / 100))
+    this.ambientLight.itensity = newAmbientIntensity
+    this.directionalLight.intensity = newDirectionalIntensity
+    this.directionalLight.position.set(
+      Math.cos(timeToRads(timeOfDay)),
+      Math.sin(timeToRads(timeOfDay)),
+      0.2
+    ).normalize()
+  }
+
+  calculateIntensity (currentTicks) {
+    const transitionStart = 12000
+    const transitionEnd = 18000
+    const timeInDay = (currentTicks % 24000)
+    let lightIntensity
+
+    if (timeInDay < transitionStart) {
+      lightIntensity = 1.0
+    } else if (timeInDay < transitionEnd) {
+      lightIntensity = 1 - (timeInDay - transitionStart) / (transitionEnd - transitionStart)
+    } else {
+      lightIntensity = (timeInDay - transitionEnd) / (24000 - transitionEnd)
+    }
+
+    return lightIntensity
+  }
+
+  // Darken by factor (0 to black, 0.5 half as bright, 1 unchanged)
+  darkenSkyColour (factor) {
+    const skyColour = parseInt(this.skyColour, 16)
+    return (Math.round((skyColour & 0x0000FF) * factor) |
+      (Math.round(((skyColour >> 8) & 0x00FF) * factor) << 8) |
+      (Math.round((skyColour >> 16) * factor) << 16)).toString(16)
   }
 
   update () {
