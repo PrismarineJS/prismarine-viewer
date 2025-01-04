@@ -36,6 +36,7 @@
     "vec3": "^0.1.7"
   },
   "devDependencies": {
+    "@types/three": "^0.161.2",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "canvas": "^2.6.1",
