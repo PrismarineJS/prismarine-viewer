@@ -57,7 +57,9 @@ jobs:
       - name: Download build
         uses: actions/download-artifact@v4.1.7
         with:
-          name: test_picture
+          path: .
+          pattern: test_picture-*
+          merge-multiple: true
       - name: Create commits
         run: |
           git config user.name 'rom1504bot'
