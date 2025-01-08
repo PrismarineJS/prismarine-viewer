@@ -40,9 +40,9 @@ jobs:
       run: sudo apt-get install -y libxi-dev libglu1-mesa-dev
     - run: npm install
     - run: npm run jestTest -- -t ${{ matrix.mcVersion }}
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
-        name: test_picture
+        name: test_picture-${{ matrix.mcVersion }}
         path: test/test_*.png
   DeployPages:
     runs-on: ubuntu-latest
@@ -57,7 +57,9 @@ jobs:
       - name: Download build
         uses: actions/download-artifact@v4.1.7
         with:
-          name: test_picture
+          path: .
+          pattern: test_picture-*
+          merge-multiple: true
       - name: Create commits
         run: |
           git config user.name 'rom1504bot'

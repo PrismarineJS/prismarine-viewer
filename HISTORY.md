@@ -1,3 +1,10 @@
+### 1.29.0
+* [Update upload action](https://github.com/PrismarineJS/prismarine-viewer/commit/db8bfb0f9745d4b26ce73e07b9b92c586e727117) (thanks @rom1504)
+* [Added support for proxy (#429)](https://github.com/PrismarineJS/prismarine-viewer/commit/02b74ff8b84263c49b61d38626dedc7b18afd61a) (thanks @sefirosweb)
+* [Bump actions/download-artifact from 2 to 4.1.7 in /.github/workflows (#433)](https://github.com/PrismarineJS/prismarine-viewer/commit/f24ea1572d10953eab4a7181a61ee45d310d680e) (thanks @dependabot[bot])
+* [Bump @tweenjs/tween.js from 19.0.0 to 23.1.1 (#424)](https://github.com/PrismarineJS/prismarine-viewer/commit/b7624c36b908ab7bcd41e2d9af4e94c4dad1425e) (thanks @dependabot[bot])
+* [Update publish.yml to node 18](https://github.com/PrismarineJS/prismarine-viewer/commit/cd324fe1ed7840eef677100d322d06e3dc08e859) (thanks @rom1504)
+
 ### 1.28.0
 * [Handle missing biome data.](https://github.com/PrismarineJS/prismarine-viewer/commit/853d226615526f6cd0ba2296eb88958d78aee175) (thanks @rom1504)
 
