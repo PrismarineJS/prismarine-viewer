@@ -57,6 +57,7 @@ function prepareModel (model, texturesJson) {
         console.log(texturesJson)
         let name = face.texture
         name = cleanupBlockName(name)
+        console.log(name)
         face.texture = JSON.parse(JSON.stringify(texturesJson[name]))
       }
 
