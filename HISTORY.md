@@ -1,3 +1,7 @@
+### 1.30.0
+* [Support 1.21.1 (New) (#450)](https://github.com/PrismarineJS/prismarine-viewer/commit/859f8d95a97db54ba9f301236e69fb7f18f0505b) (thanks @SuperGamerTron)
+* [Update ci.yml actions/upload-artifact (#448)](https://github.com/PrismarineJS/prismarine-viewer/commit/c2c89a16fd65f05b017089f7b2246ec92218a963) (thanks @extremeheat)
+
 ### 1.29.0
 * [Update upload action](https://github.com/PrismarineJS/prismarine-viewer/commit/db8bfb0f9745d4b26ce73e07b9b92c586e727117) (thanks @rom1504)
 * [Added support for proxy (#429)](https://github.com/PrismarineJS/prismarine-viewer/commit/02b74ff8b84263c49b61d38626dedc7b18afd61a) (thanks @sefirosweb)
