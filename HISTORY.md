@@ -1,3 +1,6 @@
+### 1.32.0
+* [Update to node 22 (#453)](https://github.com/PrismarineJS/prismarine-viewer/commit/774d578e5b02af5112a112b9ebd70bbc2e16a5eb) (thanks @rom1504)
+
 ### 1.31.0
 * [1.21.4 (#452)](https://github.com/PrismarineJS/prismarine-viewer/commit/cf65208c2df9520dba8d8bc00ce9cc9f63edbe78) (thanks @SuperGamerTron)
 
