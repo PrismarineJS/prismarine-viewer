@@ -37,7 +37,7 @@ jobs:
         java-version: 21
         java-package: jre
     - name: Install xi
-      run: sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential
+      run: sudo apt-get install -y libxi-dev libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential
     - run: npm install
     - run: npm run jestTest -- -t ${{ matrix.mcVersion }}
     - uses: actions/upload-artifact@v4
