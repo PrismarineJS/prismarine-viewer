@@ -111,12 +111,10 @@ supportedVersions.forEach(function (supportedVersion) {
             })
 
             page.on('error', err => {
-              page.off('console', consoleHandler);
               exit(err)
             })
 
             page.on('pageerror', pageerr => {
-              page.off('console', consoleHandler);
               exit(pageerr)
             })
             setTimeout(() => {
