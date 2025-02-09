@@ -1,3 +1,6 @@
+### 1.33.0
+* [Fix headless (#436)](https://github.com/PrismarineJS/prismarine-viewer/commit/1bcd495ba8ab067c163d7653609276b27d8c41e9) (thanks @caenopy)
+
 ### 1.32.0
 * [Update to node 22 (#453)](https://github.com/PrismarineJS/prismarine-viewer/commit/774d578e5b02af5112a112b9ebd70bbc2e16a5eb) (thanks @rom1504)
 
