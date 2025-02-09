@@ -1,3 +1,6 @@
+### 1.31.0
+* [1.21.4 (#452)](https://github.com/PrismarineJS/prismarine-viewer/commit/cf65208c2df9520dba8d8bc00ce9cc9f63edbe78) (thanks @SuperGamerTron)
+
 ### 1.30.0
 * [Support 1.21.1 (New) (#450)](https://github.com/PrismarineJS/prismarine-viewer/commit/859f8d95a97db54ba9f301236e69fb7f18f0505b) (thanks @SuperGamerTron)
 * [Update ci.yml actions/upload-artifact (#448)](https://github.com/PrismarineJS/prismarine-viewer/commit/c2c89a16fd65f05b017089f7b2246ec92218a963) (thanks @extremeheat)
