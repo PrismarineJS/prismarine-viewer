@@ -28,6 +28,8 @@ const mineflayer = require('mineflayer')
 const mineflayerViewer = require('prismarine-viewer').mineflayer
 
 const bot = mineflayer.createBot({
+  host: 'localhost'
+  port: 25565,
   username: 'Bot'
 })
 
