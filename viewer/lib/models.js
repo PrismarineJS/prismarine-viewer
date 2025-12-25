@@ -479,7 +479,7 @@ function matchProperties (block, properties) {
 
 function getModelVariants (block, blockStates) {
   // air, cave_air, void_air and so on...
-  if (block.name.includes('air')) return []
+  if (block.name == 'air' || block.name.endsWith('_air')) return []
   const state = blockStates[block.name] ?? blockStates.missing_texture
   if (!state) return []
   if (state.variants) {
