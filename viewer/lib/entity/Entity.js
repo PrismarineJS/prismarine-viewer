@@ -203,7 +203,13 @@ function getMesh (texture, jsonModel) {
 class Entity {
   constructor (version, type, scene) {
     const e = entities[type]
-    if (!e) throw new Error(`Unknown entity ${type}`)
+    if (!e) {
+      // Don't throw - just log warning and create empty mesh
+      // This allows viewer to continue rendering even if some entity types are unknown
+      console.warn(`Unknown entity ${type} - creating placeholder`)
+      this.mesh = new THREE.Object3D()
+      return
+    }
 
     this.mesh = new THREE.Object3D()
     for (const [name, jsonModel] of Object.entries(e.geometry)) {

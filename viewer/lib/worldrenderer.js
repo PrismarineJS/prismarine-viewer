@@ -31,7 +31,14 @@ class WorldRenderer {
       else src += '/worker.js'
 
       const worker = new Worker(src)
+      worker.onerror = (error) => {
+        console.error(`[WorldRenderer] Worker ${i} error:`, error.message, error.filename, error.lineno)
+      }
       worker.onmessage = ({ data }) => {
+        if (data.type === 'error') {
+          console.error(`[WorldRenderer] Worker ${i} reported error:`, data.message)
+          return
+        }
         if (data.type === 'geometry') {
           let mesh = this.sectionMeshs[data.key]
           if (mesh) {
@@ -101,9 +108,14 @@ class WorldRenderer {
       })
     }
     loadBlockStates().then((blockStates) => {
+      // Save blockStates data for diagnostics and future use
+      this.blockStatesData = blockStates
+      console.log(`[WorldRenderer] Block states loaded for ${this.version}`)
       for (const worker of this.workers) {
         worker.postMessage({ type: 'blockStates', json: blockStates })
       }
+    }).catch((err) => {
+      console.error(`[WorldRenderer] Failed to load block states:`, err)
     })
   }
 
@@ -112,7 +124,9 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
+    // FIX: Support Minecraft 1.18+ world height (Y=-64 to Y=320)
+    // Was: for (let y = 0; y < 256; y += 16) - only rendered Y=0 to Y=256
+    for (let y = -64; y < 320; y += 16) {
       const loc = new Vec3(x, y, z)
       this.setSectionDirty(loc)
       this.setSectionDirty(loc.offset(-16, 0, 0))
@@ -127,7 +141,9 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
+    // FIX: Support Minecraft 1.18+ world height (Y=-64 to Y=320)
+    // Was: for (let y = 0; y < 256; y += 16) - only cleaned up Y=0 to Y=256
+    for (let y = -64; y < 320; y += 16) {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]

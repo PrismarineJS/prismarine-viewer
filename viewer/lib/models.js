@@ -241,7 +241,8 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
       if (!neighbor) continue
       if (cullIfIdentical && neighbor.type === block.type) continue
       if (!neighbor.transparent && neighbor.isCube) continue
-      if (neighbor.position.y < 0) continue
+      // REMOVED: Incorrect Y<0 check that was culling all blocks in negative Y coordinates
+      // if (neighbor.position.y < 0) continue
     }
 
     const minx = element.from[0]
@@ -378,24 +379,63 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
     indices: []
   }
 
+  let totalBlocks = 0
+  let nullBlocks = 0
+  let airBlocks = 0
+  let solidBlocks = 0
+  let renderCalls = 0
+
   const cursor = new Vec3(0, 0, 0)
   for (cursor.y = sy; cursor.y < sy + 16; cursor.y++) {
     for (cursor.z = sz; cursor.z < sz + 16; cursor.z++) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
+        totalBlocks++
         const block = world.getBlock(cursor)
+        // FIX: Skip if chunk not loaded (world.getBlock returns null)
+        if (!block) {
+          nullBlocks++
+          continue
+        }
+
+        // Count air vs solid blocks
+        if (block.name.includes('air')) {
+          airBlocks++
+          continue  // Air blocks are skipped by getModelVariants
+        }
+
+        solidBlocks++
         const biome = block.biome.name
         if (block.variant === undefined) {
           block.variant = getModelVariants(block, blocksStates)
         }
 
+        // DEBUG: Log first solid block's variant in each section
+        if (solidBlocks === 1) {
+          const firstVariant = block.variant?.[0]
+          const elemCount = firstVariant?.model?.elements?.length || 0
+          console.log(`[MODELS] First solid block in section (${sx}, ${sy}, ${sz}): ${block.name} type=${block.type} stateId=${block.stateId} variants=${block.variant?.length || 0} hasModel=${firstVariant?.model ? 'YES' : 'NO'} elements=${elemCount}`)
+          if (elemCount === 0) {
+            console.log(`[MODELS] WARNING: Block "${block.name}" has a model but ZERO elements!`)
+          }
+        }
+
         for (const variant of block.variant) {
-          if (!variant || !variant.model) continue
+          if (!variant || !variant.model) {
+            // DEBUG: Log why we're skipping
+            if (solidBlocks === 1) {
+              console.log(`[MODELS] Skipping variant - variant:`, !!variant, 'model:', variant?.model ? 'yes' : 'no')
+            }
+            continue
+          }
 
           if (block.name === 'water') {
+            renderCalls++
             renderLiquid(world, cursor, variant.model.textures.particle, block.type, biome, true, attr)
           } else if (block.name === 'lava') {
+            renderCalls++
             renderLiquid(world, cursor, variant.model.textures.particle, block.type, biome, false, attr)
           } else {
+            renderCalls++
             let globalMatrix = null
             let globalShift = null
 
@@ -446,6 +486,15 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
   attr.normals = new Float32Array(attr.normals)
   attr.colors = new Float32Array(attr.colors)
   attr.uvs = new Float32Array(attr.uvs)
+
+  console.log(`[MODELS] Section (${sx}, ${sy}, ${sz}) stats:`)
+  console.log(`  Total blocks: ${totalBlocks}`)
+  console.log(`  Null blocks: ${nullBlocks}`)
+  console.log(`  Air blocks: ${airBlocks}`)
+  console.log(`  Solid blocks: ${solidBlocks}`)
+  console.log(`  Render calls: ${renderCalls}`)
+  console.log(`  Final vertices: ${attr.positions.length / 3}`)
+  console.log(`  Final indices: ${attr.indices.length}`)
 
   return attr
 }
