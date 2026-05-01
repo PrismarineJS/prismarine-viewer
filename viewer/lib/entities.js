@@ -77,9 +77,10 @@ class Entities {
     if (entity.pos) {
       new TWEEN.Tween(e.position).to({ x: entity.pos.x, y: entity.pos.y, z: entity.pos.z }, 50).start()
     }
-    if (entity.yaw) {
-      const da = (entity.yaw - e.rotation.y) % (Math.PI * 2)
-      const dy = 2 * da % (Math.PI * 2) - da
+    if (typeof entity.yaw === 'number' && Number.isFinite(entity.yaw)) {
+      const TAU = Math.PI * 2
+      const norm = ((entity.yaw - e.rotation.y) % TAU + TAU) % TAU
+      const dy = norm > Math.PI ? norm - TAU : norm
       new TWEEN.Tween(e.rotation).to({ y: e.rotation.y + dy }, 50).start()
     }
   }
