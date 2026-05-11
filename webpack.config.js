@@ -18,6 +18,7 @@ const indexConfig = {
   },
   resolve: {
     fallback: {
+      assert: require.resolve('assert/'),
       zlib: false
     }
   },
@@ -59,6 +60,7 @@ const workerConfig = {
   },
   resolve: {
     fallback: {
+      assert: require.resolve('assert/'),
       zlib: false
     }
   },
@@ -74,6 +76,11 @@ const workerConfig = {
   externals: [
     function (req, cb) {
       if (req.context.includes('minecraft-data') && req.request.endsWith('.json')) {
+        const requestPath = `${req.context}/${req.request}`
+        if (requestPath.match(/[\\/]data[\\/]bedrock[\\/]/)) {
+          cb(null, [])
+          return
+        }
         const fileName = req.request.split('/').pop().replace('.json', '')
         if (!allowedWorkerFiles.includes(fileName)) {
           cb(null, [])
