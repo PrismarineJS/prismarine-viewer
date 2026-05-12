@@ -32,7 +32,7 @@ function setSectionDirty (pos, value = true) {
   if (!value) {
     delete dirtySections[key]
     postMessage({ type: 'sectionFinished', key })
-  } else if (chunk && chunk.sections[Math.floor(y / 16)]) {
+  } else if (hasSection(chunk, y)) {
     dirtySections[key] = value
   } else {
     postMessage({ type: 'sectionFinished', key })
@@ -74,7 +74,7 @@ setInterval(() => {
     y = parseInt(y, 10)
     z = parseInt(z, 10)
     const chunk = world.getColumn(x, z)
-    if (chunk && chunk.sections[Math.floor(y / 16)]) {
+    if (hasSection(chunk, y)) {
       delete dirtySections[key]
       const geometry = getSectionGeometry(x, y, z, world, blocksStates)
       const transferable = [geometry.positions.buffer, geometry.normals.buffer, geometry.colors.buffer, geometry.uvs.buffer]
@@ -85,3 +85,9 @@ setInterval(() => {
   // const time = performance.now() - start
   // console.log(`Processed ${sections.length} sections in ${time} ms (${time / sections.length} ms/section)`)
 }, 50)
+
+function hasSection (chunk, y) {
+  if (!chunk) return false
+  const minY = chunk.minY ?? 0
+  return Boolean(chunk.sections[(y - minY) >> 4])
+}
