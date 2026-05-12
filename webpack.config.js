@@ -8,6 +8,7 @@ const path = require('path')
 const blockedIndexFiles = ['blocksB2J', 'blocksJ2B', 'blockMappings', 'steve', 'recipes']
 const allowedWorkerFiles = ['blocks', 'blockCollisionShapes', 'tints', 'blockStates',
   'biomes', 'features', 'version', 'legacy', 'versions', 'version', 'protocolVersions']
+const allowedWorkerBedrockFiles = ['legacy', 'versions', 'protocolVersions']
 
 const indexConfig = {
   entry: './lib/index.js',
@@ -77,11 +78,11 @@ const workerConfig = {
     function (req, cb) {
       if (req.context.includes('minecraft-data') && req.request.endsWith('.json')) {
         const requestPath = `${req.context}/${req.request}`
-        if (requestPath.match(/[\\/]data[\\/]bedrock[\\/]/)) {
+        const fileName = req.request.split('/').pop().replace('.json', '')
+        if (requestPath.match(/[\\/]data[\\/]bedrock[\\/]/) && !allowedWorkerBedrockFiles.includes(fileName)) {
           cb(null, [])
           return
         }
-        const fileName = req.request.split('/').pop().replace('.json', '')
         if (!allowedWorkerFiles.includes(fileName)) {
           cb(null, [])
           return
