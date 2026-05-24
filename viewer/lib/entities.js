@@ -19,9 +19,9 @@ function getEntityMesh (entity, scene) {
         const padX = 16
         const padY = 6
         const fontPx = 80
-        // Prefer a real Minecraft font when one is installed, falling back to a
-        // monospace face so the nametag still looks reasonable everywhere.
-        const font = `${fontPx}px minecraft, mojangles, monospace`
+        // Prefer a real Minecraft font when one is installed, falling back to
+        // sans-serif so the nametag still looks reasonable everywhere.
+        const font = `${fontPx}px minecraft, mojangles, sans-serif`
 
         const measure = createCanvas(1, 1).getContext('2d')
         measure.font = font
