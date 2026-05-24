@@ -12,22 +12,51 @@ function getEntityMesh (entity, scene) {
       const e = new Entity('1.16.4', entity.name, scene)
 
       if (entity.username !== undefined) {
-        const canvas = createCanvas(500, 100)
+        // Render the nametag like vanilla: white text with a soft drop shadow
+        // on a translucent black background, sized to the measured text so the
+        // sprite's aspect ratio matches and doesn't squash the letters.
+        const txt = entity.username
+        const padX = 16
+        const padY = 6
+        const fontPx = 80
+        // Prefer a real Minecraft font when one is installed, falling back to
+        // sans-serif so the nametag still looks reasonable everywhere.
+        const font = `${fontPx}px minecraft, mojangles, sans-serif`
 
+        const measure = createCanvas(1, 1).getContext('2d')
+        measure.font = font
+        const textW = Math.ceil(measure.measureText(txt).width)
+
+        const w = textW + padX * 2 + 2 // + shadow
+        const h = fontPx + padY * 2 + 2
+
+        const canvas = createCanvas(w, h)
         const ctx = canvas.getContext('2d')
-        ctx.font = '50pt Arial'
-        ctx.fillStyle = '#000000'
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.32)'
+        ctx.fillRect(0, 0, w, h)
+
+        ctx.font = font
         ctx.textAlign = 'left'
         ctx.textBaseline = 'top'
-
-        const txt = entity.username
-        ctx.fillText(txt, 100, 0)
+        ctx.fillStyle = '#3f3f3f'
+        ctx.fillText(txt, padX + 2, padY + 2) // shadow
+        ctx.fillStyle = '#ffffff'
+        ctx.fillText(txt, padX, padY)
 
         const tex = new THREE.Texture(canvas)
         tex.needsUpdate = true
-        const spriteMat = new THREE.SpriteMaterial({ map: tex })
+        tex.minFilter = THREE.LinearFilter
+        tex.magFilter = THREE.LinearFilter
+        tex.generateMipmaps = false
+        tex.anisotropy = 4
+        const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false })
         const sprite = new THREE.Sprite(spriteMat)
+        // Scale so the sprite is ~0.4m tall regardless of canvas pixel size,
+        // and width preserves canvas aspect — fixes the "squished" look.
+        const targetHeight = 0.4
+        sprite.scale.set(targetHeight * (w / h), targetHeight, 1)
         sprite.position.y += entity.height + 0.6
+        sprite.renderOrder = 999
 
         e.mesh.add(sprite)
       }
