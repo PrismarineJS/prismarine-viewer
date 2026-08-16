@@ -24,6 +24,8 @@ class World {
     this.columns = {}
     this.blockCache = {}
     this.biomeCache = mcData(version).biomes
+    // 0 before 1.18, -64 after — used by models.js to cull out-of-world faces
+    this.minY = new this.Chunk().minY ?? 0
   }
 
   addColumn (x, z, json) {
