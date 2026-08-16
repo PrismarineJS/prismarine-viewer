@@ -23,14 +23,16 @@ class WorldRenderer {
     this.texturesDataUrl = undefined
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
-    // Animated textures are packed as vertical runs of tiles; each vertex
-    // carries (frames, frametime) and the shader steps down the run in ticks.
-    this.uniforms = { time: { value: 0 }, tileHeight: { value: 0 } }
+    // Animated textures are packed as vertical runs of frames; each vertex
+    // carries (frames, frametime, framestep) and the shader steps down the run
+    // in ticks. The step is per-vertex rather than a uniform because tiles keep
+    // their native resolution, so frame height varies across the atlas.
+    this.uniforms = { time: { value: 0 } }
     this.material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.uniforms)
       shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', 'attribute vec2 animation;\nuniform float time;\nuniform float tileHeight;\n#include <common>')
-        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_UV\nvUv.y += mod(floor(time / animation.y), animation.x) * tileHeight;\n#endif')
+        .replace('#include <common>', 'attribute vec3 animation;\nuniform float time;\n#include <common>')
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_UV\nvUv.y += mod(floor(time / animation.y), animation.x) * animation.z;\n#endif')
     }
 
     this.workers = []
@@ -58,7 +60,7 @@ class WorldRenderer {
           geometry.setAttribute('normal', new THREE.BufferAttribute(data.geometry.normals, 3))
           geometry.setAttribute('color', new THREE.BufferAttribute(data.geometry.colors, 3))
           geometry.setAttribute('uv', new THREE.BufferAttribute(data.geometry.uvs, 2))
-          geometry.setAttribute('animation', new THREE.BufferAttribute(data.geometry.animations, 2))
+          geometry.setAttribute('animation', new THREE.BufferAttribute(data.geometry.animations, 3))
           geometry.setIndex(data.geometry.indices)
 
           mesh = new THREE.Mesh(geometry, this.material)
@@ -103,7 +105,6 @@ class WorldRenderer {
       texture.magFilter = THREE.NearestFilter
       texture.minFilter = THREE.NearestFilter
       texture.flipY = false
-      this.uniforms.tileHeight.value = 16 / texture.image.height
       this.material.map = texture
       this.material.needsUpdate = true
     })
