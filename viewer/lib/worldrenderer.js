@@ -4,6 +4,7 @@ const Vec3 = require('vec3').Vec3
 const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
 const { EventEmitter } = require('events')
 const { dispose3 } = require('./dispose')
+const Chunks = require('prismarine-chunk')
 
 function mod (x, n) {
   return ((x % n) + n) % n
@@ -15,6 +16,10 @@ class WorldRenderer {
     this.active = false
     this.version = undefined
     this.assetsVersion = undefined
+    // World Y bounds; overwritten in setVersion from the version's chunk
+    // implementation (negative-Y worlds since 1.18). Defaults match pre-1.18.
+    this.minY = 0
+    this.worldHeight = 256
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
@@ -89,6 +94,9 @@ class WorldRenderer {
   setVersion (version, assetsVersion = version) {
     this.version = version
     this.assetsVersion = assetsVersion
+    const chunk = new (Chunks(version))()
+    this.minY = chunk.minY ?? 0
+    this.worldHeight = chunk.worldHeight ?? 256
     this.resetWorld()
     this.active = true
     for (const worker of this.workers) {
@@ -130,7 +138,7 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
       const loc = new Vec3(x, y, z)
       this.setSectionDirty(loc)
       this.setSectionDirty(loc.offset(-16, 0, 0))
@@ -145,7 +153,7 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]
