@@ -112,7 +112,7 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = -64; y < 320; y += 16) {
       const loc = new Vec3(x, y, z)
       this.setSectionDirty(loc)
       this.setSectionDirty(loc.offset(-16, 0, 0))
@@ -127,7 +127,7 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = -64; y < 320; y += 16) {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]

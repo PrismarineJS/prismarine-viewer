@@ -32,7 +32,9 @@ function setSectionDirty (pos, value = true) {
   if (!value) {
     delete dirtySections[key]
     postMessage({ type: 'sectionFinished', key })
-  } else if (chunk && chunk.sections[Math.floor(y / 16)]) {
+  } else if (chunk) {
+    // Mesh any section of a loaded chunk. (The old chunk.sections[y/16] check
+    // used a 0-based index that is wrong for 1.18+ negative-Y worlds.)
     dirtySections[key] = value
   } else {
     postMessage({ type: 'sectionFinished', key })
@@ -74,7 +76,9 @@ setInterval(() => {
     y = parseInt(y, 10)
     z = parseInt(z, 10)
     const chunk = world.getColumn(x, z)
-    if (chunk && chunk.sections[Math.floor(y / 16)]) {
+    if (chunk) {
+      // Mesh any section of a loaded chunk. (The old chunk.sections[y/16] index
+      // was wrong for 1.18+ negative-Y worlds and skipped all sub-zero terrain.)
       delete dirtySections[key]
       const geometry = getSectionGeometry(x, y, z, world, blocksStates)
       const transferable = [geometry.positions.buffer, geometry.normals.buffer, geometry.colors.buffer, geometry.uvs.buffer]

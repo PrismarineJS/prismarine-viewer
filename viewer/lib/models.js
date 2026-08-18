@@ -241,7 +241,8 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
       if (!neighbor) continue
       if (cullIfIdentical && neighbor.type === block.type) continue
       if (!neighbor.transparent && neighbor.isCube) continue
-      if (neighbor.position.y < 0) continue
+      // (removed: `if (neighbor.position.y < 0) continue` — it culled every face
+      // whose neighbor sits below y=0, breaking all terrain in 1.18+ negative-Y worlds.)
     }
 
     const minx = element.from[0]
