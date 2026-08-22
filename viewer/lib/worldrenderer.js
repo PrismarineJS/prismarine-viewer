@@ -4,7 +4,6 @@ const Vec3 = require('vec3').Vec3
 const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
 const { EventEmitter } = require('events')
 const { dispose3 } = require('./dispose')
-const Chunks = require('prismarine-chunk')
 
 function mod (x, n) {
   return ((x % n) + n) % n
@@ -16,10 +15,10 @@ class WorldRenderer {
     this.active = false
     this.version = undefined
     this.assetsVersion = undefined
-    // World Y bounds; overwritten in setVersion from the version's chunk
-    // implementation (negative-Y worlds since 1.18). Defaults match pre-1.18.
+    // World Y bounds, fetched per version in setVersion. Defaults match pre-1.18.
     this.minY = 0
     this.worldHeight = 256
+    this.boundsReady = Promise.resolve()
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
@@ -96,9 +95,14 @@ class WorldRenderer {
   setVersion (version, assetsVersion = version) {
     this.version = version
     this.assetsVersion = assetsVersion
-    const chunk = new (Chunks(version))()
-    this.minY = chunk.minY ?? 0
-    this.worldHeight = chunk.worldHeight ?? 256
+    this.boundsReady = new Promise(resolve => {
+      loadJSON('worldBounds.json', (bounds) => {
+        const { minY = 0, worldHeight = 256 } = bounds[version] ?? {}
+        this.minY = minY
+        this.worldHeight = worldHeight
+        resolve()
+      })
+    })
     this.resetWorld()
     this.active = true
     for (const worker of this.workers) {
@@ -139,14 +143,18 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
-      const loc = new Vec3(x, y, z)
-      this.setSectionDirty(loc)
-      this.setSectionDirty(loc.offset(-16, 0, 0))
-      this.setSectionDirty(loc.offset(16, 0, 0))
-      this.setSectionDirty(loc.offset(0, 0, -16))
-      this.setSectionDirty(loc.offset(0, 0, 16))
-    }
+    // The worker cannot mesh anything until blockStates lands, so waiting on the
+    // bounds fetch here costs no rendering latency.
+    this.boundsReady.then(() => {
+      for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
+        const loc = new Vec3(x, y, z)
+        this.setSectionDirty(loc)
+        this.setSectionDirty(loc.offset(-16, 0, 0))
+        this.setSectionDirty(loc.offset(16, 0, 0))
+        this.setSectionDirty(loc.offset(0, 0, -16))
+        this.setSectionDirty(loc.offset(0, 0, 16))
+      }
+    })
   }
 
   removeColumn (x, z) {
@@ -154,16 +162,18 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
-      this.setSectionDirty(new Vec3(x, y, z), false)
-      const key = `${x},${y},${z}`
-      const mesh = this.sectionMeshs[key]
-      if (mesh) {
-        this.scene.remove(mesh)
-        dispose3(mesh)
+    this.boundsReady.then(() => {
+      for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
+        this.setSectionDirty(new Vec3(x, y, z), false)
+        const key = `${x},${y},${z}`
+        const mesh = this.sectionMeshs[key]
+        if (mesh) {
+          this.scene.remove(mesh)
+          dispose3(mesh)
+        }
+        delete this.sectionMeshs[key]
       }
-      delete this.sectionMeshs[key]
-    }
+    })
   }
 
   setBlockStateId (pos, stateId) {
