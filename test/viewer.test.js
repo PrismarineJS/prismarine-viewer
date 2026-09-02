@@ -99,9 +99,11 @@ supportedVersions.forEach(function (supportedVersion) {
               if (message.text() !== 'JSHandle@error') {
                 toPrint = `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`
               } else {
+                // getProperty rejects if the browser closes mid-await; don't let that
+                // unhandled rejection kill the jest process after the test is done
                 const messages = await Promise.all(message.args().map((arg) => {
-                  return arg.getProperty('message')
-                }))
+                  return arg.getProperty('message').catch(() => null)
+                })).catch(() => [])
 
                 toPrint = `${message.type().substring(0, 3).toUpperCase()} ${messages.filter(Boolean)}`
               }
