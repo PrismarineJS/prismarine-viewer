@@ -21,6 +21,15 @@ const indexConfig = {
       zlib: false
     }
   },
+  module: {
+    rules: [
+      {
+        // three declares sideEffects: false, but examples/js scripts work by attaching to the THREE global
+        test: /three[/\\]examples[/\\]js/,
+        sideEffects: true
+      }
+    ]
+  },
   plugins: [
     // fix "process is not defined" error:
     new webpack.ProvidePlugin({
