@@ -4,7 +4,7 @@ const THREE = require('three')
 const textureCache = {}
 function loadTexture (texture, cb) {
   if (!textureCache[texture]) {
-    textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(texture, resolve))
+    textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(texture, resolve, undefined, () => {}))
   }
   textureCache[texture].then(cb)
 }

@@ -128,7 +128,17 @@ function addCube (attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
   }
 }
 
-function getMesh (texture, jsonModel) {
+function applyTexture (material, texture) {
+  texture.magFilter = THREE.NearestFilter
+  texture.minFilter = THREE.NearestFilter
+  texture.flipY = false
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  material.map = texture
+  material.needsUpdate = true
+}
+
+function getMesh (texture, jsonModel, skin) {
   const bones = {}
 
   const geoData = {
@@ -195,19 +205,15 @@ function getMesh (texture, jsonModel) {
   mesh.scale.set(1 / 16, 1 / 16, 1 / 16)
 
   loadTexture(texture, texture => {
-    texture.magFilter = THREE.NearestFilter
-    texture.minFilter = THREE.NearestFilter
-    texture.flipY = false
-    texture.wrapS = THREE.RepeatWrapping
-    texture.wrapT = THREE.RepeatWrapping
-    material.map = texture
+    applyTexture(material, texture)
+    if (skin) loadTexture(skin, texture => applyTexture(material, texture))
   })
 
   return mesh
 }
 
 class Entity {
-  constructor (version, type, scene) {
+  constructor (version, type, scene, skin) {
     const e = entities[type]
     if (!e) throw new Error(`Unknown entity ${type}`)
 
@@ -216,7 +222,7 @@ class Entity {
       const texture = e.textures[name]
       if (!texture) continue
       // console.log(JSON.stringify(jsonModel, null, 2))
-      const mesh = getMesh(texture.replace('textures', 'textures/' + version) + '.png', jsonModel)
+      const mesh = getMesh(texture.replace('textures', 'textures/' + version) + '.png', jsonModel, skin)
       /* const skeletonHelper = new THREE.SkeletonHelper( mesh )
       skeletonHelper.material.linewidth = 2
       scene.add( skeletonHelper ) */

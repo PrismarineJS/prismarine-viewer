@@ -22,7 +22,7 @@ function loadTexture (texture, cb) {
     loadImage(path.resolve(__dirname, '../../public/' + texture)).then(image => {
       textureCache[texture] = new THREE.CanvasTexture(image)
       cb(textureCache[texture])
-    })
+    }).catch(() => {})
   }
 }
 

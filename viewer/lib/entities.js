@@ -9,7 +9,8 @@ const { createCanvas } = require('canvas')
 function getEntityMesh (entity, scene) {
   if (entity.name) {
     try {
-      const e = new Entity('1.16.4', entity.name, scene)
+      const skin = entity.name === 'player' && entity.username !== undefined ? `skin/${encodeURIComponent(entity.username)}` : undefined
+      const e = new Entity('1.16.4', entity.name, scene, skin)
 
       if (entity.username !== undefined) {
         const canvas = createCanvas(500, 100)
