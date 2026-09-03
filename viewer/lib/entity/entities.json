@@ -12234,6 +12234,1056 @@
       }
     }
   },
+  "player_slim": {
+    "identifier": "minecraft:player_slim",
+    "materials": {
+      "default": "entity_alphatest",
+      "cape": "entity_alphatest",
+      "animated": "player_animated"
+    },
+    "textures": {
+      "default": "textures/entity/alex"
+    },
+    "geometry": {
+      "default": {
+        "visible_bounds_width": 1,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [0, 1, 0],
+        "bones": [
+          {"name": "root", "pivot": [0, 0, 0]},
+          {
+            "name": "body",
+            "parent": "waist",
+            "pivot": [0, 24, 0],
+            "cubes": [
+              {"origin": [-4, 12, -2], "size": [8, 12, 4], "uv": [16, 16]}
+            ]
+          },
+          {"name": "waist", "parent": "root", "pivot": [0, 12, 0]},
+          {
+            "name": "head",
+            "parent": "body",
+            "pivot": [0, 24, 0],
+            "cubes": [{"origin": [-4, 24, -4], "size": [8, 8, 8], "uv": [0, 0]}]
+          },
+          {"name": "cape", "pivot": [0, 24, 3], "parent": "body"},
+          {
+            "name": "hat",
+            "parent": "head",
+            "pivot": [0, 24, 0],
+            "cubes": [
+              {
+                "origin": [-4, 24, -4],
+                "size": [8, 8, 8],
+                "uv": [32, 0],
+                "inflate": 0.5
+              }
+            ]
+          },
+          {
+            "name": "leftArm",
+            "parent": "body",
+            "pivot": [5, 22, 0],
+            "cubes": [
+              {"origin": [4, 12, -2], "size": [3, 12, 4], "uv": [32, 48]}
+            ]
+          },
+          {
+            "name": "leftSleeve",
+            "parent": "leftArm",
+            "pivot": [5, 22, 0],
+            "cubes": [
+              {
+                "origin": [4, 12, -2],
+                "size": [3, 12, 4],
+                "uv": [48, 48],
+                "inflate": 0.25
+              }
+            ]
+          },
+          {"name": "leftItem", "pivot": [6, 15, 1], "parent": "leftArm"},
+          {
+            "name": "rightArm",
+            "parent": "body",
+            "pivot": [-5, 22, 0],
+            "cubes": [
+              {"origin": [-7, 12, -2], "size": [3, 12, 4], "uv": [40, 16]}
+            ]
+          },
+          {
+            "name": "rightSleeve",
+            "parent": "rightArm",
+            "pivot": [-5, 22, 0],
+            "cubes": [
+              {
+                "origin": [-7, 12, -2],
+                "size": [3, 12, 4],
+                "uv": [40, 32],
+                "inflate": 0.25
+              }
+            ]
+          },
+          {
+            "name": "rightItem",
+            "pivot": [-6, 15, 1],
+            "locators": {"lead_hold": [-6, 15, 1]},
+            "parent": "rightArm"
+          },
+          {
+            "name": "leftLeg",
+            "parent": "root",
+            "pivot": [1.9, 12, 0],
+            "cubes": [
+              {"origin": [-0.1, 0, -2], "size": [4, 12, 4], "uv": [16, 48]}
+            ]
+          },
+          {
+            "name": "leftPants",
+            "parent": "leftLeg",
+            "pivot": [1.9, 12, 0],
+            "cubes": [
+              {
+                "origin": [-0.1, 0, -2],
+                "size": [4, 12, 4],
+                "uv": [0, 48],
+                "inflate": 0.25
+              }
+            ]
+          },
+          {
+            "name": "rightLeg",
+            "parent": "root",
+            "pivot": [-1.9, 12, 0],
+            "cubes": [
+              {"origin": [-3.9, 0, -2], "size": [4, 12, 4], "uv": [0, 16]}
+            ]
+          },
+          {
+            "name": "rightPants",
+            "parent": "rightLeg",
+            "pivot": [-1.9, 12, 0],
+            "cubes": [
+              {
+                "origin": [-3.9, 0, -2],
+                "size": [4, 12, 4],
+                "uv": [0, 32],
+                "inflate": 0.25
+              }
+            ]
+          },
+          {
+            "name": "jacket",
+            "parent": "body",
+            "pivot": [0, 24, 0],
+            "cubes": [
+              {
+                "origin": [-4, 12, -2],
+                "size": [8, 12, 4],
+                "uv": [16, 32],
+                "inflate": 0.25
+              }
+            ]
+          }
+        ]
+      },
+      "cape": {
+        "texturewidth": 64,
+        "textureheight": 32,
+        "bones": [
+          {"name": "root", "pivot": [0, 0, 0]},
+          {"name": "body", "pivot": [0, 24, 0], "parent": "waist"},
+          {
+            "name": "waist",
+            "parent": "root",
+            "neverRender": true,
+            "pivot": [0, 12, 0]
+          },
+          {
+            "name": "cape",
+            "parent": "body",
+            "pivot": [0, 24, 3],
+            "bind_pose_rotation": [0, 180, 0],
+            "rotation": [0, 180, 0],
+            "cubes": [{"origin": [-5, 8, 3], "size": [10, 16, 1], "uv": [0, 0]}]
+          }
+        ]
+      }
+    },
+    "scripts": {
+      "scale": "0.9375",
+      "initialize": [
+        "variable.is_holding_right = 0.0;",
+        "variable.is_blinking = 0.0;",
+        "variable.last_blink_time = 0.0;",
+        "variable.hand_bob = 0.0;"
+      ],
+      "pre_animation": [
+        "variable.helmet_layer_visible = 1.0;",
+        "variable.leg_layer_visible = 1.0;",
+        "variable.boot_layer_visible = 1.0;",
+        "variable.chest_layer_visible = 1.0;",
+        "variable.attack_body_rot_y = Math.sin(360*Math.sqrt(variable.attack_time)) * 5.0;",
+        "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed / variable.gliding_speed_value) * 57.3;",
+        "variable.first_person_rotation_factor = math.sin((1 - variable.attack_time) * 180.0);",
+        "variable.hand_bob = query.life_time < 0.01 ? 0.0 : variable.hand_bob + ((query.is_on_ground && query.is_alive ? math.clamp(math.sqrt(math.pow(query.position_delta(0), 2.0) + math.pow(query.position_delta(2), 2.0)), 0.0, 0.1) : 0.0) - variable.hand_bob) * 0.02;",
+        "variable.map_angle = math.clamp(1 - variable.player_x_rotation / 45.1, 0.0, 1.0);",
+        "variable.item_use_normalized = query.main_hand_item_use_duration / query.main_hand_item_max_duration;"
+      ],
+      "animate": ["root"]
+    },
+    "animations": {
+      "humanoid_base_pose": {
+        "loop": true,
+        "bones": {"waist": {"rotation": [0, 0, 0]}}
+      },
+      "look_at_target_ui": {
+        "loop": true,
+        "bones": {
+          "head": {
+            "rotation": [
+              "query.target_x_rotation",
+              "query.target_y_rotation",
+              0
+            ]
+          }
+        }
+      },
+      "look_at_target_default": {
+        "loop": true,
+        "bones": {
+          "head": {
+            "relative_to": {"rotation": "entity"},
+            "rotation": [
+              "query.target_x_rotation",
+              "query.target_y_rotation",
+              0
+            ]
+          }
+        }
+      },
+      "look_at_target_gliding": {
+        "loop": true,
+        "bones": {"head": {"rotation": [-45, "query.target_y_rotation", 0]}}
+      },
+      "look_at_target_swimming": {
+        "loop": true,
+        "bones": {
+          "head": {
+            "rotation": [
+              "math.lerp(query.target_x_rotation, -45.0, variable.swim_amount)",
+              "query.target_y_rotation",
+              0
+            ]
+          }
+        }
+      },
+      "look_at_target_inverted": {
+        "loop": true,
+        "bones": {
+          "head": {
+            "rotation": [
+              "-query.target_x_rotation",
+              "-query.target_y_rotation",
+              0
+            ]
+          }
+        }
+      },
+      "cape": {
+        "loop": true,
+        "bones": {
+          "cape": {
+            "position": [
+              0,
+              "query.get_root_locator_offset('armor_offset.default_neck', 1)",
+              0
+            ],
+            "rotation": [
+              "math.lerp(0.0, -126.0, query.cape_flap_amount) - 6.0",
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "move.arms": {
+        "loop": true,
+        "bones": {
+          "leftarm": {"rotation": ["variable.tcos0", 0, 0]},
+          "rightarm": {"rotation": ["-variable.tcos0", 0, 0]}
+        }
+      },
+      "move.legs": {
+        "loop": true,
+        "bones": {
+          "leftleg": {"rotation": ["variable.tcos0 * -1.4", 0, 0]},
+          "rightleg": {"rotation": ["variable.tcos0 * 1.4", 0, 0]}
+        }
+      },
+      "swimming": {
+        "animation_length": 1.3,
+        "loop": true,
+        "override_previous_animation": true,
+        "bones": {
+          "leftarm": {
+            "rotation": {
+              "0": [0, 180, 180],
+              "0.7": [0, 180, 287.2],
+              "1.1": [90, 180, 180],
+              "1.3": [0, 180, 180]
+            }
+          },
+          "rightarm": {
+            "rotation": {
+              "0": [0, 180, -180],
+              "0.7": [0, 180, -287.2],
+              "1.1": [90, 180, -180],
+              "1.3": [0, 180, -180]
+            }
+          },
+          "root": {
+            "position": [
+              0,
+              "(math.sin(query.target_x_rotation) * 24.0 + 3.0) * variable.swim_amount",
+              "(math.cos(query.target_x_rotation) * 24.0 + 9.0) * variable.swim_amount"
+            ],
+            "rotation": [
+              "variable.swim_amount * (90 + query.target_x_rotation)",
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "swimming.legs": {
+        "loop": true,
+        "override_previous_animation": true,
+        "bones": {
+          "leftleg": {
+            "rotation": [
+              "math.lerp(0.0, math.cos(query.life_time * 390.0 + 180.0) * 17.2, variable.swim_amount)",
+              0,
+              0
+            ]
+          },
+          "rightleg": {
+            "rotation": [
+              "math.lerp(0.0, math.cos(query.life_time * 390.0) * 17.2, variable.swim_amount)",
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "riding.arms": {
+        "loop": true,
+        "bones": {
+          "leftarm": {"rotation": [-36, 0, 0]},
+          "rightarm": {"rotation": [-36, 0, 0]}
+        }
+      },
+      "riding.legs": {
+        "loop": true,
+        "bones": {
+          "leftleg": {"rotation": ["-72.0 - this", "-18.0 - this", "-this"]},
+          "rightleg": {"rotation": ["-72.0 - this", "18.0 - this", "-this"]}
+        }
+      },
+      "holding": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "rotation": [
+              "variable.is_holding_left ? (-this * 0.5 - 18.0) : 0.0",
+              0,
+              0
+            ]
+          },
+          "rightarm": {
+            "rotation": [
+              "variable.is_holding_right ? (-this * 0.5 - 18.0) : 0.0",
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "brandish_spear": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "rotation": [
+              "this * -0.5 - 157.5 - 22.5 * variable.charge_amount",
+              "-this",
+              0
+            ]
+          }
+        }
+      },
+      "charging": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "rotation": ["22.5 * variable.charge_amount - this", "-this", 0]
+          }
+        }
+      },
+      "attack.positions": {
+        "loop": true,
+        "bones": {"head": {"rotation": [0, 0, 0]}}
+      },
+      "attack.rotations": {
+        "loop": true,
+        "bones": {
+          "body": {"rotation": [0, "variable.attack_body_rot_y", 0]},
+          "leftarm": {
+            "rotation": [
+              "-(math.sin((1 - math.pow((1 - variable.attack_time), 4)) * 180) * 1.2 + math.sin(variable.attack_time * 180)) * 10.0",
+              0,
+              0
+            ]
+          },
+          "rightarm": {
+            "rotation": [
+              "-(math.sin((1 - math.pow((1 - variable.attack_time), 4)) * 180) * 1.2 + math.sin(variable.attack_time * 180)) * 30.0",
+              "-(math.sin((1 - math.pow((1 - variable.attack_time), 4)) * 180) ? (-90.0 * math.sin((1 - math.pow((1 - variable.attack_time), 4)) * 180)) + 30.0 : 0.0)",
+              0
+            ]
+          }
+        }
+      },
+      "sneaking": {
+        "loop": true,
+        "bones": {
+          "body": {"position": [0, -2, 0]},
+          "head": {"position": [0, -1, 0]},
+          "leftarm": {"rotation": [-5.7, 0, 0]},
+          "leftleg": {"rotation": [-28, 0, 0]},
+          "rightarm": {"rotation": [-5.7, 0, 0]},
+          "rightleg": {"rotation": [-28, 0, 0]},
+          "root": {"position": [0, 1.25, 9], "rotation": ["28.0 - this", 0, 0]}
+        }
+      },
+      "bob": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "rotation": [
+              0,
+              0,
+              "-((math.cos(query.life_time * 103.2) * 2.865) + 2.865)"
+            ]
+          },
+          "rightarm": {
+            "rotation": [
+              0,
+              0,
+              "(math.cos(query.life_time * 103.2) * 2.865) + 2.865"
+            ]
+          }
+        }
+      },
+      "damage_nearby_mobs": {
+        "loop": true,
+        "bones": {
+          "leftarm": {"rotation": ["-45.0-this", "-this", "-this"]},
+          "leftleg": {"rotation": ["45.0-this", "-this", "-this"]},
+          "rightarm": {"rotation": ["45.0-this", "-this", "-this"]},
+          "rightleg": {"rotation": ["-45.0-this", "-this", "-this"]}
+        }
+      },
+      "fishing_rod": {
+        "loop": true,
+        "bones": {"rightarm": {"rotation": [" -19.0 - this", "-this", "-this"]}}
+      },
+      "use_item_progress": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "rotation": [
+              "variable.use_item_startup_progress * -60.0 + variable.use_item_interval_progress * 11.25",
+              "variable.use_item_startup_progress * -22.5 + variable.use_item_interval_progress * 11.25",
+              "variable.use_item_startup_progress * -5.625 + variable.use_item_interval_progress * 11.25"
+            ]
+          }
+        }
+      },
+      "skeleton_attack": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "rotation": [
+              "-68.75 * math.sin(variable.attack_time * 180.0) + 22.92 * (math.sin((1.0 - (1.0 - variable.attack_time) * (1.0 - variable.attack_time)) * 180.0))",
+              "5.73 - math.sin(variable.attack_time * 180.0) * 34.38 - this",
+              "-this"
+            ]
+          },
+          "rightarm": {
+            "rotation": [
+              "-68.75 * math.sin(variable.attack_time * 180.0) + 22.92 * (math.sin((1.0 - (1.0 - variable.attack_time) * (1.0 - variable.attack_time)) * 180.0))",
+              "-5.73 + math.sin(variable.attack_time * 180.0) * 34.38 - this",
+              "-this"
+            ]
+          }
+        }
+      },
+      "sleeping": {
+        "loop": true,
+        "override_previous_animation": true,
+        "bones": {
+          "head": {"rotation": ["30.0 - this", "-this", "-this"]},
+          "root": {
+            "position": [
+              "24.0 * math.cos(query.body_y_rotation) * math.cos(query.sleep_rotation) - 24.0 * math.sin(query.body_y_rotation) * math.sin(query.sleep_rotation)",
+              0,
+              "24.0 * math.cos(query.body_y_rotation) * math.sin(query.sleep_rotation) + 24.0 * math.sin(query.body_y_rotation) * math.cos(query.sleep_rotation)"
+            ],
+            "rotation": [
+              -90,
+              "270.0 - query.sleep_rotation - query.body_y_rotation",
+              0
+            ]
+          }
+        }
+      },
+      "first_person_base_pose": {
+        "loop": true,
+        "bones": {
+          "body": {
+            "rotation": [
+              "query.target_x_rotation",
+              "query.target_y_rotation",
+              0
+            ]
+          }
+        }
+      },
+      "first_person_empty_hand": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "position": [13.5, -10, 12],
+            "rotation": [
+              "95.0 + variable.is_using_vr * 7.5",
+              "-45.0 + variable.is_using_vr * 7.5",
+              "115.0 + variable.is_using_vr * -2.5"
+            ]
+          }
+        }
+      },
+      "first_person_swap_item": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "position": [
+              0,
+              "query.get_equipped_item_name('off_hand') == 'map' ? 0.0 : -10.0 * (1.0 - variable.player_arm_height)",
+              0
+            ]
+          },
+          "rightarm": {
+            "position": [0, "-10.0 * (1.0 - variable.player_arm_height)", 0]
+          }
+        }
+      },
+      "first_person_attack_rotation": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "position": [
+              "math.clamp(-15.5 * math.sin(variable.first_person_rotation_factor * variable.attack_time * 112.0), -7.0, 999.0) * math.sin(variable.first_person_rotation_factor * variable.attack_time * 112.0)",
+              "math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) * 7.5 - variable.first_person_rotation_factor * variable.attack_time * 15.0 + variable.short_arm_offset_right",
+              "math.sin(variable.first_person_rotation_factor * variable.attack_time * 120.0) * 1.75"
+            ],
+            "rotation": [
+              "math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 280.0) * -60.0",
+              "math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 280.0) * 40.0",
+              "math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 280.0) * 20.0"
+            ]
+          }
+        }
+      },
+      "first_person_vr_attack_rotation": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "position": [
+              "5.0 * math.sin(variable.first_person_rotation_factor * variable.attack_time * 112.0)",
+              "(math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) - 0.8) * 8.75 + 5.0",
+              "math.sin(variable.first_person_rotation_factor * variable.attack_time * 120.0) * 15.0"
+            ],
+            "rotation": [
+              "30.7 * math.sin(variable.first_person_rotation_factor * variable.attack_time * -180.0 - 45.0) * 1.5",
+              0,
+              "21.8 * math.sin(variable.first_person_rotation_factor * variable.attack_time * 200.0 + 30.0) * 1.25"
+            ]
+          }
+        }
+      },
+      "first_person_map_hold": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "position": [
+              "-16.250 + variable.is_vertical_splitscreen * 7.0",
+              "-10.75 - variable.map_angle * 8.0 + variable.is_vertical_splitscreen * 0.6 - variable.short_arm_offset_left",
+              "9.0 - variable.map_angle * 8.0 + variable.short_arm_offset_left"
+            ],
+            "rotation": [40, -20, -155],
+            "scale": [1.15, 1.15, 1.15]
+          },
+          "rightarm": {
+            "position": [
+              "12.50 + variable.is_vertical_splitscreen * 1.75",
+              "-7.5 - variable.map_angle * 8.0 + variable.is_vertical_splitscreen * 0.5 - variable.short_arm_offset_right",
+              "5.25 - variable.map_angle * 8.0 + variable.short_arm_offset_right"
+            ],
+            "rotation": [77.5, 7.5, 160]
+          }
+        }
+      },
+      "first_person_map_hold_attack": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "position": [
+              "math.sin(variable.first_person_rotation_factor * variable.attack_time * 112.0) * -10.75",
+              "math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) * 3.75 - variable.first_person_rotation_factor * variable.attack_time * 1.25 + variable.short_arm_offset_left",
+              "math.sin(variable.first_person_rotation_factor * variable.attack_time * 120.0) * 5.75"
+            ],
+            "rotation": [
+              "variable.map_angle * 90.0",
+              "-15.0 * math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * -100.0)",
+              0
+            ]
+          },
+          "rightarm": {
+            "position": [
+              "math.sin(variable.first_person_rotation_factor * variable.attack_time * 112.0) * -6.25",
+              "math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) * 1.75 + variable.short_arm_offset_right",
+              "math.sin(variable.first_person_rotation_factor * variable.attack_time * 120.0) * 5.25"
+            ],
+            "rotation": ["variable.map_angle * 90.0", 0, 0]
+          }
+        }
+      },
+      "first_person_map_hold_off_hand": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "position": [
+              "-14.50 + variable.is_horizontal_splitscreen * 2.0 + variable.is_vertical_splitscreen * 8.7",
+              "-8.250 + variable.short_arm_offset_left",
+              "11.50 + variable.is_horizontal_splitscreen * 0.5"
+            ],
+            "rotation": [195, 182.5, 2.5],
+            "scale": [0.75, 0.75, 0.75]
+          }
+        }
+      },
+      "first_person_map_hold_main_hand": {
+        "loop": true,
+        "bones": {
+          "rightarm": {
+            "position": [
+              "14.50 - variable.is_vertical_splitscreen * 0.75",
+              "-8.25 + variable.short_arm_offset_right + math.sin(variable.first_person_rotation_factor * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) * 2.75 - variable.first_person_rotation_factor * variable.attack_time * 3.0 - variable.is_horizontal_splitscreen",
+              "11.5 + math.sin(variable.first_person_rotation_factor * variable.attack_time * 120.0) * 3.5 + variable.is_horizontal_splitscreen * 3.5"
+            ],
+            "rotation": [195, 182.5, -5],
+            "scale": [0.75, 0.75, 0.75]
+          }
+        }
+      },
+      "first_person_crossbow_equipped": {
+        "loop": true,
+        "override_previous_animation": true,
+        "bones": {
+          "leftarm": {
+            "position": [
+              "1.5 - variable.item_use_normalized * 3.5",
+              "-3.799999952316284 + variable.short_arm_offset_left",
+              "8.25 - (1 - variable.item_use_normalized)"
+            ],
+            "rotation": [165, -60, 45],
+            "scale": [0.4, 0.4, 0.4]
+          }
+        }
+      },
+      "third_person_crossbow_equipped": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "position": [0, 0, 0.5],
+            "rotation": [
+              "-this - 65.0 - (1.0 - variable.item_use_normalized) * 5.0",
+              "-this + (1.0 - variable.item_use_normalized) * 30.0",
+              "-this + 20.0 + (1.0 - variable.item_use_normalized) * 10.0"
+            ]
+          },
+          "rightarm": {
+            "rotation": ["- 60.0 - this", "- 45.0 - this", "- 2.5 - this"]
+          }
+        }
+      },
+      "third_person_bow_equipped": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "rotation": [
+              "-90.0 + query.target_x_rotation - query.is_sneaking * 15.0 - this",
+              "27.5 + query.target_y_rotation",
+              0
+            ]
+          },
+          "rightarm": {
+            "rotation": [
+              "-90.0 + query.target_x_rotation - query.is_sneaking * 15.0 - this",
+              "-5.0 + query.target_y_rotation",
+              0
+            ]
+          },
+          "rightitem": {"rotation": [0, -10, 0]}
+        }
+      },
+      "crossbow_hold": {
+        "loop": true,
+        "bones": {
+          "leftarm": {
+            "rotation": [
+              "query.is_swimming ? 0.0 : -93.0 + query.target_x_rotation - query.is_sneaking * 27.0 -this",
+              "query.is_swimming ? 0.0 : 42.0 + math.clamp(query.target_y_rotation, -45.0, 5.0) -this",
+              "query.is_sneaking * -15.0"
+            ]
+          },
+          "rightarm": {
+            "rotation": [
+              "query.is_swimming ? 0.0 : -93.0 + query.target_x_rotation - query.is_sneaking * 27.0 -this",
+              "query.is_swimming ? 0.0 : math.clamp(query.target_y_rotation, -60.0, 45.0) -this",
+              0
+            ]
+          }
+        }
+      },
+      "shield_block_main_hand": {
+        "loop": true,
+        "bones": {
+          "rightarm": {"rotation": [-20, -30, -25]},
+          "rightitem": {"position": [-1, -3, 0], "rotation": [0, -60, -45]}
+        }
+      },
+      "shield_block_off_hand": {
+        "loop": true,
+        "bones": {
+          "leftarm": {"rotation": [-20, 20, 20]},
+          "leftitem": {
+            "position": [
+              "1.0 + query.item_is_charged * 1.5",
+              "-3.0 + query.item_is_charged",
+              0
+            ],
+            "rotation": [
+              "query.item_is_charged * 30.0",
+              "70.0 - query.item_is_charged * 60.0",
+              "65.0 - query.item_is_charged * 15.0"
+            ]
+          }
+        }
+      }
+    },
+    "render_controllers": [
+      {"controller.render.player.first_person": "variable.is_first_person"},
+      {
+        "controller.render.player.third_person": "!variable.is_first_person && !variable.map_face_icon"
+      },
+      {"controller.render.player.map": "variable.map_face_icon"}
+    ],
+    "enable_attachables": true,
+    "animation_controllers": {
+      "root": {
+        "initial_state": "first_person",
+        "states": {
+          "first_person": {
+            "animations": [
+              "first_person_swap_item",
+              {
+                "first_person_attack_controller": "variable.attack_time > 0.0f && query.get_equipped_item_name != 'map'"
+              },
+              "first_person_base_pose",
+              {
+                "first_person_empty_hand": "query.get_equipped_item_name(0, 1) != 'map'"
+              },
+              {
+                "first_person_map_controller": "(query.get_equipped_item_name(0, 1) == 'map' || query.get_equipped_item_name('off_hand') == 'map')"
+              },
+              {
+                "first_person_crossbow_equipped": "query.get_equipped_item_name == 'crossbow' && (variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+              }
+            ],
+            "transitions": [
+              {"paperdoll": "variable.is_paperdoll"},
+              {"map_player": "variable.map_face_icon"},
+              {"third_person": "!variable.is_first_person"}
+            ]
+          },
+          "map_player": {
+            "transitions": [
+              {"paperdoll": "variable.is_paperdoll"},
+              {"first_person": "variable.is_first_person"},
+              {
+                "third_person": "!variable.map_face_icon && !variable.is_first_person"
+              }
+            ]
+          },
+          "paperdoll": {
+            "animations": [
+              "humanoid_base_pose",
+              {"look_at_target_ui": "variable.should_look_at_target_ui"},
+              "move.arms",
+              "move.legs",
+              "cape"
+            ],
+            "transitions": [
+              {
+                "first_person": "!variable.is_paperdoll && variable.is_first_person"
+              },
+              {"map_player": "variable.map_face_icon"},
+              {
+                "third_person": "!variable.is_paperdoll && !variable.is_first_person"
+              }
+            ]
+          },
+          "third_person": {
+            "animations": [
+              "humanoid_base_pose",
+              {"look_at_target": "!query.is_sleeping && !query.is_emoting"},
+              "move.arms",
+              "move.legs",
+              "cape",
+              {"riding.arms": "query.is_riding"},
+              {"riding.legs": "query.is_riding"},
+              "holding",
+              {"brandish_spear": "variable.is_brandishing_spear"},
+              {"charging": "query.is_charging"},
+              {"sneaking": "query.is_sneaking && !query.is_sleeping"},
+              "bob",
+              {"damage_nearby_mobs": "variable.damage_nearby_mobs"},
+              {"swimming": "variable.swim_amount > 0.0"},
+              {"swimming.legs": "variable.swim_amount > 0.0"},
+              {
+                "use_item_progress": "( variable.use_item_interval_progress > 0.0 ) || ( variable.use_item_startup_progress > 0.0 ) && !variable.is_brandishing_spear"
+              },
+              {"fishing_rod": "query.get_equipped_item_name == 'fishing_rod'"},
+              {"sleeping": "query.is_sleeping && query.is_alive"},
+              {"attack.positions": "variable.attack_time >= 0.0"},
+              {"attack.rotations": "variable.attack_time >= 0.0"},
+              {
+                "shield_block_main_hand": "query.blocking && query.get_equipped_item_name('off_hand') != 'shield' && query.get_equipped_item_name == 'shield'"
+              },
+              {
+                "shield_block_off_hand": "query.blocking && query.get_equipped_item_name('off_hand') == 'shield' && !(variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+              },
+              {
+                "crossbow_controller": "query.get_equipped_item_name == 'crossbow'"
+              },
+              {
+                "third_person_bow_equipped": "query.get_equipped_item_name == 'bow' && (variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+              }
+            ],
+            "transitions": [
+              {"paperdoll": "variable.is_paperdoll"},
+              {"first_person": "variable.is_first_person"},
+              {"map_player": "variable.map_face_icon"}
+            ]
+          }
+        }
+      },
+      "base_controller": "controller.animation.player.base",
+      "hudplayer": {
+        "initial_state": "default",
+        "states": {
+          "default": {
+            "animations": [
+              "humanoid_base_pose",
+              {"look_at_target": "!query.is_sleeping && !query.is_emoting"},
+              "move.arms",
+              "move.legs",
+              "cape",
+              {"riding.arms": "query.is_riding"},
+              {"riding.legs": "query.is_riding"},
+              "holding",
+              {"brandish_spear": "variable.is_brandishing_spear"},
+              {"charging": "query.is_charging"},
+              {"sneaking": "query.is_sneaking && !query.is_sleeping"},
+              "bob",
+              {"damage_nearby_mobs": "variable.damage_nearby_mobs"},
+              {"swimming": "variable.swim_amount > 0.0"},
+              {"swimming.legs": "variable.swim_amount > 0.0"},
+              {
+                "use_item_progress": "( variable.use_item_interval_progress > 0.0 ) || ( variable.use_item_startup_progress > 0.0 ) && !variable.is_brandishing_spear"
+              },
+              {"sleeping": "query.is_sleeping && query.is_alive"},
+              {"attack.positions": "variable.attack_time >= 0.0"},
+              {"attack.rotations": "variable.attack_time >= 0.0"},
+              {
+                "shield_block_main_hand": "query.blocking && query.get_equipped_item_name('off_hand') != 'shield' && query.get_equipped_item_name == 'shield'"
+              },
+              {
+                "shield_block_off_hand": "query.blocking && query.get_equipped_item_name('off_hand') == 'shield' && !(variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+              },
+              {
+                "crossbow_controller": "query.get_equipped_item_name == 'crossbow'"
+              },
+              {
+                "third_person_bow_equipped": "query.get_equipped_item_name == 'bow' && (variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+              }
+            ]
+          }
+        }
+      },
+      "look_at_target": {
+        "initial_state": "default",
+        "states": {
+          "default": {
+            "animations": ["look_at_target_default"],
+            "transitions": [
+              {"gliding": "query.is_gliding"},
+              {"swimming": "query.is_swimming"}
+            ]
+          },
+          "gliding": {
+            "animations": ["look_at_target_gliding"],
+            "transitions": [
+              {"swimming": "query.is_swimming"},
+              {"default": "!query.is_gliding"}
+            ]
+          },
+          "swimming": {
+            "animations": ["look_at_target_swimming"],
+            "transitions": [
+              {"gliding": "query.is_gliding"},
+              {"default": "!query.is_swimming"}
+            ]
+          }
+        }
+      },
+      "first_person_attack_controller": {
+        "initial_state": "default",
+        "states": {
+          "default": {
+            "animations": ["first_person_attack_rotation"],
+            "transitions": [{"vr_attack": "variable.is_using_vr"}]
+          },
+          "vr_attack": {
+            "animations": ["first_person_vr_attack_rotation"],
+            "transitions": [{"default": "!variable.is_using_vr"}]
+          }
+        }
+      },
+      "first_person_map_controller": {
+        "initial_state": "default",
+        "states": {
+          "default": {
+            "transitions": [
+              {
+                "one_hand": "query.get_equipped_item_name('off_hand') == 'map' || query.get_equipped_item_name('off_hand') == 'shield'"
+              },
+              {
+                "two_hand": "query.get_equipped_item_name('off_hand') != 'map' && query.get_equipped_item_name('off_hand') != 'shield'"
+              }
+            ]
+          },
+          "one_hand": {
+            "animations": [
+              {
+                "first_person_map_hold_main_hand": "query.get_equipped_item_name(0, 1) == 'map'"
+              },
+              {
+                "first_person_map_hold_off_hand": "query.get_equipped_item_name('off_hand') == 'map' && (query.get_equipped_item_name == 'bow' ? !(variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0) : 1.0)"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "query.get_equipped_item_name(0, 1) != 'map' && query.get_equipped_item_name('off_hand') != 'map'"
+              },
+              {
+                "two_hand": "query.get_equipped_item_name('off_hand') != 'map' && query.get_equipped_item_name('off_hand') != 'shield'"
+              }
+            ]
+          },
+          "two_hand": {
+            "animations": [
+              "first_person_map_hold",
+              "first_person_map_hold_attack"
+            ],
+            "transitions": [
+              {
+                "default": "query.get_equipped_item_name(0, 1) != 'map' && query.get_equipped_item_name('off_hand') != 'map'"
+              },
+              {
+                "one_hand": "query.get_equipped_item_name('off_hand') == 'map' || query.get_equipped_item_name('off_hand') == 'shield'"
+              }
+            ]
+          }
+        }
+      },
+      "crossbow_controller": {
+        "initial_state": "default",
+        "states": {
+          "charge": {
+            "animations": ["third_person_crossbow_equipped"],
+            "transitions": [
+              {
+                "default": "query.get_equipped_item_name != 'crossbow' || (query.item_remaining_use_duration <= 0.0 && !query.item_is_charged)"
+              },
+              {"hold": "query.item_is_charged"}
+            ]
+          },
+          "default": {
+            "transitions": [
+              {"hold": "query.item_is_charged"},
+              {"charge": "query.item_remaining_use_duration > 0.0"}
+            ]
+          },
+          "hold": {
+            "animations": ["crossbow_hold"],
+            "transitions": [
+              {
+                "default": "query.get_equipped_item_name != 'crossbow' || (query.item_remaining_use_duration <= 0.0 && !query.item_is_charged)"
+              },
+              {"charge": "query.item_remaining_use_duration > 0.0"}
+            ]
+          }
+        }
+      },
+      "blink": {
+        "initial_state": "default",
+        "states": {
+          "default": {
+            "transitions": [
+              {
+                "open": "variable.is_blinking = 0; variable.last_blink_time = query.life_time; return variable.last_blink_time != 0;"
+              }
+            ]
+          },
+          "open": {
+            "transitions": [
+              {
+                "blink": "variable.is_blinking = 0; variable.return_from_blink = query.life_time + math.random(0, 0.2); return query.life_time > (variable.last_blink_time + math.random(3, 40));"
+              }
+            ]
+          },
+          "blink": {
+            "transitions": [
+              {
+                "open": "variable.is_blinking = 1; variable.last_blink_time = query.life_time; return query.all_animations_finished && (query.life_time > variable.return_from_blink);"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
   "polar_bear": {
     "identifier": "minecraft:polar_bear",
     "materials": {"default": "polar_bear"},
