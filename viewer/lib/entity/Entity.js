@@ -154,31 +154,37 @@ function texturePixels (image) {
   return ctx.getImageData(0, 0, image.width, image.height).data
 }
 
-// Skins predating 1.8 are 64x32; the player geometry samples a 64x64 sheet. Same steps as
-// vanilla's HttpTexture.processLegacySkin: the left limbs are mirrored copies of the right
-// ones, and an overlay block with no transparency at all was never used as a hat, so its
-// hat rows are dropped (the arm and torso rows below are base texture and stay). Capes are
+// Same steps as vanilla's HttpTexture.processLegacySkin. Skins predating 1.8 are 64x32 and
+// the player geometry samples a 64x64 sheet: the left limbs become mirrored copies of the
+// right ones, and an overlay block with no transparency at all was never used as a hat, so
+// its hat rows are dropped. Every skin then gets its base layers forced opaque (head, body
+// row, lower limbs), which is what makes the second layer the only see-through one. Capes are
 // 64x32 by design and never pass through here.
-function upgradeLegacySkin (texture) {
+function prepareSkin (texture) {
   const image = texture.image
-  if (image.width !== 64 || image.height !== 32) return texture
+  if (image.width !== 64 || (image.height !== 32 && image.height !== 64)) return texture
   const src = texturePixels(image)
   const out = new Uint8Array(64 * 64 * 4)
   out.set(src)
   const at = (x, y) => (y * 64 + x) * 4
-  for (const [x, y, dx, dy, w, h] of legacySkinCopies) {
-    for (let j = 0; j < h; j++) {
-      for (let i = 0; i < w; i++) {
-        out.set(src.subarray(at(x + i, y + j), at(x + i, y + j) + 4), at(x + dx + w - 1 - i, y + dy + j))
+  if (image.height === 32) {
+    for (const [x, y, dx, dy, w, h] of legacySkinCopies) {
+      for (let j = 0; j < h; j++) {
+        for (let i = 0; i < w; i++) {
+          out.set(src.subarray(at(x + i, y + j), at(x + i, y + j) + 4), at(x + dx + w - 1 - i, y + dy + j))
+        }
       }
     }
+    let opaque = true
+    for (let y = 0; y < 32 && opaque; y++) for (let x = 32; x < 64; x++) if (out[at(x, y) + 3] < 128) { opaque = false; break }
+    if (opaque) for (let y = 0; y < 16; y++) for (let x = 32; x < 64; x++) out[at(x, y) + 3] = 0
   }
-  let opaque = true
-  for (let y = 0; y < 32 && opaque; y++) for (let x = 32; x < 64; x++) if (out[at(x, y) + 3] < 128) { opaque = false; break }
-  if (opaque) for (let y = 0; y < 16; y++) for (let x = 32; x < 64; x++) out[at(x, y) + 3] = 0
-  const upgraded = new THREE.DataTexture(out, 64, 64, THREE.RGBAFormat)
-  upgraded.needsUpdate = true
-  return upgraded
+  for (const [x0, y0, x1, y1] of [[0, 0, 32, 16], [0, 16, 64, 32], [16, 48, 48, 64]]) {
+    for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) out[at(x, y) + 3] = 255
+  }
+  const prepared = new THREE.DataTexture(out, 64, 64, THREE.RGBAFormat)
+  prepared.needsUpdate = true
+  return prepared
 }
 
 function getMesh (texture, jsonModel, override) {
@@ -257,7 +263,7 @@ function getMesh (texture, jsonModel, override) {
     if (texture) {
       loadTexture(texture, texture => {
         applyTexture(material, texture)
-        if (override) loadTexture(override, texture => applyTexture(material, upgradeLegacySkin(texture)))
+        if (override) loadTexture(override, texture => applyTexture(material, prepareSkin(texture)))
       })
     } else {
       loadTexture(override, texture => applyTexture(material, texture))
