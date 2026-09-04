@@ -234,13 +234,18 @@ function getMesh (texture, jsonModel, override) {
   mesh.bind(skeleton)
   mesh.scale.set(1 / 16, 1 / 16, 1 / 16)
 
-  if (texture) {
-    loadTexture(texture, texture => {
-      applyTexture(material, texture)
-      if (override) loadTexture(override, texture => applyTexture(material, upgradeLegacySkin(texture)))
-    })
-  } else {
-    loadTexture(override, texture => applyTexture(material, texture))
+  // Textures load the first time the mesh is drawn, so an entity the camera
+  // never sees (a player across the server) costs no fetch.
+  mesh.onBeforeRender = () => {
+    mesh.onBeforeRender = () => {}
+    if (texture) {
+      loadTexture(texture, texture => {
+        applyTexture(material, texture)
+        if (override) loadTexture(override, texture => applyTexture(material, upgradeLegacySkin(texture)))
+      })
+    } else {
+      loadTexture(override, texture => applyTexture(material, texture))
+    }
   }
 
   return mesh
