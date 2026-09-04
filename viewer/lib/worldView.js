@@ -6,8 +6,18 @@ const EventEmitter = require('events')
 // online-mode servers); nothing for other entities or players without skin data
 function playerSkin (bot, e) {
   const skinData = e.username !== undefined && bot.players[e.username]?.skinData
-  if (!skinData) return {}
+  if (!skinData) return { skinModel: defaultSkinModel(e.uuid) }
   return { skin: skinData.url, skinModel: skinData.model, cape: skinData.capeUrl }
+}
+
+// Vanilla's DefaultPlayerSkin: a player without skin data is Alex when the Java hashCode of
+// their UUID is odd, which is the xor of the lowest bit of each 32-bit quarter.
+function defaultSkinModel (uuid) {
+  if (typeof uuid !== 'string') return undefined
+  const hex = uuid.replace(/-/g, '')
+  if (hex.length !== 32) return undefined
+  const odd = [7, 15, 23, 31].reduce((acc, i) => acc ^ parseInt(hex[i], 16), 0) & 1
+  return odd ? 'slim' : undefined
 }
 
 class WorldView extends EventEmitter {
