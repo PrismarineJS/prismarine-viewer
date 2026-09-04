@@ -26,36 +26,36 @@ const elemFaces = {
     u1: [2, 0, 1],
     v1: [0, 0, 1],
     corners: [
-      [1, 0, 1, 0, 0],
-      [0, 0, 1, 1, 0],
-      [1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1]
+      [1, 0, 1, 1, 0],
+      [0, 0, 1, 0, 0],
+      [1, 0, 0, 1, 1],
+      [0, 0, 0, 0, 1]
     ]
   },
   east: {
     dir: [1, 0, 0],
-    u0: [0, 0, 0],
-    v0: [0, 0, 1],
-    u1: [0, 0, 1],
-    v1: [0, 1, 1],
-    corners: [
-      [1, 1, 1, 0, 0],
-      [1, 0, 1, 0, 1],
-      [1, 1, 0, 1, 0],
-      [1, 0, 0, 1, 1]
-    ]
-  },
-  west: {
-    dir: [-1, 0, 0],
     u0: [1, 0, 1],
     v0: [0, 0, 1],
     u1: [1, 0, 2],
     v1: [0, 1, 1],
     corners: [
-      [0, 1, 0, 0, 0],
-      [0, 0, 0, 0, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 1, 1]
+      [1, 1, 1, 1, 0],
+      [1, 0, 1, 1, 1],
+      [1, 1, 0, 0, 0],
+      [1, 0, 0, 0, 1]
+    ]
+  },
+  west: {
+    dir: [-1, 0, 0],
+    u0: [0, 0, 0],
+    v0: [0, 0, 1],
+    u1: [0, 0, 1],
+    v1: [0, 1, 1],
+    corners: [
+      [0, 1, 0, 1, 0],
+      [0, 0, 0, 1, 1],
+      [0, 1, 1, 0, 0],
+      [0, 0, 1, 0, 1]
     ]
   },
   north: {
@@ -65,10 +65,10 @@ const elemFaces = {
     u1: [1, 0, 1],
     v1: [0, 1, 1],
     corners: [
-      [1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1],
-      [1, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0]
+      [1, 0, 0, 1, 1],
+      [0, 0, 0, 0, 1],
+      [1, 1, 0, 1, 0],
+      [0, 1, 0, 0, 0]
     ]
   },
   south: {
@@ -78,10 +78,10 @@ const elemFaces = {
     u1: [2, 0, 2],
     v1: [0, 1, 1],
     corners: [
-      [0, 0, 1, 0, 1],
-      [1, 0, 1, 1, 1],
-      [0, 1, 1, 0, 0],
-      [1, 1, 1, 1, 0]
+      [0, 0, 1, 1, 1],
+      [1, 0, 1, 0, 1],
+      [0, 1, 1, 1, 0],
+      [1, 1, 1, 0, 0]
     ]
   }
 }
@@ -245,7 +245,10 @@ function getMesh (texture, jsonModel, override) {
   const mesh = new THREE.SkinnedMesh(geometry, material)
   mesh.add(...rootBones)
   mesh.bind(skeleton)
-  mesh.scale.set(1 / 16, 1 / 16, 1 / 16)
+  // Model space is x-mirrored relative to the world (Bedrock geometry, same as Java's model
+  // space, which vanilla draws under a (-1, -1, 1) scale): the left arm sits at +x. Flip it
+  // so the player's left limbs end up on their left; the face UVs below are laid out for this.
+  mesh.scale.set(-1 / 16, 1 / 16, 1 / 16)
 
   // Textures load the first time the mesh is drawn, so an entity the camera
   // never sees (a player across the server) costs no fetch.
