@@ -4,7 +4,10 @@ const THREE = require('three')
 const textureCache = {}
 function loadTexture (texture, cb) {
   if (!textureCache[texture]) {
-    textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(texture, resolve, undefined, () => {}))
+    // textures.minecraft.net sends no CORS headers: player skins go through the
+    // server's proxy route (lib/mineflayer.js)
+    const url = texture.replace(/^https?:\/\/textures\.minecraft\.net\/texture\//, 'texture/')
+    textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(url, resolve, undefined, () => {}))
   }
   textureCache[texture].then(cb)
 }

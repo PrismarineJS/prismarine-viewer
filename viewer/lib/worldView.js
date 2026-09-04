@@ -2,6 +2,14 @@ const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
 const EventEmitter = require('events')
 
+// Skin and cape texture URLs of a player entity (textures.minecraft.net on
+// online-mode servers); nothing for other entities or players without skin data
+function playerSkin (bot, e) {
+  const skinData = e.username !== undefined && bot.players[e.username]?.skinData
+  if (!skinData) return {}
+  return { skin: skinData.url, skinModel: skinData.model, cape: skinData.capeUrl }
+}
+
 class WorldView extends EventEmitter {
   constructor (world, viewDistance, position = new Vec3(0, 0, 0), emitter = null) {
     super()
@@ -27,7 +35,7 @@ class WorldView extends EventEmitter {
       // 'move': botPosition,
       entitySpawn: function (e) {
         if (e === bot.entity) return
-        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, skinModel: bot.players[e.username]?.skinData?.model, cape: bot.players[e.username]?.skinData?.capeUrl !== undefined })
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, ...playerSkin(bot, e) })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
@@ -60,7 +68,7 @@ class WorldView extends EventEmitter {
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
-        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, skinModel: bot.players[e.username]?.skinData?.model, cape: bot.players[e.username]?.skinData?.capeUrl !== undefined })
+        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, ...playerSkin(bot, e) })
       }
     }
   }

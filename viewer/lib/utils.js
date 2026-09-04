@@ -19,7 +19,9 @@ function loadTexture (texture, cb) {
   if (textureCache[texture]) {
     cb(textureCache[texture])
   } else {
-    loadImage(path.resolve(__dirname, '../../public/' + texture)).then(image => {
+    // bundled textures are files under public/; player skins are http(s) URLs
+    const src = /^https?:\/\//.test(texture) ? texture : path.resolve(__dirname, '../../public/' + texture)
+    loadImage(src).then(image => {
       textureCache[texture] = new THREE.CanvasTexture(image)
       cb(textureCache[texture])
     }).catch(() => {})
