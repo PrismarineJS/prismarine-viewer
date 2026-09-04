@@ -159,6 +159,12 @@ function upgradeLegacySkin (texture) {
     ctx.drawImage(image, x, y, w, h, 0, 0, w, h)
     ctx.restore()
   }
+  // A hat layer with no transparent pixel at all is an unused layer, not a helmet (vanilla's "Notch transparency hack")
+  const hat = ctx.getImageData(32, 0, 32, 32)
+  if (!hat.data.some((v, i) => i % 4 === 3 && v < 128)) {
+    for (let i = 3; i < hat.data.length; i += 4) hat.data[i] = 0
+    ctx.putImageData(hat, 32, 0)
+  }
   return new THREE.CanvasTexture(canvas)
 }
 
