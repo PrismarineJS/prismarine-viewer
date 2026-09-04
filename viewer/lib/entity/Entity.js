@@ -145,6 +145,15 @@ const legacySkinCopies = [
   [44, 16, -8, 32, 4, 4], [48, 16, -8, 32, 4, 4], [40, 20, 0, 32, 4, 12], [44, 20, -8, 32, 4, 12], [48, 20, -16, 32, 4, 12], [52, 20, -8, 32, 4, 12]
 ]
 
+// The overlay block of a 64x32 skin spans the hat rows and the arm and torso rows. Vanilla
+// clears the block when it holds no transparency at all, then forces the arm and torso rows
+// opaque again, so only the hat is really dropped: an overlay that was never used as one.
+function clearUnusedHat (ctx) {
+  const { data } = ctx.getImageData(32, 0, 32, 32)
+  for (let i = 3; i < data.length; i += 4) if (data[i] < 128) return
+  ctx.clearRect(32, 0, 32, 16)
+}
+
 // Skins predating 1.8 are 64x32; the player geometry samples a 64x64 sheet. Capes are 64x32 by design and never pass through here.
 function upgradeLegacySkin (texture) {
   const image = texture.image
@@ -159,12 +168,7 @@ function upgradeLegacySkin (texture) {
     ctx.drawImage(image, x, y, w, h, 0, 0, w, h)
     ctx.restore()
   }
-  // A hat layer with no transparent pixel at all is an unused layer, not a helmet (vanilla's "Notch transparency hack")
-  const hat = ctx.getImageData(32, 0, 32, 32)
-  if (!hat.data.some((v, i) => i % 4 === 3 && v < 128)) {
-    for (let i = 3; i < hat.data.length; i += 4) hat.data[i] = 0
-    ctx.putImageData(hat, 32, 0)
-  }
+  clearUnusedHat(ctx)
   return new THREE.CanvasTexture(canvas)
 }
 
