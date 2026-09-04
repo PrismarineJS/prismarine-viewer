@@ -2,6 +2,7 @@
 
 const entities = require('./entities.json')
 const { loadTexture } = globalThis.isElectron ? require('../utils.electron.js') : require('../utils')
+const { createCanvas } = require('canvas')
 
 const elemFaces = {
   up: {
@@ -138,6 +139,29 @@ function applyTexture (material, texture) {
   material.needsUpdate = true
 }
 
+// Same rects as vanilla's SkinTextureDownloader.processLegacySkin: the left limbs are mirrored copies of the right ones.
+const legacySkinCopies = [
+  [4, 16, 16, 32, 4, 4], [8, 16, 16, 32, 4, 4], [0, 20, 24, 32, 4, 12], [4, 20, 16, 32, 4, 12], [8, 20, 8, 32, 4, 12], [12, 20, 16, 32, 4, 12],
+  [44, 16, -8, 32, 4, 4], [48, 16, -8, 32, 4, 4], [40, 20, 0, 32, 4, 12], [44, 20, -8, 32, 4, 12], [48, 20, -16, 32, 4, 12], [52, 20, -8, 32, 4, 12]
+]
+
+// Skins predating 1.8 are 64x32; the player geometry samples a 64x64 sheet. Capes are 64x32 by design and never pass through here.
+function upgradeLegacySkin (texture) {
+  const image = texture.image
+  if (image.width !== 64 || image.height !== 32) return texture
+  const canvas = createCanvas(64, 64)
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(image, 0, 0)
+  for (const [x, y, dx, dy, w, h] of legacySkinCopies) {
+    ctx.save()
+    ctx.translate(x + dx + w, y + dy)
+    ctx.scale(-1, 1)
+    ctx.drawImage(image, x, y, w, h, 0, 0, w, h)
+    ctx.restore()
+  }
+  return new THREE.CanvasTexture(canvas)
+}
+
 function getMesh (texture, jsonModel, override) {
   const bones = {}
 
@@ -207,7 +231,7 @@ function getMesh (texture, jsonModel, override) {
   if (texture) {
     loadTexture(texture, texture => {
       applyTexture(material, texture)
-      if (override) loadTexture(override, texture => applyTexture(material, texture))
+      if (override) loadTexture(override, texture => applyTexture(material, upgradeLegacySkin(texture)))
     })
   } else {
     loadTexture(override, texture => applyTexture(material, texture))
