@@ -2,7 +2,8 @@
 
 const entities = require('./entities.json')
 const { loadTexture } = globalThis.isElectron ? require('../utils.electron.js') : require('../utils')
-const { createCanvas } = require('canvas')
+let createCanvas
+try { ({ createCanvas } = require('canvas')) } catch {}
 
 const elemFaces = {
   up: {
@@ -139,37 +140,45 @@ function applyTexture (material, texture) {
   material.needsUpdate = true
 }
 
-// Same rects as vanilla's SkinTextureDownloader.processLegacySkin: the left limbs are mirrored copies of the right ones.
+// [x, y, dx, dy, w, h]: the w*h block at (x, y) is copied to (x + dx, y + dy), mirrored horizontally
 const legacySkinCopies = [
   [4, 16, 16, 32, 4, 4], [8, 16, 16, 32, 4, 4], [0, 20, 24, 32, 4, 12], [4, 20, 16, 32, 4, 12], [8, 20, 8, 32, 4, 12], [12, 20, 16, 32, 4, 12],
   [44, 16, -8, 32, 4, 4], [48, 16, -8, 32, 4, 4], [40, 20, 0, 32, 4, 12], [44, 20, -8, 32, 4, 12], [48, 20, -16, 32, 4, 12], [52, 20, -8, 32, 4, 12]
 ]
 
-// The overlay block of a 64x32 skin spans the hat rows and the arm and torso rows. Vanilla
-// clears the block when it holds no transparency at all, then forces the arm and torso rows
-// opaque again, so only the hat is really dropped: an overlay that was never used as one.
-function clearUnusedHat (ctx) {
-  const { data } = ctx.getImageData(32, 0, 32, 32)
-  for (let i = 3; i < data.length; i += 4) if (data[i] < 128) return
-  ctx.clearRect(32, 0, 32, 16)
+// RGBA rows of a loaded texture. A DataTexture carries them; an image is drawn once to read them.
+function texturePixels (image) {
+  if (image.data) return image.data
+  const ctx = createCanvas(image.width, image.height).getContext('2d')
+  ctx.drawImage(image, 0, 0)
+  return ctx.getImageData(0, 0, image.width, image.height).data
 }
 
-// Skins predating 1.8 are 64x32; the player geometry samples a 64x64 sheet. Capes are 64x32 by design and never pass through here.
+// Skins predating 1.8 are 64x32; the player geometry samples a 64x64 sheet. Same steps as
+// vanilla's HttpTexture.processLegacySkin: the left limbs are mirrored copies of the right
+// ones, and an overlay block with no transparency at all was never used as a hat, so its
+// hat rows are dropped (the arm and torso rows below are base texture and stay). Capes are
+// 64x32 by design and never pass through here.
 function upgradeLegacySkin (texture) {
   const image = texture.image
   if (image.width !== 64 || image.height !== 32) return texture
-  const canvas = createCanvas(64, 64)
-  const ctx = canvas.getContext('2d')
-  ctx.drawImage(image, 0, 0)
+  const src = texturePixels(image)
+  const out = new Uint8Array(64 * 64 * 4)
+  out.set(src)
+  const at = (x, y) => (y * 64 + x) * 4
   for (const [x, y, dx, dy, w, h] of legacySkinCopies) {
-    ctx.save()
-    ctx.translate(x + dx + w, y + dy)
-    ctx.scale(-1, 1)
-    ctx.drawImage(image, x, y, w, h, 0, 0, w, h)
-    ctx.restore()
+    for (let j = 0; j < h; j++) {
+      for (let i = 0; i < w; i++) {
+        out.set(src.subarray(at(x + i, y + j), at(x + i, y + j) + 4), at(x + dx + w - 1 - i, y + dy + j))
+      }
+    }
   }
-  clearUnusedHat(ctx)
-  return new THREE.CanvasTexture(canvas)
+  let opaque = true
+  for (let y = 0; y < 32 && opaque; y++) for (let x = 32; x < 64; x++) if (out[at(x, y) + 3] < 128) { opaque = false; break }
+  if (opaque) for (let y = 0; y < 16; y++) for (let x = 32; x < 64; x++) out[at(x, y) + 3] = 0
+  const upgraded = new THREE.DataTexture(out, 64, 64, THREE.RGBAFormat)
+  upgraded.needsUpdate = true
+  return upgraded
 }
 
 function getMesh (texture, jsonModel, override) {
