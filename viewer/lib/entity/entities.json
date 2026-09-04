@@ -11352,8 +11352,8 @@
             "name": "cape",
             "parent": "body",
             "pivot": [0, 24, 3],
-            "bind_pose_rotation": [0, 180, 0],
-            "rotation": [0, 180, 0],
+            "bind_pose_rotation": [6, 180, 0],
+            "rotation": [6, 180, 0],
             "cubes": [{"origin": [-5, 8, 3], "size": [10, 16, 1], "uv": [0, 0]}]
           }
         ]
@@ -12283,18 +12283,18 @@
           {
             "name": "leftArm",
             "parent": "body",
-            "pivot": [5, 22, 0],
+            "pivot": [5, 21.5, 0],
             "cubes": [
-              {"origin": [4, 12, -2], "size": [3, 12, 4], "uv": [32, 48]}
+              {"origin": [4, 11.5, -2], "size": [3, 12, 4], "uv": [32, 48]}
             ]
           },
           {
             "name": "leftSleeve",
             "parent": "leftArm",
-            "pivot": [5, 22, 0],
+            "pivot": [5, 21.5, 0],
             "cubes": [
               {
-                "origin": [4, 12, -2],
+                "origin": [4, 11.5, -2],
                 "size": [3, 12, 4],
                 "uv": [48, 48],
                 "inflate": 0.25
@@ -12305,18 +12305,18 @@
           {
             "name": "rightArm",
             "parent": "body",
-            "pivot": [-5, 22, 0],
+            "pivot": [-5, 21.5, 0],
             "cubes": [
-              {"origin": [-7, 12, -2], "size": [3, 12, 4], "uv": [40, 16]}
+              {"origin": [-7, 11.5, -2], "size": [3, 12, 4], "uv": [40, 16]}
             ]
           },
           {
             "name": "rightSleeve",
             "parent": "rightArm",
-            "pivot": [-5, 22, 0],
+            "pivot": [-5, 21.5, 0],
             "cubes": [
               {
-                "origin": [-7, 12, -2],
+                "origin": [-7, 11.5, -2],
                 "size": [3, 12, 4],
                 "uv": [40, 32],
                 "inflate": 0.25
@@ -12402,8 +12402,8 @@
             "name": "cape",
             "parent": "body",
             "pivot": [0, 24, 3],
-            "bind_pose_rotation": [0, 180, 0],
-            "rotation": [0, 180, 0],
+            "bind_pose_rotation": [6, 180, 0],
+            "rotation": [6, 180, 0],
             "cubes": [{"origin": [-5, 8, 3], "size": [10, 16, 1], "uv": [0, 0]}]
           }
         ]
