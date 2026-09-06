@@ -27,10 +27,19 @@ class WorldView extends EventEmitter {
       // 'move': botPosition,
       entitySpawn: function (e) {
         if (e === bot.entity) return
-        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username })
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
+      },
+      entityAttach: function (e) {
+        worldView.emitter.emit('entity', { id: e.id, riding: true })
+      },
+      entityDetach: function (e) {
+        worldView.emitter.emit('entity', { id: e.id, riding: false })
+      },
+      entityHurt: function (e) {
+        worldView.emitter.emit('entity', { id: e.id, hurt: true })
       },
       entityGone: function (e) {
         worldView.emitter.emit('entity', { id: e.id, delete: true })
@@ -51,7 +60,7 @@ class WorldView extends EventEmitter {
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
-        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username })
+        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle })
       }
     }
   }

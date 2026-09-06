@@ -142,6 +142,7 @@ function getMesh (texture, jsonModel) {
   let i = 0
   for (const jsonBone of jsonModel.bones) {
     const bone = new THREE.Bone()
+    bone.name = jsonBone.name
     if (jsonBone.pivot) {
       bone.position.x = jsonBone.pivot[0]
       bone.position.y = jsonBone.pivot[1]
@@ -168,8 +169,13 @@ function getMesh (texture, jsonModel) {
 
   const rootBones = []
   for (const jsonBone of jsonModel.bones) {
-    if (jsonBone.parent) bones[jsonBone.parent].add(bones[jsonBone.name])
-    else rootBones.push(bones[jsonBone.name])
+    if (jsonBone.parent) {
+      const parentPivot = jsonModel.bones.find(b => b.name === jsonBone.parent).pivot
+      const bone = bones[jsonBone.name]
+      // pivots are absolute in the json, bone positions are relative to the parent
+      if (parentPivot) bone.position.sub(new THREE.Vector3(...parentPivot))
+      bones[jsonBone.parent].add(bone)
+    } else rootBones.push(bones[jsonBone.name])
   }
 
   const skeleton = new THREE.Skeleton(Object.values(bones))
