@@ -24,6 +24,8 @@ class WorldRenderer {
     this.renderUpdateEmitter = new EventEmitter()
     this.blockStatesData = undefined
     this.texturesDataUrl = undefined
+    // Resolves when the block atlas is uploaded; replaced per setVersion.
+    this.texturesLoaded = Promise.resolve()
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
     // Animated textures are packed as vertical runs of tiles; each vertex
@@ -104,7 +106,8 @@ class WorldRenderer {
   }
 
   updateTexturesData () {
-    loadTexture(this.host, this.texturesDataUrl || `textures/${this.assetsVersion}.png`).then(texture => {
+    // waitForReady awaits this; the mesher already gates on the block states message.
+    this.texturesLoaded = loadTexture(this.host, this.texturesDataUrl || `textures/${this.assetsVersion}.png`).then(texture => {
       if (!texture) return
       this.uniforms.tileHeight.value = 16 / texture.image.height
       this.material.map = texture
@@ -197,6 +200,13 @@ class WorldRenderer {
       }
       this.renderUpdateEmitter.on('update', updateHandler)
     })
+  }
+
+  // Call after listen()/init() have queued chunks. waitForChunksToRender only tracks
+  // the mesher; a frame before material.map is set renders untextured geometry.
+  async waitForReady () {
+    await this.texturesLoaded
+    await this.waitForChunksToRender()
   }
 }
 
