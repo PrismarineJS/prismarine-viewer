@@ -87,8 +87,20 @@ the emitter should emit these events:
 * loadChunk({x, z, chunk}) ; add a column
 * unloadChunk({x, z}) ; removes a column
 * blockUpdate({pos, stateId}) ; update a block
-it also listen to these events:
-* mouseClick({ origin, direction, button })
+
+The WorldView on the other end listens for mouseClick({ origin, direction, button }) and raycasts it into the world; the page emits it from its own pointer events with `pickRay`:
+
+```js
+renderer.domElement.addEventListener('pointerdown', (evt) => {
+  const x = (evt.clientX / renderer.domElement.clientWidth) * 2 - 1
+  const y = -(evt.clientY / renderer.domElement.clientHeight) * 2 + 1
+  emitter.emit('mouseClick', { ...viewer.pickRay(x, y), button: evt.button })
+})
+```
+
+#### pickRay (x, y)
+
+The camera ray through a point of the view, x and y in [-1, 1] with right and up positive. Returns { origin, direction }.
 
 #### update ()
 
