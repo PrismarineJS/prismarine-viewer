@@ -130,6 +130,12 @@ class Viewer {
   async waitForChunksToRender () {
     await this.world.waitForChunksToRender()
   }
+
+  // Resolves once the block atlas is uploaded and the queued chunks are meshed,
+  // so the next render is fully textured. Call after listen()/init().
+  async waitForReady () {
+    await this.world.waitForReady()
+  }
 }
 
 module.exports = { Viewer }
