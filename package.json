@@ -3,6 +3,9 @@
   "version": "1.33.0",
   "description": "Web based viewer",
   "main": "index.js",
+  "browser": {
+    "./viewer/lib/host/node.js": "./viewer/lib/host/browser.js"
+  },
   "scripts": {
     "jestTest": "jest --verbose --runInBand --forceExit",
     "test": "npm run test",

@@ -23,15 +23,47 @@ export function headless(bot: Bot, settings: {
     width?: number;
     height?: number;
     logFFMPEG?: boolean;
-    jpegOption: any;
+    jpegOption?: any;
+    numWorkers?: number;
 });
+
+export interface HostImage {
+    width: number;
+    height: number;
+    /** RGBA bytes, top row first */
+    data: Uint8Array;
+}
+
+export interface HostWorker {
+    postMessage(msg: any, transfer?: ArrayBuffer[]): void;
+    onMessage(cb: (msg: any) => void): void;
+    terminate(): void;
+}
+
+/** Everything the viewer needs from its platform */
+export interface Host {
+    loadImage(name: string): Promise<HostImage>;
+    loadJSON(name: string): Promise<any>;
+    createWorker(): HostWorker;
+    now(): number;
+    renderText?: ((text: string) => HostImage | null) | null;
+}
+
+export interface ViewerOptions {
+    host?: Host;
+    numWorkers?: number;
+}
 
 export const viewer: {
     Viewer: any;
     WorldView: any;
     MapControls: any;
-    Entitiy: any;
+    Entity: any;
     getBufferFromStream: (stream: any) => Promise<Buffer>;
+    defaultHost: () => Host;
+    createNodeHost: (options?: { assetsDir?: string; fetch?: typeof fetch; workerFile?: string }) => Host;
+    createBrowserHost: (options?: { assetsUrl?: string; workerUrl?: string; textureProxy?: string | null }) => Host;
+    createElectronHost: (options?: { assetsDir?: string; workerUrl?: string }) => Host;
 };
 
 export const supportedVersions: versions[];

@@ -8,11 +8,21 @@ Viewer library provides Viewer and WorldView which together make it possible to 
 
 The viewer exposes methods to render a world to a three.js renderer.
 
-#### Viewer(renderer)
+#### Viewer(renderer, options = {})
 
 Build the viewer.
 
 * renderer is a [WebGLRenderer](https://threejs.org/docs/#api/en/renderers/WebGLRenderer) instance
+* options.host is a [host](#hosts); defaults to the browser host on a page, the electron host when `globalThis.isElectron` is set, and the node host otherwise
+* options.numWorkers is the number of mesher workers (default 4)
+
+#### host
+
+the host the viewer loads assets and spawns workers through
+
+#### dispose ()
+
+Removes everything from the scene and terminates the mesher workers.
 
 #### version
 
@@ -87,6 +97,38 @@ Update the world. This need to be called in the animate function, just before th
 #### waitForChunksToRender ()
 
 Returns a promise that resolve once all sections marked dirty have been rendered by the worker threads. Can be used to wait for chunks to 'appear'.
+
+### Hosts
+
+A host is everything the viewer needs from its platform. The rendering code only talks to the host, so the same Viewer runs in a browser, in node under headless-gl or node-canvas-webgl, and in electron.
+
+```js
+{
+  loadImage (name),   // -> Promise<{ width, height, data }>: RGBA bytes, top row first
+  loadJSON (name),    // -> Promise<object>
+  createWorker (),    // -> { postMessage (msg, transfer), onMessage (cb), terminate () }
+  now (),             // -> milliseconds
+  renderText (text)   // -> { width, height, data } or null; optional, draws username labels
+}
+```
+
+`name` is an asset path under `public/` (`textures/1.16.4.png`, `blocksStates/1.16.4.json`) or an http(s) URL (player skins).
+
+#### createNodeHost({ assetsDir, fetch, workerFile })
+
+Reads assets from the prerendered `public/` directory (or the given `assetsDir`), fetches URLs with `fetch`, meshes on `worker_threads`, and draws labels with `canvas` when it is installed. Needs no native module besides the renderer you bring.
+
+#### createBrowserHost({ assetsUrl, workerUrl, textureProxy })
+
+Fetches assets relative to the page (`assetsUrl` prefix), meshes on a Web Worker loaded from `workerUrl` (default `worker.js`), and rewrites `textures.minecraft.net` skin URLs to the `textureProxy` route (default `texture/`, the one `mineflayer` mode serves; `null` to fetch skins directly).
+
+#### createElectronHost({ assetsDir, workerUrl })
+
+Node loaders with the page's Web Worker and canvas, for a renderer with node integration.
+
+#### defaultHost()
+
+The host `Viewer` picks when none is given. Bundlers replace the node host with the browser host through the package's `browser` field.
 
 ### WorldView
 
