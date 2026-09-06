@@ -114,9 +114,9 @@ A host is everything the viewer needs from its platform. The rendering code only
 
 `name` is an asset path under `public/` (`textures/1.16.4.png`, `blocksStates/1.16.4.json`) or an http(s) URL (player skins).
 
-#### createNodeHost({ assetsDir, fetch, workerFile })
+#### createNodeHost({ assetsDir, fetch, workerFile, inlineMesher })
 
-Reads assets from the prerendered `public/` directory (or the given `assetsDir`), fetches URLs with `fetch`, meshes on `worker_threads`, and draws labels with `canvas` when it is installed. Needs no native module besides the renderer you bring.
+Reads assets from the prerendered `public/` directory (or the given `assetsDir`), fetches URLs with `fetch`, meshes on `worker_threads` (or on the calling thread with `inlineMesher: true`, which saves a copy of the block data per worker), and draws labels with `canvas` when it is installed. Needs no native module besides the renderer you bring.
 
 #### createBrowserHost({ assetsUrl, workerUrl, textureProxy })
 

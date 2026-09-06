@@ -175,8 +175,9 @@ class WorldRenderer {
     // This guarantees uniformity accross workers and that a given section
     // is always dispatched to the same worker
     const hash = mod(Math.floor(pos.x / 16) + Math.floor(pos.y / 16) + Math.floor(pos.z / 16), this.workers.length)
-    this.workers[hash].postMessage({ type: 'dirty', x: pos.x, y: pos.y, z: pos.z, value })
+    // outstanding before the post: an inline worker answers synchronously
     this.sectionsOutstanding.add(`${Math.floor(pos.x / 16) * 16},${Math.floor(pos.y / 16) * 16},${Math.floor(pos.z / 16) * 16}`)
+    this.workers[hash].postMessage({ type: 'dirty', x: pos.x, y: pos.y, z: pos.z, value })
   }
 
   // Listen for chunk rendering updates emitted if a worker finished a render and resolve if the number
