@@ -100,7 +100,7 @@ class WorldView extends EventEmitter {
       const column = await this.world.getColumnAt(pos)
       if (column) {
         const chunk = column.toJson()
-        this.emitter.emit('loadChunk', { x: pos.x, z: pos.z, chunk })
+        this.emitter.emit('loadChunk', { x: pos.x, z: pos.z, chunk, minY: column.minY ?? 0, worldHeight: column.worldHeight ?? 256 })
         this.loadedChunks[`${pos.x},${pos.z}`] = true
       }
     }

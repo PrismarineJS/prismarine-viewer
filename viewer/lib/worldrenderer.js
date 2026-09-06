@@ -125,12 +125,12 @@ class WorldRenderer {
     this.uniforms.time.value = performance.now() / 50
   }
 
-  addColumn (x, z, chunk) {
-    this.loadedChunks[`${x},${z}`] = true
+  addColumn (x, z, chunk, minY = 0, worldHeight = 256) {
+    this.loadedChunks[`${x},${z}`] = { minY, worldHeight }
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = minY; y < minY + worldHeight; y += 16) {
       const loc = new Vec3(x, y, z)
       this.setSectionDirty(loc)
       this.setSectionDirty(loc.offset(-16, 0, 0))
@@ -141,11 +141,12 @@ class WorldRenderer {
   }
 
   removeColumn (x, z) {
+    const { minY, worldHeight } = this.loadedChunks[`${x},${z}`] ?? { minY: 0, worldHeight: 256 }
     delete this.loadedChunks[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = minY; y < minY + worldHeight; y += 16) {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]
