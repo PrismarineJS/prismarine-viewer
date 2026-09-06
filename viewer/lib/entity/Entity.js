@@ -2,6 +2,8 @@
 
 const entities = require('./entities.json')
 const { loadTexture } = globalThis.isElectron ? require('../utils.electron.js') : require('../utils')
+let createCanvas
+try { ({ createCanvas } = require('canvas')) } catch {}
 
 const elemFaces = {
   up: {
@@ -24,36 +26,36 @@ const elemFaces = {
     u1: [2, 0, 1],
     v1: [0, 0, 1],
     corners: [
-      [1, 0, 1, 0, 0],
-      [0, 0, 1, 1, 0],
-      [1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1]
+      [1, 0, 1, 1, 0],
+      [0, 0, 1, 0, 0],
+      [1, 0, 0, 1, 1],
+      [0, 0, 0, 0, 1]
     ]
   },
   east: {
     dir: [1, 0, 0],
-    u0: [0, 0, 0],
-    v0: [0, 0, 1],
-    u1: [0, 0, 1],
-    v1: [0, 1, 1],
-    corners: [
-      [1, 1, 1, 0, 0],
-      [1, 0, 1, 0, 1],
-      [1, 1, 0, 1, 0],
-      [1, 0, 0, 1, 1]
-    ]
-  },
-  west: {
-    dir: [-1, 0, 0],
     u0: [1, 0, 1],
     v0: [0, 0, 1],
     u1: [1, 0, 2],
     v1: [0, 1, 1],
     corners: [
-      [0, 1, 0, 0, 0],
-      [0, 0, 0, 0, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 1, 1]
+      [1, 1, 1, 1, 0],
+      [1, 0, 1, 1, 1],
+      [1, 1, 0, 0, 0],
+      [1, 0, 0, 0, 1]
+    ]
+  },
+  west: {
+    dir: [-1, 0, 0],
+    u0: [0, 0, 0],
+    v0: [0, 0, 1],
+    u1: [0, 0, 1],
+    v1: [0, 1, 1],
+    corners: [
+      [0, 1, 0, 1, 0],
+      [0, 0, 0, 1, 1],
+      [0, 1, 1, 0, 0],
+      [0, 0, 1, 0, 1]
     ]
   },
   north: {
@@ -63,10 +65,10 @@ const elemFaces = {
     u1: [1, 0, 1],
     v1: [0, 1, 1],
     corners: [
-      [1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1],
-      [1, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0]
+      [1, 0, 0, 1, 1],
+      [0, 0, 0, 0, 1],
+      [1, 1, 0, 1, 0],
+      [0, 1, 0, 0, 0]
     ]
   },
   south: {
@@ -76,10 +78,10 @@ const elemFaces = {
     u1: [2, 0, 2],
     v1: [0, 1, 1],
     corners: [
-      [0, 0, 1, 0, 1],
-      [1, 0, 1, 1, 1],
-      [0, 1, 1, 0, 0],
-      [1, 1, 1, 1, 0]
+      [0, 0, 1, 1, 1],
+      [1, 0, 1, 0, 1],
+      [0, 1, 1, 1, 0],
+      [1, 1, 1, 0, 0]
     ]
   }
 }
@@ -128,7 +130,64 @@ function addCube (attr, boneId, bone, cube, texWidth = 64, texHeight = 64) {
   }
 }
 
-function getMesh (texture, jsonModel) {
+function applyTexture (material, texture) {
+  texture.magFilter = THREE.NearestFilter
+  texture.minFilter = THREE.NearestFilter
+  texture.flipY = false
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  material.map = texture
+  material.needsUpdate = true
+}
+
+// [x, y, dx, dy, w, h]: the w*h block at (x, y) is copied to (x + dx, y + dy), mirrored horizontally
+const legacySkinCopies = [
+  [4, 16, 16, 32, 4, 4], [8, 16, 16, 32, 4, 4], [0, 20, 24, 32, 4, 12], [4, 20, 16, 32, 4, 12], [8, 20, 8, 32, 4, 12], [12, 20, 16, 32, 4, 12],
+  [44, 16, -8, 32, 4, 4], [48, 16, -8, 32, 4, 4], [40, 20, 0, 32, 4, 12], [44, 20, -8, 32, 4, 12], [48, 20, -16, 32, 4, 12], [52, 20, -8, 32, 4, 12]
+]
+
+// RGBA rows of a loaded texture. A DataTexture carries them; an image is drawn once to read them.
+function texturePixels (image) {
+  if (image.data) return image.data
+  const ctx = createCanvas(image.width, image.height).getContext('2d')
+  ctx.drawImage(image, 0, 0)
+  return ctx.getImageData(0, 0, image.width, image.height).data
+}
+
+// Same steps as vanilla's HttpTexture.processLegacySkin. Skins predating 1.8 are 64x32 and
+// the player geometry samples a 64x64 sheet: the left limbs become mirrored copies of the
+// right ones, and an overlay block with no transparency at all was never used as a hat, so
+// its hat rows are dropped. Every skin then gets its base layers forced opaque (head, body
+// row, lower limbs), which is what makes the second layer the only see-through one. Capes are
+// 64x32 by design and never pass through here.
+function prepareSkin (texture) {
+  const image = texture.image
+  if (image.width !== 64 || (image.height !== 32 && image.height !== 64)) return texture
+  const src = texturePixels(image)
+  const out = new Uint8Array(64 * 64 * 4)
+  out.set(src)
+  const at = (x, y) => (y * 64 + x) * 4
+  if (image.height === 32) {
+    for (const [x, y, dx, dy, w, h] of legacySkinCopies) {
+      for (let j = 0; j < h; j++) {
+        for (let i = 0; i < w; i++) {
+          out.set(src.subarray(at(x + i, y + j), at(x + i, y + j) + 4), at(x + dx + w - 1 - i, y + dy + j))
+        }
+      }
+    }
+    let opaque = true
+    for (let y = 0; y < 32 && opaque; y++) for (let x = 32; x < 64; x++) if (out[at(x, y) + 3] < 128) { opaque = false; break }
+    if (opaque) for (let y = 0; y < 16; y++) for (let x = 32; x < 64; x++) out[at(x, y) + 3] = 0
+  }
+  for (const [x0, y0, x1, y1] of [[0, 0, 32, 16], [0, 16, 64, 32], [16, 48, 48, 64]]) {
+    for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) out[at(x, y) + 3] = 255
+  }
+  const prepared = new THREE.DataTexture(out, 64, 64, THREE.RGBAFormat)
+  prepared.needsUpdate = true
+  return prepared
+}
+
+function getMesh (texture, jsonModel, override) {
   const bones = {}
 
   const geoData = {
@@ -192,31 +251,39 @@ function getMesh (texture, jsonModel) {
   const mesh = new THREE.SkinnedMesh(geometry, material)
   mesh.add(...rootBones)
   mesh.bind(skeleton)
-  mesh.scale.set(1 / 16, 1 / 16, 1 / 16)
+  // Model space is x-mirrored relative to the world (Bedrock geometry, same as Java's model
+  // space, which vanilla draws under a (-1, -1, 1) scale): the left arm sits at +x. Flip it
+  // so the player's left limbs end up on their left; the face UVs below are laid out for this.
+  mesh.scale.set(-1 / 16, 1 / 16, 1 / 16)
 
-  loadTexture(texture, texture => {
-    texture.magFilter = THREE.NearestFilter
-    texture.minFilter = THREE.NearestFilter
-    texture.flipY = false
-    texture.wrapS = THREE.RepeatWrapping
-    texture.wrapT = THREE.RepeatWrapping
-    material.map = texture
-  })
+  // Textures load the first time the mesh is drawn, so an entity the camera
+  // never sees (a player across the server) costs no fetch.
+  mesh.onBeforeRender = () => {
+    mesh.onBeforeRender = () => {}
+    if (texture) {
+      loadTexture(texture, texture => {
+        applyTexture(material, texture)
+        if (override) loadTexture(override, texture => applyTexture(material, prepareSkin(texture)))
+      })
+    } else {
+      loadTexture(override, texture => applyTexture(material, texture))
+    }
+  }
 
   return mesh
 }
 
 class Entity {
-  constructor (version, type, scene) {
+  constructor (version, type, scene, textures = {}) {
     const e = entities[type]
     if (!e) throw new Error(`Unknown entity ${type}`)
 
     this.mesh = new THREE.Object3D()
     for (const [name, jsonModel] of Object.entries(e.geometry)) {
       const texture = e.textures[name]
-      if (!texture) continue
+      if (!texture && !textures[name]) continue
       // console.log(JSON.stringify(jsonModel, null, 2))
-      const mesh = getMesh(texture.replace('textures', 'textures/' + version) + '.png', jsonModel)
+      const mesh = getMesh(texture && texture.replace('textures', 'textures/' + version) + '.png', jsonModel, textures[name])
       /* const skeletonHelper = new THREE.SkeletonHelper( mesh )
       skeletonHelper.material.linewidth = 2
       scene.add( skeletonHelper ) */

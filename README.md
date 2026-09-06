@@ -86,6 +86,8 @@ Options:
 * `firstPerson` is the view first person ? default: `false`
 * `port` the port for the webserver, default: `3000`
 
+Players are rendered with their skin, wide or slim, and cape when the server sends skin data (online-mode servers).
+
 [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/bot.js)
 
 #### standalone

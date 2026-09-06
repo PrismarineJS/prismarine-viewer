@@ -9,7 +9,11 @@ const { createCanvas } = require('canvas')
 function getEntityMesh (entity, scene) {
   if (entity.name) {
     try {
-      const e = new Entity('1.16.4', entity.name, scene)
+      const textures = {}
+      if (entity.skin) textures.default = entity.skin
+      if (entity.cape) textures.cape = entity.cape
+      const model = entity.name === 'player' && entity.skinModel === 'slim' ? 'player_slim' : entity.name
+      const e = new Entity('1.16.4', model, scene, textures)
 
       if (entity.username !== undefined) {
         const canvas = createCanvas(500, 100)
