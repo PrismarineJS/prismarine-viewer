@@ -61,7 +61,7 @@ export const viewer: {
     Entity: any;
     getBufferFromStream: (stream: any) => Promise<Buffer>;
     defaultHost: () => Host;
-    createNodeHost: (options?: { assetsDir?: string; fetch?: typeof fetch; workerFile?: string }) => Host;
+    createNodeHost: (options?: { assetsDir?: string; fetch?: typeof fetch; workerFile?: string; inlineMesher?: boolean }) => Host;
     createBrowserHost: (options?: { assetsUrl?: string; workerUrl?: string; textureProxy?: string | null }) => Host;
     createElectronHost: (options?: { assetsDir?: string; workerUrl?: string }) => Host;
 };
