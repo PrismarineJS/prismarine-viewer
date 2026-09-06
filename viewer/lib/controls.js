@@ -1,4 +1,5 @@
 /* eslint-disable */
+const THREE = require('three')
 // Similar to THREE MapControls with more Minecraft-like
 // controls.
 // Defaults:
