@@ -4,7 +4,8 @@ const TWEEN = require('@tweenjs/tween.js')
 const Entity = require('./entity/Entity')
 const { dispose3 } = require('./dispose')
 
-const { createCanvas } = require('canvas')
+let createCanvas
+try { ({ createCanvas } = require('canvas')) } catch {}
 
 function getEntityMesh (entity, scene) {
   if (entity.name) {
@@ -15,7 +16,7 @@ function getEntityMesh (entity, scene) {
       const model = entity.name === 'player' && entity.skinModel === 'slim' ? 'player_slim' : entity.name
       const e = new Entity('1.16.4', model, scene, textures)
 
-      if (entity.username !== undefined) {
+      if (entity.username !== undefined && createCanvas) {
         const canvas = createCanvas(500, 100)
 
         const ctx = canvas.getContext('2d')
