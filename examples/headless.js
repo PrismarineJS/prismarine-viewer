@@ -8,8 +8,15 @@ const bot = mineflayer.createBot({
   username: 'Bot'
 })
 
-bot.once('spawn', () => {
-  // Record 200 frames, 512x512 pixels, and save them to output.mp4
-  mineflayerViewer(bot, { output: 'output.mp4', frames: 200, width: 512, height: 512 })
+bot.once('spawn', async () => {
+  // Record 10 seconds at 512x512, 20 fps, to output.mp4
+  const recording = mineflayerViewer(bot, { output: 'output.mp4', width: 512, height: 512, fps: 20 })
+  if (!recording) throw Error(`no assets for ${bot.version}`)
+  await recording.ready
   bot.setControlState('jump', true)
+  setTimeout(async () => {
+    await recording.stop()
+    console.log('saved output.mp4')
+    bot.quit()
+  }, 10000)
 })

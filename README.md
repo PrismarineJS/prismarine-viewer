@@ -117,11 +117,18 @@ const { headless } = require('prismarine-viewer')
 
 Options:
 * `viewDistance` view radius, in chunks, default: `6`
-* `output` the output file or a `host:port` address to stream to, default: `output.mp4`
-* `frames` number of frames to record, `-1` for infinite, default: `200`
+* `output` the output file (`.mp4`), an `rtmp://` stream or a `host:port` address to stream length-prefixed JPEG frames to, default: `output.mp4`
+* `frames` number of frames to record, `-1` for infinite, default: `-1`
+* `fps` frames per second, default: `20`; frames are paced on the wall clock so the video plays at real speed
 * `width` the width of a frame, default: `512`
 * `height` the height of a frame, default: `512`
 * `numWorkers` mesher worker threads, default: `4`
+
+Returns `false` when the bot's version has no assets, otherwise a recording handle:
+* `stop()` finish the recording: closes the output (ffmpeg then writes the mp4 index), waits for it and frees the GL context. Called for you when `frames` is reached, the bot ends or the output goes away.
+* `ready` promise for the first frame: the block atlas and the sections around the bot are rendered before anything is written, so the video does not open on blank sky
+* `canvas` the node-canvas-webgl canvas, e.g. `canvas.toBuffer('image/png')` for a still of the latest frame
+* `viewer`, `client` the underlying `Viewer` and the ffmpeg process or TCP socket
 
 [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/headless.js)
 
