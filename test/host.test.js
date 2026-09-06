@@ -2,6 +2,18 @@
 const path = require('path')
 const { createNodeHost } = require('../viewer/lib/host/node')
 const { loadTexture, loadPixels } = require('../viewer/lib/textures')
+const { createMesher, createInlineWorker } = require('../viewer/lib/mesher')
+const { Vec3 } = require('vec3')
+
+const version = '1.16.4'
+const stoneColumn = () => {
+  const Chunk = require('prismarine-chunk')(version)
+  const stone = require('minecraft-data')(version).blocksByName.stone.defaultState
+  const chunk = new Chunk()
+  for (let x = 0; x < 16; x++) for (let z = 0; z < 16; z++) chunk.setBlockStateId(new Vec3(x, 0, z), stone)
+  return chunk.toJson()
+}
+const blockStates = () => require('../public/blocksStates/' + version + '.json')
 
 describe('node host', () => {
   const host = createNodeHost({ assetsDir: path.join(__dirname, '../viewer/lib') })
@@ -55,5 +67,36 @@ describe('textures', () => {
   it('resolves null instead of failing when an image is unavailable', async () => {
     expect(await loadTexture(host, 'nope.png')).toBe(null)
     expect(await loadPixels(host, 'nope.png')).toBe(null)
+  })
+})
+
+describe('mesher', () => {
+  it('meshes a dirty section and reports the rest finished', () => {
+    const posted = []
+    const mesher = createMesher((msg, transfer) => posted.push({ msg, transfer }))
+    mesher.handle({ type: 'version', version })
+    mesher.handle({ type: 'blockStates', json: blockStates() })
+    mesher.handle({ type: 'chunk', x: 0, z: 0, chunk: stoneColumn() })
+    mesher.handle({ type: 'dirty', x: 0, y: 0, z: 0, value: true })
+    mesher.handle({ type: 'dirty', x: 0, y: 64, z: 0, value: true })
+    expect(posted.map(p => p.msg.type)).toEqual(['sectionFinished'])
+    mesher.tick()
+    const types = posted.map(p => p.msg.type)
+    expect(types).toEqual(['sectionFinished', 'geometry', 'sectionFinished'])
+    const { msg, transfer } = posted[1]
+    expect(msg.key).toBe('0,0,0')
+    expect(msg.geometry.positions.length).toBeGreaterThan(0)
+    expect(transfer).toContain(msg.geometry.positions.buffer)
+  })
+
+  it('runs inline behind the host worker interface', async () => {
+    const worker = createInlineWorker()
+    const geometry = new Promise(resolve => worker.onMessage(msg => { if (msg.type === 'geometry') resolve(msg) }))
+    worker.postMessage({ type: 'version', version })
+    worker.postMessage({ type: 'blockStates', json: blockStates() })
+    worker.postMessage({ type: 'chunk', x: 0, z: 0, chunk: stoneColumn() })
+    worker.postMessage({ type: 'dirty', x: 0, y: 0, z: 0, value: true })
+    expect((await geometry).key).toBe('0,0,0')
+    worker.terminate()
   })
 })
