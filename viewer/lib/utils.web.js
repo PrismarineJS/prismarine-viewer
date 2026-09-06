@@ -1,30 +1,20 @@
-/* global XMLHttpRequest */
-const THREE = require('three')
+// Deprecated: the viewer loads through a host now (see ./host). Kept for code
+// that imported these loaders directly.
+const { createBrowserHost } = require('./host/browser')
+const { loadTexture: load } = require('./textures')
 
-const textureCache = {}
-function loadTexture (texture, cb) {
-  if (!textureCache[texture]) {
-    // textures.minecraft.net sends no CORS headers: player skins go through the
-    // server's proxy route (lib/mineflayer.js)
-    const url = texture.replace(/^https?:\/\/textures\.minecraft\.net\/texture\//, 'texture/')
-    textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(url, resolve, undefined, () => {}))
-  }
-  textureCache[texture].then(cb)
+let host
+function getHost () {
+  if (!host) host = createBrowserHost()
+  return host
 }
 
-function loadJSON (url, callback) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', url, true)
-  xhr.responseType = 'json'
-  xhr.onload = function () {
-    const status = xhr.status
-    if (status === 200) {
-      callback(xhr.response)
-    } else {
-      throw new Error(url + ' not found')
-    }
-  }
-  xhr.send()
+function loadTexture (texture, cb) {
+  load(getHost(), texture).then(texture => { if (texture) cb(texture) })
+}
+
+function loadJSON (json, cb) {
+  getHost().loadJSON(json).then(cb)
 }
 
 module.exports = { loadTexture, loadJSON }

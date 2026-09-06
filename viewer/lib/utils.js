@@ -1,41 +1,20 @@
-const { PNG } = require('pngjs')
-const THREE = require('three')
-const path = require('path')
-const fs = require('fs')
+// Deprecated: the viewer loads through a host now (see ./host). Kept for code
+// that imported these loaders directly.
+const { defaultHost } = require('./host')
+const { loadTexture: load } = require('./textures')
 
-const textureCache = {}
-
-// bundled textures are files under public/; player skins are http(s) URLs
-async function readPng (texture) {
-  if (/^https?:\/\//.test(texture)) {
-    const res = await fetch(texture)
-    if (!res.ok) throw new Error(`${texture}: ${res.status}`)
-    return PNG.sync.read(Buffer.from(await res.arrayBuffer()))
-  }
-  return PNG.sync.read(await fs.promises.readFile(path.resolve(__dirname, '../../public/' + texture)))
+let host
+function getHost () {
+  if (!host) host = defaultHost()
+  return host
 }
 
-// todo not ideal, export different functions for browser and node
 function loadTexture (texture, cb) {
-  if (process.platform === 'browser') {
-    return require('./utils.web').loadTexture(texture, cb)
-  }
-
-  if (!textureCache[texture]) {
-    textureCache[texture] = readPng(texture).then(png => {
-      const tex = new THREE.DataTexture(new Uint8Array(png.data), png.width, png.height, THREE.RGBAFormat)
-      tex.needsUpdate = true
-      return tex
-    })
-  }
-  textureCache[texture].then(cb).catch(() => {})
+  load(getHost(), texture).then(texture => { if (texture) cb(texture) })
 }
 
 function loadJSON (json, cb) {
-  if (process.platform === 'browser') {
-    return require('./utils.web').loadJSON(json, cb)
-  }
-  cb(require(path.resolve(__dirname, '../../public/' + json)))
+  getHost().loadJSON(json).then(cb)
 }
 
 module.exports = { loadTexture, loadJSON }
