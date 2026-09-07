@@ -41,10 +41,13 @@ function getEntityMesh (entity, scene) {
 
       return e.mesh
     } catch (err) {
-      // An entity type without a model is reported once and drawn as a box.
+      // An entity type without a model is reported once and drawn as a box. A server with a
+      // newer or modded entity list hits that on purpose, so it is one line; anything else
+      // thrown here is a real failure and keeps its stack.
       if (!reportedMissingModels.has(entity.name)) {
         reportedMissingModels.add(entity.name)
-        console.log(err)
+        if (err.message?.startsWith('Unknown entity')) console.warn(`prismarine-viewer: ${err.message}, drawing a box instead`)
+        else console.warn(err)
       }
     }
   }
