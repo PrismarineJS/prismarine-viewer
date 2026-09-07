@@ -48,7 +48,7 @@ class Viewer {
     console.log(`Using version: ${version} (assets: ${assetsVersion})`)
     this.version = version
     this.world.setVersion(version, assetsVersion)
-    this.entities.clear()
+    this.entities.setVersion(assetsVersion)
     this.primitives.clear()
     return true
   }

@@ -2,6 +2,20 @@ const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
 const EventEmitter = require('events')
 
+// A dropped item's stack lives in the entity's metadata, keyed by the raw metadata index.
+function droppedItemName (registry, entity) {
+  if (entity.name !== 'item' || !entity.metadata) return undefined
+  const keys = registry.entitiesByName?.item?.metadataKeys
+  const slots = keys ? [entity.metadata[keys.indexOf('item')]] : Object.values(entity.metadata)
+  for (const slot of slots) {
+    if (!slot || typeof slot !== 'object') continue
+    if (slot.present === false || slot.itemCount === 0) continue
+    const id = slot.itemId ?? slot.blockId
+    if (id === undefined || id < 0) continue
+    return registry.items[id]?.name
+  }
+}
+
 class WorldView extends EventEmitter {
   constructor (world, viewDistance, position = new Vec3(0, 0, 0), emitter = null) {
     super()
@@ -27,7 +41,11 @@ class WorldView extends EventEmitter {
       // 'move': botPosition,
       entitySpawn: function (e) {
         if (e === bot.entity) return
-        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle })
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, itemName: droppedItemName(bot.registry, e) })
+      },
+      entityUpdate: function (e) {
+        const itemName = droppedItemName(bot.registry, e)
+        if (itemName !== undefined) worldView.emitter.emit('entity', { id: e.id, pos: e.position, itemName })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
@@ -60,7 +78,7 @@ class WorldView extends EventEmitter {
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
-        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle })
+        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, itemName: droppedItemName(bot.registry, e) })
       }
     }
   }
