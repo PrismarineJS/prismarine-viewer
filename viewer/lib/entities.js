@@ -6,6 +6,8 @@ const { dispose3 } = require('./dispose')
 
 const { createCanvas } = require('canvas')
 
+const reportedMissingModels = new Set()
+
 function getEntityMesh (entity, scene) {
   if (entity.name) {
     try {
@@ -39,7 +41,11 @@ function getEntityMesh (entity, scene) {
 
       return e.mesh
     } catch (err) {
-      console.log(err)
+      // An entity type without a model is reported once and drawn as a box.
+      if (!reportedMissingModels.has(entity.name)) {
+        reportedMissingModels.add(entity.name)
+        console.log(err)
+      }
     }
   }
 
