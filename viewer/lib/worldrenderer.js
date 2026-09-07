@@ -111,12 +111,14 @@ class WorldRenderer {
       this.material.needsUpdate = true
     })
 
+    // Only the mesher reads the block states, and parsing them here would block for as long as
+    // the file is big (150 ms for 26.1), so the text goes to the workers unparsed.
     const blockStates = this.blockStatesData
-      ? Promise.resolve(this.blockStatesData)
-      : this.host.loadJSON(`blocksStates/${this.assetsVersion}.json`)
-    blockStates.then((json) => {
+      ? Promise.resolve({ json: this.blockStatesData })
+      : this.host.loadText(`blocksStates/${this.assetsVersion}.json`).then(text => ({ text }))
+    blockStates.then((message) => {
       for (const worker of this.workers) {
-        worker.postMessage({ type: 'blockStates', json })
+        worker.postMessage({ type: 'blockStates', ...message })
       }
     })
   }

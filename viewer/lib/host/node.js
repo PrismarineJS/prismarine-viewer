@@ -17,6 +17,10 @@ function isUrl (name) {
 // drawn with node-canvas when it is installed. Nothing here needs a GL canvas,
 // so it pairs with headless-gl, node-canvas-webgl or any other renderer.
 function createNodeHost ({ assetsDir = path.resolve(__dirname, '../../../public'), fetch = globalThis.fetch, workerFile = path.join(__dirname, '../worker.node.js'), inlineMesher = false } = {}) {
+  async function readText (name) {
+    return (await readAsset(name)).toString('utf8')
+  }
+
   async function readAsset (name) {
     if (!isUrl(name)) return fs.promises.readFile(path.resolve(assetsDir, name))
     const res = await fetch(name)
@@ -36,8 +40,10 @@ function createNodeHost ({ assetsDir = path.resolve(__dirname, '../../../public'
     },
 
     async loadJSON (name) {
-      return JSON.parse((await readAsset(name)).toString('utf8'))
+      return JSON.parse(await readText(name))
     },
+
+    loadText: readText,
 
     createWorker () {
       if (inlineMesher) return createInlineWorker()
