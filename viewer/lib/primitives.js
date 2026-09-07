@@ -2,10 +2,10 @@ const THREE = require('three')
 const { MeshLine, MeshLineMaterial } = require('three.meshline')
 const { dispose3 } = require('./dispose')
 
-function getMesh (primitive, camera) {
+function getMesh (primitive, camera, size) {
   if (primitive.type === 'line') {
     const color = primitive.color ? primitive.color : 0xff0000
-    const resolution = new THREE.Vector2(window.innerWidth / camera.zoom, window.innerHeight / camera.zoom)
+    const resolution = new THREE.Vector2(size.x / camera.zoom, size.y / camera.zoom)
     const material = new MeshLineMaterial({ color, resolution, sizeAttenuation: false, lineWidth: 8 })
 
     const points = []
@@ -48,9 +48,10 @@ function getMesh (primitive, camera) {
 }
 
 class Primitives {
-  constructor (scene, camera) {
+  constructor (scene, camera, getSize) {
     this.scene = scene
     this.camera = camera
+    this.getSize = getSize
     this.primitives = {}
   }
 
@@ -69,7 +70,7 @@ class Primitives {
       delete this.primitives[primitive.id]
     }
 
-    const mesh = getMesh(primitive, this.camera)
+    const mesh = getMesh(primitive, this.camera, this.getSize())
     if (!mesh) return
     this.primitives[primitive.id] = mesh
     this.scene.add(mesh)
