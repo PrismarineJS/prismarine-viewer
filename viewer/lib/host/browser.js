@@ -37,6 +37,13 @@ function createBrowserHost ({ assetsUrl = '', workerUrl = 'worker.js', texturePr
       return res.json()
     },
 
+    async loadText (name) {
+      const url = resolve(name)
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(`${url}: ${res.status}`)
+      return res.text()
+    },
+
     createWorker () {
       const worker = new Worker(workerUrl)
       return {

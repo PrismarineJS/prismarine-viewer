@@ -54,6 +54,12 @@ describe('node host', () => {
     expect(json.player.geometry).toBeDefined()
   })
 
+  it('reads an asset as text without parsing it', async () => {
+    const text = await host.loadText('entity/entities.json')
+    expect(typeof text).toBe('string')
+    expect(JSON.parse(text).player.geometry).toBeDefined()
+  })
+
   it('rejects a missing asset', async () => {
     await expect(host.loadImage('nope.png')).rejects.toThrow()
   })
@@ -109,6 +115,17 @@ describe('mesher', () => {
     expect(msg.key).toBe('0,0,0')
     expect(msg.geometry.positions.length).toBeGreaterThan(0)
     expect(transfer).toContain(msg.geometry.positions.buffer)
+  })
+
+  it('parses block states handed over as text', () => {
+    const posted = []
+    const mesher = createMesher((msg, transfer) => posted.push({ msg, transfer }))
+    mesher.handle({ type: 'version', version })
+    mesher.handle({ type: 'blockStates', text: JSON.stringify(blockStates()) })
+    mesher.handle({ type: 'chunk', x: 0, z: 0, chunk: stoneColumn() })
+    mesher.handle({ type: 'dirty', x: 0, y: 0, z: 0, value: true })
+    mesher.tick()
+    expect(posted.map(p => p.msg.type)).toContain('geometry')
   })
 
   it('runs inline behind the host worker interface', async () => {
