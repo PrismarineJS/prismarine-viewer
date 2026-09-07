@@ -1,16 +1,19 @@
-/* global Worker */
 const THREE = require('three')
 const Vec3 = require('vec3').Vec3
-const { loadTexture, loadJSON } = globalThis.isElectron ? require('./utils.electron.js') : require('./utils')
 const { EventEmitter } = require('events')
 const { dispose3 } = require('./dispose')
+const { defaultHost } = require('./host')
+const { loadTexture } = require('./textures')
 
 function mod (x, n) {
   return ((x % n) + n) % n
 }
 
 class WorldRenderer {
-  constructor (scene, numWorkers = 4) {
+  constructor (scene, options = {}) {
+    if (typeof options === 'number') options = { numWorkers: options }
+    const { host = defaultHost(), numWorkers = 4 } = options
+    this.host = host
     this.sectionMeshs = {}
     this.active = false
     this.version = undefined
@@ -35,44 +38,46 @@ class WorldRenderer {
 
     this.workers = []
     for (let i = 0; i < numWorkers; i++) {
-      // Node environement needs an absolute path, but browser needs the url of the file
-      let src = __dirname
-      if (typeof window !== 'undefined') src = 'worker.js'
-      else src += '/worker.js'
-
-      const worker = new Worker(src)
-      worker.onmessage = ({ data }) => {
-        if (data.type === 'geometry') {
-          let mesh = this.sectionMeshs[data.key]
-          if (mesh) {
-            this.scene.remove(mesh)
-            dispose3(mesh)
-            delete this.sectionMeshs[data.key]
-          }
-
-          const chunkCoords = data.key.split(',')
-          if (!this.loadedChunks[chunkCoords[0] + ',' + chunkCoords[2]]) return
-
-          const geometry = new THREE.BufferGeometry()
-          geometry.setAttribute('position', new THREE.BufferAttribute(data.geometry.positions, 3))
-          geometry.setAttribute('normal', new THREE.BufferAttribute(data.geometry.normals, 3))
-          geometry.setAttribute('color', new THREE.BufferAttribute(data.geometry.colors, 3))
-          geometry.setAttribute('uv', new THREE.BufferAttribute(data.geometry.uvs, 2))
-          geometry.setAttribute('animation', new THREE.BufferAttribute(data.geometry.animations, 2))
-          geometry.setIndex(data.geometry.indices)
-
-          mesh = new THREE.Mesh(geometry, this.material)
-          mesh.position.set(data.geometry.sx, data.geometry.sy, data.geometry.sz)
-          this.sectionMeshs[data.key] = mesh
-          this.scene.add(mesh)
-        } else if (data.type === 'sectionFinished') {
-          this.sectionsOutstanding.delete(data.key)
-          this.renderUpdateEmitter.emit('update')
-        }
-      }
-      if (worker.on) worker.on('message', (data) => { worker.onmessage({ data }) })
+      const worker = host.createWorker()
+      worker.onMessage((data) => this.onWorkerMessage(data))
       this.workers.push(worker)
     }
+  }
+
+  onWorkerMessage (data) {
+    if (data.type === 'geometry') {
+      let mesh = this.sectionMeshs[data.key]
+      if (mesh) {
+        this.scene.remove(mesh)
+        dispose3(mesh)
+        delete this.sectionMeshs[data.key]
+      }
+
+      const chunkCoords = data.key.split(',')
+      if (!this.loadedChunks[chunkCoords[0] + ',' + chunkCoords[2]]) return
+
+      const geometry = new THREE.BufferGeometry()
+      geometry.setAttribute('position', new THREE.BufferAttribute(data.geometry.positions, 3))
+      geometry.setAttribute('normal', new THREE.BufferAttribute(data.geometry.normals, 3))
+      geometry.setAttribute('color', new THREE.BufferAttribute(data.geometry.colors, 3))
+      geometry.setAttribute('uv', new THREE.BufferAttribute(data.geometry.uvs, 2))
+      geometry.setAttribute('animation', new THREE.BufferAttribute(data.geometry.animations, 2))
+      geometry.setIndex(data.geometry.indices)
+
+      mesh = new THREE.Mesh(geometry, this.material)
+      mesh.position.set(data.geometry.sx, data.geometry.sy, data.geometry.sz)
+      this.sectionMeshs[data.key] = mesh
+      this.scene.add(mesh)
+    } else if (data.type === 'sectionFinished') {
+      this.sectionsOutstanding.delete(data.key)
+      this.renderUpdateEmitter.emit('update')
+    }
+  }
+
+  dispose () {
+    this.resetWorld()
+    for (const worker of this.workers) worker.terminate()
+    this.workers = []
   }
 
   resetWorld () {
@@ -99,30 +104,25 @@ class WorldRenderer {
   }
 
   updateTexturesData () {
-    loadTexture(this.texturesDataUrl || `textures/${this.assetsVersion}.png`, texture => {
-      texture.magFilter = THREE.NearestFilter
-      texture.minFilter = THREE.NearestFilter
-      texture.flipY = false
+    loadTexture(this.host, this.texturesDataUrl || `textures/${this.assetsVersion}.png`).then(texture => {
+      if (!texture) return
       this.uniforms.tileHeight.value = 16 / texture.image.height
       this.material.map = texture
       this.material.needsUpdate = true
     })
 
-    const loadBlockStates = () => {
-      return new Promise(resolve => {
-        if (this.blockStatesData) return resolve(this.blockStatesData)
-        return loadJSON(`blocksStates/${this.assetsVersion}.json`, resolve)
-      })
-    }
-    loadBlockStates().then((blockStates) => {
+    const blockStates = this.blockStatesData
+      ? Promise.resolve(this.blockStatesData)
+      : this.host.loadJSON(`blocksStates/${this.assetsVersion}.json`)
+    blockStates.then((json) => {
       for (const worker of this.workers) {
-        worker.postMessage({ type: 'blockStates', json: blockStates })
+        worker.postMessage({ type: 'blockStates', json })
       }
     })
   }
 
   update () {
-    this.uniforms.time.value = performance.now() / 50
+    this.uniforms.time.value = this.host.now() / 50
   }
 
   addColumn (x, z, chunk) {

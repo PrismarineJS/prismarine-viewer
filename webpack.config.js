@@ -37,12 +37,7 @@ const indexConfig = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    }),
-    new webpack.NormalModuleReplacementPlugin(
-      // eslint-disable-next-line
-      /viewer[\/|\\]lib[\/|\\]utils/,
-      './utils.web.js'
-    )
+    })
     // new BundleAnalyzerPlugin()
   ],
   externals: [

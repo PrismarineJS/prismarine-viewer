@@ -121,8 +121,11 @@ Options:
 * `frames` number of frames to record, `-1` for infinite, default: `200`
 * `width` the width of a frame, default: `512`
 * `height` the height of a frame, default: `512`
+* `numWorkers` mesher worker threads, default: `4`
 
 [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/headless.js)
+
+`headless` renders through `node-canvas-webgl`. To render with another GL context (headless-gl, a custom renderer) use the core API with the node host, which needs no native module: see [viewer/README.md](viewer/README.md#hosts) and [examples/core/headless.js](examples/core/headless.js).
 
 ### Drawing (mineflayer mode)
 

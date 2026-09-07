@@ -1,5 +1,5 @@
 /* global THREE */
-const { WorldView, Viewer, MapControls } = require('prismarine-viewer/viewer')
+const { WorldView, Viewer, MapControls, createElectronHost } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
 
@@ -27,7 +27,7 @@ class LocalViewer {
     document.body.appendChild(this.renderer.domElement)
 
     // Create viewer
-    this.viewer = new Viewer(this.renderer)
+    this.viewer = new Viewer(this.renderer, { host: createElectronHost() })
     if (!this.viewer.setVersion(this.version)) {
       return false
     }
