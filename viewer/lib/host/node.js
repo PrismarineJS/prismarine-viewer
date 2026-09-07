@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { Worker } = require('worker_threads')
 const { PNG } = require('pngjs')
+const { createInlineWorker } = require('../mesher')
 
 let createCanvas
 try { ({ createCanvas } = require('canvas')) } catch {}
@@ -11,10 +12,11 @@ function isUrl (name) {
 }
 
 // Host for node: assets are read from the prerendered public/ directory (or
-// any http(s) URL), meshing runs on worker_threads, and username sprites are
+// any http(s) URL), meshing runs on worker_threads (or inline, for a process
+// that can't afford another copy of the block data), and username sprites are
 // drawn with node-canvas when it is installed. Nothing here needs a GL canvas,
 // so it pairs with headless-gl, node-canvas-webgl or any other renderer.
-function createNodeHost ({ assetsDir = path.resolve(__dirname, '../../../public'), fetch = globalThis.fetch, workerFile = path.join(__dirname, '../worker.js') } = {}) {
+function createNodeHost ({ assetsDir = path.resolve(__dirname, '../../../public'), fetch = globalThis.fetch, workerFile = path.join(__dirname, '../worker.node.js'), inlineMesher = false } = {}) {
   async function readAsset (name) {
     if (!isUrl(name)) return fs.promises.readFile(path.resolve(assetsDir, name))
     const res = await fetch(name)
@@ -33,6 +35,7 @@ function createNodeHost ({ assetsDir = path.resolve(__dirname, '../../../public'
     },
 
     createWorker () {
+      if (inlineMesher) return createInlineWorker()
       const worker = new Worker(workerFile)
       return {
         postMessage: (msg, transfer) => worker.postMessage(msg, transfer),
