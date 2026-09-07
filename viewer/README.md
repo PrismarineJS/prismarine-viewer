@@ -118,6 +118,7 @@ A host is everything the viewer needs from its platform. The rendering code only
 {
   loadImage (name),   // -> Promise<{ width, height, data }>: RGBA bytes, top row first
   loadJSON (name),    // -> Promise<object>
+  loadText (name),    // -> Promise<string>
   createWorker (),    // -> { postMessage (msg, transfer), onMessage (cb), terminate () }
   now (),             // -> milliseconds
   renderText (text)   // -> { width, height, data } or null; optional, draws username labels
