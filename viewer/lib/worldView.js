@@ -47,6 +47,15 @@ class WorldView extends EventEmitter {
       chunkColumnLoad: function (pos) {
         worldView.loadChunk(pos)
       },
+      chunkColumnUnload: function (pos) {
+        worldView.unloadChunk(pos)
+      },
+      // A dimension change or server transfer unloads every column (each arrives above as a
+      // chunkColumnUnload) and may replace bot.world with a fresh object; follow it so chunks that
+      // load afterwards are read from the world the bot is now in, not the one it left.
+      login: function () {
+        worldView.world = bot.world
+      },
       blockUpdate: function (oldBlock, newBlock) {
         const stateId = newBlock.stateId ? newBlock.stateId : ((newBlock.type << 4) | newBlock.metadata)
         worldView.emitter.emit('blockUpdate', { pos: oldBlock.position, stateId })
