@@ -21,10 +21,16 @@ function readTexture (basePath, name) {
   return fs.readFileSync(path.join(basePath, name), 'base64')
 }
 
+function loadImage (basePath, name) {
+  const img = new Image()
+  img.src = 'data:image/png;base64,' + readTexture(basePath, name)
+  return img
+}
+
 // An animated texture is a vertical strip of square frames described by a
 // .mcmeta next to it. Frame order and per-frame durations are baked into the
-// atlas as repeated tiles, so the shader only needs a frame count and one
-// frame time (in ticks). "interpolate" is ignored.
+// atlas as repeated tiles, so the shader only needs a frame count, one frame
+// time (in ticks) and the UV step between frames. "interpolate" is ignored.
 function readAnimation (basePath, name, img) {
   const mcmetaPath = path.join(basePath, name + '.mcmeta')
   if (img.height <= img.width || !fs.existsSync(mcmetaPath)) return null
@@ -40,52 +46,71 @@ function readAnimation (basePath, name, img) {
   }
 }
 
+// Tiles keep their native resolution (some are 32x32 since 26.1), so nothing
+// here assumes a single atlas-wide tile size. Each entry carries its own
+// u/v/su/sv extents, and an animated entry additionally carries its frame
+// count, frame time and per-frame UV step, since that step now varies per
+// texture rather than being uniform across the atlas.
 function makeTextureAtlas (mcAssets) {
   const blocksTexturePath = path.join(mcAssets.directory, '/blocks')
   const textureFiles = fs.readdirSync(blocksTexturePath).filter(file => file.endsWith('.png'))
   textureFiles.unshift('missing_texture.png')
 
-  const tileSize = 16
-
-  const textures = textureFiles.map(file => {
-    const img = new Image()
-    img.src = 'data:image/png;base64,' + readTexture(blocksTexturePath, file)
+  // An animated texture reserves a vertical run of frames; a plain one that is
+  // taller than wide contributes only its first frame, as model UV space maps
+  // to a single frame either way.
+  const tiles = textureFiles.map(file => {
+    const img = loadImage(blocksTexturePath, file)
     const animation = readAnimation(blocksTexturePath, file, img)
-    return { name: file.split('.')[0], img, animation, frames: animation ? animation.frames : [0], frameHeight: animation ? animation.frameHeight : tileSize }
+    const frames = animation ? animation.frames : [0]
+    const frameHeight = animation ? animation.frameHeight : Math.min(img.width, img.height)
+    return { name: file.split('.')[0], img, animation, frames, frameHeight, w: img.width, h: frameHeight * frames.length }
   })
 
-  // Each texture takes a vertical run of tiles (one per frame). Tallest first,
-  // each into the currently shortest column, so strips never straddle columns.
-  const tileCount = textures.reduce((n, tex) => n + tex.frames.length, 0)
-  const texSize = nextPowerOfTwo(Math.ceil(Math.sqrt(tileCount)))
-  const columns = new Array(texSize).fill(0)
-  textures.sort((a, b) => b.frames.length - a.frames.length)
-  for (const tex of textures) {
-    const col = columns.indexOf(Math.min(...columns))
-    tex.x = col * tileSize
-    tex.y = columns[col] * tileSize
-    columns[col] += tex.frames.length
-  }
+  // shelf-pack: sort by height, lay out rows, then round the atlas up to a power of two
+  const totalArea = tiles.reduce((a, t) => a + t.w * t.h, 0)
+  const maxWidth = Math.max(...tiles.map(t => t.w))
+  const width = nextPowerOfTwo(Math.max(maxWidth, Math.ceil(Math.sqrt(totalArea))))
+  tiles.sort((a, b) => b.h - a.h)
 
-  const imgWidth = texSize * tileSize
-  const imgHeight = nextPowerOfTwo(Math.max(...columns) * tileSize)
-  const canvas = new Canvas(imgWidth, imgHeight, 'png')
+  let shelfX = 0
+  let shelfY = 0
+  let shelfH = 0
+  let packedHeight = 0
+  for (const tile of tiles) {
+    if (shelfX + tile.w > width) {
+      shelfX = 0
+      shelfY += shelfH
+      shelfH = 0
+    }
+    tile.x = shelfX
+    tile.y = shelfY
+    shelfX += tile.w
+    shelfH = Math.max(shelfH, tile.h)
+    packedHeight = Math.max(packedHeight, shelfY + tile.h)
+  }
+  const height = nextPowerOfTwo(packedHeight)
+
+  const canvas = new Canvas(width, height, 'png')
   const g = canvas.getContext('2d')
 
   const texturesIndex = {}
 
-  for (const tex of textures) {
-    texturesIndex[tex.name] = { u: tex.x / imgWidth, v: tex.y / imgHeight, su: tileSize / imgWidth, sv: tileSize / imgHeight }
-    if (tex.animation) {
-      texturesIndex[tex.name].frames = tex.frames.length
-      texturesIndex[tex.name].frametime = tex.animation.frametime
+  for (const tile of tiles) {
+    const framestep = tile.frameHeight / height
+    texturesIndex[tile.name] = { u: tile.x / width, v: tile.y / height, su: tile.w / width, sv: framestep }
+    if (tile.animation) {
+      texturesIndex[tile.name].frames = tile.frames.length
+      texturesIndex[tile.name].frametime = tile.animation.frametime
+      texturesIndex[tile.name].framestep = framestep
     }
-    tex.frames.forEach((frame, i) => {
-      g.drawImage(tex.img, 0, frame * tex.frameHeight, tileSize, tileSize, tex.x, tex.y + i * tileSize, tileSize, tileSize)
+    tile.frames.forEach((frame, i) => {
+      g.drawImage(tile.img, 0, frame * tile.frameHeight, tile.w, tile.frameHeight,
+        tile.x, tile.y + i * tile.frameHeight, tile.w, tile.frameHeight)
     })
   }
 
-  return { image: canvas.toBuffer(), canvas, json: { tileSize, width: imgWidth, height: imgHeight, textures: texturesIndex } }
+  return { image: canvas.toBuffer(), canvas, json: { width, height, textures: texturesIndex } }
 }
 
 module.exports = {

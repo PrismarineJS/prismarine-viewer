@@ -130,7 +130,7 @@ function renderLiquid (world, cursor, texture, type, biome, water, attr) {
     if (!neighbor) continue
     if (neighbor.type === type) continue
     if ((neighbor.isCube && !isUp) || neighbor.material === 'plant' || neighbor.getProperties().waterlogged) continue
-    if (neighbor.position.y < 0) continue
+    if (neighbor.position.y < (world.minY ?? 0)) continue
 
     let tint = [1, 1, 1]
     if (water) {
@@ -154,7 +154,7 @@ function renderLiquid (world, cursor, texture, type, biome, water, attr) {
         (pos[2] ? 1 : 0) + (cursor.z & 15) - 8)
       attr.t_normals.push(...dir)
       attr.t_uvs.push(pos[3] * su + u, pos[4] * sv * (pos[1] ? 1 : height) + v)
-      attr.t_animations.push(texture.frames || 1, texture.frametime || 1)
+      attr.t_animations.push(texture.frames || 1, texture.frametime || 1, texture.framestep || 0)
       attr.t_colors.push(tint[0], tint[1], tint[2])
     }
   }
@@ -242,7 +242,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
       if (!neighbor) continue
       if (cullIfIdentical && neighbor.type === block.type) continue
       if (!neighbor.transparent && neighbor.isCube) continue
-      if (neighbor.position.y < 0) continue
+      if (neighbor.position.y < (world.minY ?? 0)) continue
     }
 
     const minx = element.from[0]
@@ -322,7 +322,7 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
       const baseu = (pos[3] - 0.5) * uvcs - (pos[4] - 0.5) * uvsn + 0.5
       const basev = (pos[3] - 0.5) * uvsn + (pos[4] - 0.5) * uvcs + 0.5
       attr.uvs.push(baseu * su + u, basev * sv + v)
-      attr.animations.push(eFace.texture.frames || 1, eFace.texture.frametime || 1)
+      attr.animations.push(eFace.texture.frames || 1, eFace.texture.frametime || 1, eFace.texture.framestep || 0)
 
       let light = 1
       if (doAO) {

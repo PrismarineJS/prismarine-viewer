@@ -2,7 +2,22 @@ const path = require('path')
 const { makeTextureAtlas } = require('./lib/atlas')
 const { prepareBlocksStates } = require('./lib/modelsBuilder')
 const mcAssets = require('minecraft-assets')
+const Chunks = require('prismarine-chunk')
 const fs = require('fs-extra')
+
+const supportedVersions = require('./lib/version').supportedVersions
+
+// World bounds come from prismarine-chunk, which is a build-time dependency here.
+// Emitting them lets the browser fetch the answer instead of bundling
+// prismarine-chunk (and all of minecraft-data behind it) into index.js.
+const publicPath = path.resolve(__dirname, '../public')
+fs.mkdirSync(publicPath, { recursive: true })
+fs.writeFileSync(path.resolve(publicPath, 'worldBounds.json'), JSON.stringify(
+  Object.fromEntries(supportedVersions.map(version => {
+    const chunk = new (Chunks(version))()
+    return [version, { minY: chunk.minY ?? 0, worldHeight: chunk.worldHeight ?? 256 }]
+  }))
+))
 
 const texturesPath = path.resolve(__dirname, '../public/textures')
 if (fs.existsSync(texturesPath) && !process.argv.includes('-f')) {
@@ -13,8 +28,6 @@ fs.mkdirSync(texturesPath, { recursive: true })
 
 const blockStatesPath = path.resolve(__dirname, '../public/blocksStates')
 fs.mkdirSync(blockStatesPath, { recursive: true })
-
-const supportedVersions = require('./lib/version').supportedVersions
 
 for (const version of supportedVersions) {
   const assets = mcAssets(version)

@@ -6,6 +6,7 @@ public/index.js*
 public/worker.js*
 public/textures/
 public/blocksStates/
+public/worldBounds.json
 examples/standalone/public/index.js
 examples/standalone/public/worker.js
 examples/standalone/public/textures/
