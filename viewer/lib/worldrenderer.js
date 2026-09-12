@@ -97,7 +97,10 @@ class WorldRenderer {
     this.assetsVersion = assetsVersion
     this.boundsReady = new Promise(resolve => {
       loadJSON('worldBounds.json', (bounds) => {
-        const { minY = 0, worldHeight = 256 } = bounds[version] ?? {}
+        // worldBounds.json only has entries for supportedVersions, while
+        // version is the server's exact version, so fall back to the snapped
+        // assets version (same major, hence same bounds) when it is absent.
+        const { minY = 0, worldHeight = 256 } = bounds[version] ?? bounds[assetsVersion] ?? {}
         this.minY = minY
         this.worldHeight = worldHeight
         resolve()
