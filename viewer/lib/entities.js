@@ -142,6 +142,18 @@ class Entities {
     if (this.items[entity.id]) entity = { ...this.items[entity.id], ...entity }
     if (entity.delete) delete this.items[entity.id]
 
+    // An invisible entity has no model in the vanilla client, so it gets no mesh here; one that
+    // was visible when it spawned loses the mesh it already has.
+    if (entity.invisible) {
+      const hidden = this.entities[entity.id]
+      if (hidden) {
+        this.scene.remove(hidden)
+        dispose3(hidden)
+        delete this.entities[entity.id]
+      }
+      return
+    }
+
     // A dropped item's stack arrives after its spawn and can change; its mesh is that stack's model.
     const known = this.entities[entity.id]
     if (known && entity.itemName !== undefined && known.itemName !== entity.itemName) {
