@@ -2,6 +2,16 @@ const { spiral, ViewRect, chunkPos } = require('./simpleUtils')
 const { Vec3 } = require('vec3')
 const EventEmitter = require('events')
 
+// Bit 0x20 of the shared entity flags, metadata index 0 on every version.
+const INVISIBLE_FLAG = 0x20
+
+// The vanilla client draws nothing for an invisible entity: LivingEntityRenderer.getRenderType
+// returns null once isBodyVisible is false and the entity is not glowing. Servers lean on that for
+// holograms, which are invisible marker armour stands carrying a name tag.
+function isInvisible (entity) {
+  return (((entity.metadata && entity.metadata[0]) || 0) & INVISIBLE_FLAG) !== 0
+}
+
 class WorldView extends EventEmitter {
   constructor (world, viewDistance, position = new Vec3(0, 0, 0), emitter = null) {
     super()
@@ -27,7 +37,13 @@ class WorldView extends EventEmitter {
       // 'move': botPosition,
       entitySpawn: function (e) {
         if (e === bot.entity) return
-        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle })
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, invisible: isInvisible(e) })
+      },
+      entityUpdate: function (e) {
+        // The metadata that carries the invisible flag arrives after the spawn, and a mob can turn
+        // invisible at any time, so the flag is re-read on every metadata update.
+        if (e === bot.entity) return
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, invisible: isInvisible(e) })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
@@ -60,7 +76,7 @@ class WorldView extends EventEmitter {
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
-        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle })
+        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, invisible: isInvisible(e) })
       }
     }
   }
