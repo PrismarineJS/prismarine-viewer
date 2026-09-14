@@ -53,8 +53,8 @@ class Viewer {
     return true
   }
 
-  addColumn (x, z, chunk) {
-    this.world.addColumn(x, z, chunk)
+  addColumn (x, z, chunk, minY, worldHeight) {
+    this.world.addColumn(x, z, chunk, minY, worldHeight)
   }
 
   removeColumn (x, z) {
@@ -91,8 +91,8 @@ class Viewer {
       this.updatePrimitive(p)
     })
 
-    emitter.on('loadChunk', ({ x, z, chunk }) => {
-      this.addColumn(x, z, chunk)
+    emitter.on('loadChunk', ({ x, z, chunk, minY, worldHeight }) => {
+      this.addColumn(x, z, chunk, minY, worldHeight)
     })
 
     emitter.on('unloadChunk', ({ x, z }) => {
