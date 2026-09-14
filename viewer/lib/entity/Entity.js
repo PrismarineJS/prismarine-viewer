@@ -167,14 +167,18 @@ function getMesh (texture, jsonModel) {
     i++
   }
 
+  // Parent names are not cased like the bones they name (piglin parents leftItem to "leftArm"
+  // while the bone is "leftarm"), and a model can name a bone it does not define at all (witch's
+  // head): that bone stays at the model root rather than failing the whole entity.
+  const bonesByName = new Map(jsonModel.bones.map(jsonBone => [jsonBone.name.toLowerCase(), jsonBone]))
   const rootBones = []
   for (const jsonBone of jsonModel.bones) {
-    if (jsonBone.parent) {
-      const parentPivot = jsonModel.bones.find(b => b.name === jsonBone.parent).pivot
+    const parent = jsonBone.parent ? bonesByName.get(jsonBone.parent.toLowerCase()) : undefined
+    if (parent) {
       const bone = bones[jsonBone.name]
       // pivots are absolute in the json, bone positions are relative to the parent
-      if (parentPivot) bone.position.sub(new THREE.Vector3(...parentPivot))
-      bones[jsonBone.parent].add(bone)
+      if (parent.pivot) bone.position.sub(new THREE.Vector3(...parent.pivot))
+      bones[parent.name].add(bone)
     } else rootBones.push(bones[jsonBone.name])
   }
 
