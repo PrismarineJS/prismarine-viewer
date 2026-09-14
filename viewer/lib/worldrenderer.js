@@ -17,6 +17,7 @@ class WorldRenderer {
     this.assetsVersion = undefined
     this.scene = scene
     this.loadedChunks = {}
+    this.loadedChunkRanges = {}
     this.sectionsOutstanding = new Set()
     this.renderUpdateEmitter = new EventEmitter()
     this.blockStatesData = undefined
@@ -81,6 +82,8 @@ class WorldRenderer {
       this.scene.remove(mesh)
     }
     this.sectionMeshs = {}
+    this.loadedChunks = {}
+    this.loadedChunkRanges = {}
     for (const worker of this.workers) {
       worker.postMessage({ type: 'reset' })
     }
@@ -127,10 +130,12 @@ class WorldRenderer {
 
   addColumn (x, z, chunk) {
     this.loadedChunks[`${x},${z}`] = true
+    const range = getChunkVerticalRange(chunk)
+    this.loadedChunkRanges[`${x},${z}`] = range
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = range.minY; y < range.maxY; y += 16) {
       const loc = new Vec3(x, y, z)
       this.setSectionDirty(loc)
       this.setSectionDirty(loc.offset(-16, 0, 0))
@@ -142,10 +147,12 @@ class WorldRenderer {
 
   removeColumn (x, z) {
     delete this.loadedChunks[`${x},${z}`]
+    const range = this.loadedChunkRanges[`${x},${z}`] || { minY: 0, maxY: 256 }
+    delete this.loadedChunkRanges[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = range.minY; y < range.maxY; y += 16) {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]
@@ -197,6 +204,14 @@ class WorldRenderer {
       this.renderUpdateEmitter.on('update', updateHandler)
     })
   }
+}
+
+function getChunkVerticalRange (chunk) {
+  if (!chunk) return { minY: 0, maxY: 256 }
+  const data = typeof chunk === 'string' ? JSON.parse(chunk) : chunk
+  const minY = data.minY ?? 0
+  const worldHeight = data.worldHeight ?? 256
+  return { minY, maxY: minY + worldHeight }
 }
 
 module.exports = { WorldRenderer }

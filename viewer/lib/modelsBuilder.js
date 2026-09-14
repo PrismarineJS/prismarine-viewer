@@ -1,6 +1,21 @@
 function cleanupBlockName (name) {
+  name = getTextureName(name)
+  if (name === null) return 'missing_texture'
   if (name.startsWith('block') || name.startsWith('minecraft:block')) return name.split('/')[1]
   return name
+}
+
+function getTextureName (texture) {
+  if (texture === null || texture === undefined) return null
+  if (typeof texture === 'string') return texture
+  if (typeof texture.sprite === 'string') return texture.sprite
+  if (typeof texture.texture === 'string') return texture.texture
+  return null
+}
+
+function resolveTexture (texture, texturesJson) {
+  const name = cleanupBlockName(texture)
+  return JSON.parse(JSON.stringify(texturesJson[name] || texturesJson.missing_texture))
 }
 
 function getModel (name, blocksModels) {
@@ -36,32 +51,30 @@ function getModel (name, blocksModels) {
 function prepareModel (model, texturesJson) {
   // resolve texture names eg west: #all -> blocks/stone
   for (const tex in model.textures) {
-    let root = model.textures[tex]
-    while (root.charAt(0) === '#') {
-      root = model.textures[root.substr(1)]
+    let root = getTextureName(model.textures[tex])
+    while (root && root.charAt(0) === '#') {
+      root = getTextureName(model.textures[root.substr(1)])
     }
-    model.textures[tex] = root
+    model.textures[tex] = root || 'missing_texture'
   }
   for (const tex in model.textures) {
-    let name = model.textures[tex]
-    name = cleanupBlockName(name)
-    model.textures[tex] = texturesJson[name]
+    model.textures[tex] = resolveTexture(model.textures[tex], texturesJson)
   }
   for (const elem of model.elements) {
     for (const sideName of Object.keys(elem.faces)) {
       const face = elem.faces[sideName]
+      const faceTextureName = getTextureName(face.texture)
 
-      if (face.texture.charAt(0) === '#') {
-        face.texture = JSON.parse(JSON.stringify(model.textures[face.texture.substr(1)]))
+      if (faceTextureName && faceTextureName.charAt(0) === '#') {
+        face.texture = JSON.parse(JSON.stringify(model.textures[faceTextureName.substr(1)]))
       } else if (
-        !(cleanupBlockName(face.texture) in texturesJson) &&
-        face.texture in model.textures
+        !(cleanupBlockName(faceTextureName) in texturesJson) &&
+        faceTextureName &&
+        faceTextureName in model.textures
       ) {
-        face.texture = JSON.parse(JSON.stringify(model.textures[face.texture]))
+        face.texture = JSON.parse(JSON.stringify(model.textures[faceTextureName]))
       } else {
-        let name = face.texture
-        name = cleanupBlockName(name)
-        face.texture = JSON.parse(JSON.stringify(texturesJson[name]))
+        face.texture = resolveTexture(faceTextureName, texturesJson)
       }
 
       let uv = face.uv
