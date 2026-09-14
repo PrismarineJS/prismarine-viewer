@@ -117,6 +117,17 @@ class Entities {
   }
 
   update (entity) {
+    // An invisible entity has no model in the vanilla client, so it gets no mesh here; one that
+    // was visible when it spawned loses the mesh it already has.
+    if (entity.invisible) {
+      const hidden = this.entities[entity.id]
+      if (hidden) {
+        this.scene.remove(hidden)
+        dispose3(hidden)
+        delete this.entities[entity.id]
+      }
+      return
+    }
     if (!this.entities[entity.id]) {
       if (!entity.pos) return
       const mesh = getEntityMesh(entity, this.scene)
