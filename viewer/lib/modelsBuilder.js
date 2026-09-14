@@ -33,12 +33,17 @@ function getModel (name, blocksModels) {
   return model
 }
 
+function unwrapTexture (ref) {
+  // 26.x wraps some model texture refs in objects ({ sprite, force_translucent, ... })
+  return typeof ref === 'object' && ref !== null ? ref.sprite : ref
+}
+
 function prepareModel (model, texturesJson) {
   // resolve texture names eg west: #all -> blocks/stone
   for (const tex in model.textures) {
-    let root = model.textures[tex]
+    let root = unwrapTexture(model.textures[tex])
     while (root.charAt(0) === '#') {
-      root = model.textures[root.substr(1)]
+      root = unwrapTexture(model.textures[root.substr(1)])
     }
     model.textures[tex] = root
   }

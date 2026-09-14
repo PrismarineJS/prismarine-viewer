@@ -15,6 +15,10 @@ class WorldRenderer {
     this.active = false
     this.version = undefined
     this.assetsVersion = undefined
+    // World Y bounds, fetched per version in setVersion. Defaults match pre-1.18.
+    this.minY = 0
+    this.worldHeight = 256
+    this.boundsReady = Promise.resolve()
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
@@ -23,14 +27,16 @@ class WorldRenderer {
     this.texturesDataUrl = undefined
 
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, alphaTest: 0.1 })
-    // Animated textures are packed as vertical runs of tiles; each vertex
-    // carries (frames, frametime) and the shader steps down the run in ticks.
-    this.uniforms = { time: { value: 0 }, tileHeight: { value: 0 } }
+    // Animated textures are packed as vertical runs of frames; each vertex
+    // carries (frames, frametime, framestep) and the shader steps down the run
+    // in ticks. The step is per-vertex rather than a uniform because tiles keep
+    // their native resolution, so frame height varies across the atlas.
+    this.uniforms = { time: { value: 0 } }
     this.material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.uniforms)
       shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', 'attribute vec2 animation;\nuniform float time;\nuniform float tileHeight;\n#include <common>')
-        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_UV\nvUv.y += mod(floor(time / animation.y), animation.x) * tileHeight;\n#endif')
+        .replace('#include <common>', 'attribute vec3 animation;\nuniform float time;\n#include <common>')
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_UV\nvUv.y += mod(floor(time / animation.y), animation.x) * animation.z;\n#endif')
     }
 
     this.workers = []
@@ -58,7 +64,7 @@ class WorldRenderer {
           geometry.setAttribute('normal', new THREE.BufferAttribute(data.geometry.normals, 3))
           geometry.setAttribute('color', new THREE.BufferAttribute(data.geometry.colors, 3))
           geometry.setAttribute('uv', new THREE.BufferAttribute(data.geometry.uvs, 2))
-          geometry.setAttribute('animation', new THREE.BufferAttribute(data.geometry.animations, 2))
+          geometry.setAttribute('animation', new THREE.BufferAttribute(data.geometry.animations, 3))
           geometry.setIndex(data.geometry.indices)
 
           mesh = new THREE.Mesh(geometry, this.material)
@@ -89,6 +95,17 @@ class WorldRenderer {
   setVersion (version, assetsVersion = version) {
     this.version = version
     this.assetsVersion = assetsVersion
+    this.boundsReady = new Promise(resolve => {
+      loadJSON('worldBounds.json', (bounds) => {
+        // worldBounds.json only has entries for supportedVersions, while
+        // version is the server's exact version, so fall back to the snapped
+        // assets version (same major, hence same bounds) when it is absent.
+        const { minY = 0, worldHeight = 256 } = bounds[version] ?? bounds[assetsVersion] ?? {}
+        this.minY = minY
+        this.worldHeight = worldHeight
+        resolve()
+      })
+    })
     this.resetWorld()
     this.active = true
     for (const worker of this.workers) {
@@ -103,7 +120,6 @@ class WorldRenderer {
       texture.magFilter = THREE.NearestFilter
       texture.minFilter = THREE.NearestFilter
       texture.flipY = false
-      this.uniforms.tileHeight.value = 16 / texture.image.height
       this.material.map = texture
       this.material.needsUpdate = true
     })
@@ -130,14 +146,18 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
-      const loc = new Vec3(x, y, z)
-      this.setSectionDirty(loc)
-      this.setSectionDirty(loc.offset(-16, 0, 0))
-      this.setSectionDirty(loc.offset(16, 0, 0))
-      this.setSectionDirty(loc.offset(0, 0, -16))
-      this.setSectionDirty(loc.offset(0, 0, 16))
-    }
+    // The worker cannot mesh anything until blockStates lands, so waiting on the
+    // bounds fetch here costs no rendering latency.
+    this.boundsReady.then(() => {
+      for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
+        const loc = new Vec3(x, y, z)
+        this.setSectionDirty(loc)
+        this.setSectionDirty(loc.offset(-16, 0, 0))
+        this.setSectionDirty(loc.offset(16, 0, 0))
+        this.setSectionDirty(loc.offset(0, 0, -16))
+        this.setSectionDirty(loc.offset(0, 0, 16))
+      }
+    })
   }
 
   removeColumn (x, z) {
@@ -145,16 +165,18 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
-      this.setSectionDirty(new Vec3(x, y, z), false)
-      const key = `${x},${y},${z}`
-      const mesh = this.sectionMeshs[key]
-      if (mesh) {
-        this.scene.remove(mesh)
-        dispose3(mesh)
+    this.boundsReady.then(() => {
+      for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
+        this.setSectionDirty(new Vec3(x, y, z), false)
+        const key = `${x},${y},${z}`
+        const mesh = this.sectionMeshs[key]
+        if (mesh) {
+          this.scene.remove(mesh)
+          dispose3(mesh)
+        }
+        delete this.sectionMeshs[key]
       }
-      delete this.sectionMeshs[key]
-    }
+    })
   }
 
   setBlockStateId (pos, stateId) {
