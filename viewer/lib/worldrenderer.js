@@ -147,7 +147,7 @@ class WorldRenderer {
     }
     // The worker cannot mesh anything until blockStates lands, so waiting on the
     // bounds fetch here costs no rendering latency.
-    this.boundsReady.then(() => {
+    this.whenBoundsReady(() => {
       for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
         const loc = new Vec3(x, y, z)
         this.setSectionDirty(loc)
@@ -164,7 +164,7 @@ class WorldRenderer {
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    this.boundsReady.then(() => {
+    this.whenBoundsReady(() => {
       for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
         this.setSectionDirty(new Vec3(x, y, z), false)
         const key = `${x},${y},${z}`
@@ -175,6 +175,15 @@ class WorldRenderer {
         }
         delete this.sectionMeshs[key]
       }
+    })
+  }
+
+  // Column work queued before the bounds land must not run against a world
+  // that a later setVersion() has replaced in the meantime.
+  whenBoundsReady (fn) {
+    const boundsReady = this.boundsReady
+    boundsReady.then(() => {
+      if (this.boundsReady === boundsReady) fn()
     })
   }
 
