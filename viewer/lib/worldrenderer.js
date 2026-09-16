@@ -179,8 +179,7 @@ class WorldRenderer {
     })
   }
 
-  // Column work queued before the bounds land must not run against a world
-  // that a later setVersion() has replaced in the meantime.
+  // fn must not run once a later setVersion() has replaced boundsReady.
   whenBoundsReady (fn) {
     const boundsReady = this.boundsReady
     boundsReady.then(() => {
@@ -213,8 +212,10 @@ class WorldRenderer {
   // Listen for chunk rendering updates emitted if a worker finished a render and resolve if the number
   // of sections not rendered are 0
   waitForChunksToRender () {
-    return new Promise((resolve, reject) => {
-      if (Array.from(this.sectionsOutstanding).length === 0) {
+    // Must chain on boundsReady so every earlier addColumn has registered
+    // its sections before the size check.
+    return this.boundsReady.then(() => new Promise((resolve, reject) => {
+      if (this.sectionsOutstanding.size === 0) {
         resolve()
         return
       }
@@ -226,7 +227,7 @@ class WorldRenderer {
         }
       }
       this.renderUpdateEmitter.on('update', updateHandler)
-    })
+    }))
   }
 }
 
