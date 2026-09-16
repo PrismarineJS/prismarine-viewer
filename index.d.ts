@@ -44,6 +44,7 @@ export interface HostWorker {
 export interface Host {
     loadImage(name: string): Promise<HostImage>;
     loadJSON(name: string): Promise<any>;
+    loadText(name: string): Promise<string>;
     createWorker(): HostWorker;
     now(): number;
     renderText?: ((text: string) => HostImage | null) | null;
