@@ -55,6 +55,24 @@ describe('WorldRenderer with a delayed world bounds load', () => {
     worker = renderer.workers[0]
   })
 
+  test('waitForChunksToRender covers columns added before the bounds land', async () => {
+    renderer.setVersion('1.18.2')
+    renderer.addColumn(0, 0, {})
+    const rendered = jest.fn()
+    const wait = renderer.waitForChunksToRender().then(rendered)
+    await flush()
+    expect(rendered).not.toHaveBeenCalled()
+
+    mockBounds.pending[0](BOUNDS)
+    await wait
+
+    const ys = worker.messages.filter(m => m.type === 'dirty' && m.x === 0 && m.z === 0).map(m => m.y)
+    expect(Math.min(...ys)).toBe(-64)
+    expect(Math.max(...ys)).toBe(304)
+    expect(ys).toHaveLength(24)
+    expect(renderer.sectionsOutstanding.size).toBe(0)
+  })
+
   test('a removal queued before the bounds land does not touch a replacement world', async () => {
     renderer.setVersion('1.18.2')
     renderer.addColumn(0, 0, {})
