@@ -11,6 +11,7 @@ function createElectronHost ({ assetsDir, workerUrl = 'worker.js' } = {}) {
   return {
     loadImage: node.loadImage,
     loadJSON: node.loadJSON,
+    loadText: node.loadText,
     createWorker: browser.createWorker,
     now: browser.now,
     renderText: browser.renderText

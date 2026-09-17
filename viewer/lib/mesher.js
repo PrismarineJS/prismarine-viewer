@@ -35,7 +35,7 @@ function createMesher (post) {
     if (data.type === 'version') {
       world = new World(data.version)
     } else if (data.type === 'blockStates') {
-      blocksStates = data.json
+      blocksStates = data.json ?? JSON.parse(data.text)
     } else if (data.type === 'dirty') {
       const loc = new Vec3(data.x, data.y, data.z)
       setSectionDirty(loc, data.value)
