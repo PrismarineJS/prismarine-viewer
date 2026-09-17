@@ -26,7 +26,12 @@ function createNodeHost ({ assetsDir = path.resolve(__dirname, '../../../public'
 
   return {
     async loadImage (name) {
-      const png = PNG.sync.read(await readAsset(name))
+      const buffer = await readAsset(name)
+      // The streaming parser yields between chunks; PNG.sync.read holds the event loop for the
+      // whole decode, which is 68 ms for a block atlas and stalls whatever else the process runs.
+      const png = await new Promise((resolve, reject) => {
+        new PNG().parse(buffer, (err, png) => err ? reject(err) : resolve(png))
+      })
       return { width: png.width, height: png.height, data: new Uint8Array(png.data.buffer, png.data.byteOffset, png.data.byteLength) }
     },
 

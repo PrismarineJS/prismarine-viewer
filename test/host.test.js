@@ -1,4 +1,5 @@
 /* eslint-env jest */
+const fs = require('fs')
 const path = require('path')
 const { createNodeHost } = require('../viewer/lib/host/node')
 const { loadTexture, loadPixels } = require('../viewer/lib/textures')
@@ -25,6 +26,27 @@ describe('node host', () => {
     expect(image.data).toBeInstanceOf(Uint8Array)
     expect(image.data.length).toBe(16 * 16 * 4)
     expect(image.data[3]).toBe(255)
+  })
+
+  it('decodes without holding the event loop', async () => {
+    const { PNG } = require('pngjs')
+    const atlas = createNodeHost()
+    const buffer = await fs.promises.readFile(path.join(__dirname, '../public/textures/1.16.4.png'))
+    const settle = () => new Promise(resolve => setTimeout(resolve, 10))
+    const longestBlock = async (work) => {
+      let longest = 0
+      let last = performance.now()
+      const timer = setInterval(() => { const now = performance.now(); longest = Math.max(longest, now - last - 2); last = now }, 2)
+      try {
+        await settle() // let the timer fire once so a block before the first tick still shows up
+        await work()
+        await settle()
+      } finally { clearInterval(timer) }
+      return longest
+    }
+    const blocking = await longestBlock(async () => PNG.sync.read(buffer))
+    const streamed = await longestBlock(async () => expect((await atlas.loadImage('textures/1.16.4.png')).width).toBe(1024))
+    expect(streamed).toBeLessThan(blocking / 2)
   })
 
   it('reads json assets', async () => {
