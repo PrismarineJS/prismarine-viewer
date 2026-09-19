@@ -12,6 +12,24 @@ function isInvisible (entity) {
   return (((entity.metadata && entity.metadata[0]) || 0) & INVISIBLE_FLAG) !== 0
 }
 
+// Skin and cape texture URLs of a player entity (textures.minecraft.net on
+// online-mode servers); nothing for other entities or players without skin data
+function playerSkin (bot, e) {
+  const skinData = e.username !== undefined && bot.players[e.username]?.skinData
+  if (!skinData) return { skinModel: defaultSkinModel(e.uuid) }
+  return { skin: skinData.url, skinModel: skinData.model, cape: skinData.capeUrl }
+}
+
+// Vanilla's DefaultPlayerSkin: a player without skin data is Alex when the Java hashCode of
+// their UUID is odd, which is the xor of the lowest bit of each 32-bit quarter.
+function defaultSkinModel (uuid) {
+  if (typeof uuid !== 'string') return undefined
+  const hex = uuid.replace(/-/g, '')
+  if (hex.length !== 32) return undefined
+  const odd = [7, 15, 23, 31].reduce((acc, i) => acc ^ parseInt(hex[i], 16), 0) & 1
+  return odd ? 'slim' : undefined
+}
+
 class WorldView extends EventEmitter {
   constructor (world, viewDistance, position = new Vec3(0, 0, 0), emitter = null) {
     super()
@@ -37,13 +55,13 @@ class WorldView extends EventEmitter {
       // 'move': botPosition,
       entitySpawn: function (e) {
         if (e === bot.entity) return
-        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, invisible: isInvisible(e) })
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, ...playerSkin(bot, e), invisible: isInvisible(e) })
       },
       entityUpdate: function (e) {
         // The metadata that carries the invisible flag arrives after the spawn, and a mob can turn
         // invisible at any time, so the flag is re-read on every metadata update.
         if (e === bot.entity) return
-        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, invisible: isInvisible(e) })
+        worldView.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, ...playerSkin(bot, e), invisible: isInvisible(e) })
       },
       entityMoved: function (e) {
         worldView.emitter.emit('entity', { id: e.id, pos: e.position, pitch: e.pitch, yaw: e.yaw })
@@ -76,7 +94,7 @@ class WorldView extends EventEmitter {
     for (const id in bot.entities) {
       const e = bot.entities[id]
       if (e && e !== bot.entity) {
-        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, invisible: isInvisible(e) })
+        this.emitter.emit('entity', { id: e.id, name: e.name, pos: e.position, width: e.width, height: e.height, username: e.username, riding: !!e.vehicle, ...playerSkin(bot, e), invisible: isInvisible(e) })
       }
     }
   }
