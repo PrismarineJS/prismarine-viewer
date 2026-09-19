@@ -24,8 +24,6 @@ class World {
     this.columns = {}
     this.blockCache = {}
     this.biomeCache = mcData(version).biomes
-    // 0 before 1.18, -64 after — used by models.js to cull out-of-world faces
-    this.minY = new this.Chunk().minY ?? 0
   }
 
   addColumn (x, z, json) {
@@ -40,6 +38,13 @@ class World {
 
   getColumn (x, z) {
     return this.columns[columnKey(x, z)]
+  }
+
+  // Bottom of the world at pos, read off the loaded column because a dimension
+  // can set its own. 0 before 1.18. Used by models.js to cull out-of-world faces.
+  getMinY (pos) {
+    const column = this.columns[columnKey(Math.floor(pos.x / 16) * 16, Math.floor(pos.z / 16) * 16)]
+    return column?.minY ?? 0
   }
 
   setBlockStateId (pos, stateId) {
