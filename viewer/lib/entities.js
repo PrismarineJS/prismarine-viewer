@@ -99,6 +99,9 @@ class Entities {
   constructor (scene) {
     this.scene = scene
     this.entities = {}
+    // Ids of invisible entities. Only spawn and metadata updates say whether an entity is invisible,
+    // so the state is kept here for the partial updates (movement, riding, hurt) that follow.
+    this.invisible = new Set()
     this.lastAnimate = performance.now()
   }
 
@@ -118,9 +121,24 @@ class Entities {
       dispose3(mesh)
     }
     this.entities = {}
+    this.invisible.clear()
   }
 
   update (entity) {
+    if (entity.delete) this.invisible.delete(entity.id)
+    else if (entity.invisible === true) this.invisible.add(entity.id)
+    else if (entity.invisible === false) this.invisible.delete(entity.id)
+    // An invisible entity has no model in the vanilla client, so it gets no mesh here; one that
+    // was visible when it spawned loses the mesh it already has.
+    if (this.invisible.has(entity.id)) {
+      const hidden = this.entities[entity.id]
+      if (hidden) {
+        this.scene.remove(hidden)
+        dispose3(hidden)
+        delete this.entities[entity.id]
+      }
+      return
+    }
     if (!this.entities[entity.id]) {
       if (!entity.pos) return
       const mesh = getEntityMesh(entity, this.scene)
