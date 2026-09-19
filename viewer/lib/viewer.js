@@ -131,10 +131,11 @@ class Viewer {
     await this.world.waitForChunksToRender()
   }
 
-  // Resolves once the block atlas is uploaded and the queued chunks are meshed,
-  // so the next render is fully textured. Call after listen()/init().
+  // Resolves once the block atlas is uploaded, the queued chunks are meshed and
+  // the current entities' textures are applied, so the next render is fully
+  // textured. Rejects if the block atlas can't be loaded. Call after listen()/init().
   async waitForReady () {
-    await this.world.waitForReady()
+    await Promise.all([this.world.waitForReady(), this.entities.loadTextures()])
   }
 }
 

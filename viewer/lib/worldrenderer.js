@@ -107,12 +107,16 @@ class WorldRenderer {
 
   updateTexturesData () {
     // waitForReady awaits this; the mesher already gates on the block states message.
-    this.texturesLoaded = loadTexture(this.host, this.texturesDataUrl || `textures/${this.assetsVersion}.png`).then(texture => {
-      if (!texture) return
+    // A missing atlas rejects it, so a capture can't mistake untextured blocks for ready.
+    const name = this.texturesDataUrl || `textures/${this.assetsVersion}.png`
+    this.texturesLoaded = loadTexture(this.host, name).then(texture => {
+      if (!texture) throw new Error(`Could not load the block atlas ${name}`)
       this.uniforms.tileHeight.value = 16 / texture.image.height
       this.material.map = texture
       this.material.needsUpdate = true
     })
+    // Only waitForReady reports the failure; nothing else awaits this
+    this.texturesLoaded.catch(() => {})
 
     // Only the mesher reads the block states, and parsing them here would block for as long as
     // the file is big (150 ms for 26.1), so the text goes to the workers unparsed.

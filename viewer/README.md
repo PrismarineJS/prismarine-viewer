@@ -110,6 +110,10 @@ Update the world. This need to be called in the animate function, just before th
 
 Returns a promise that resolve once all sections marked dirty have been rendered by the worker threads. Can be used to wait for chunks to 'appear'.
 
+#### waitForReady ()
+
+Returns a promise that resolves once the block atlas is loaded, all sections marked dirty have been rendered and the textures of the entities currently in the scene are applied, so the next render is fully textured. Use it before a headless capture (screenshot, first video frame). It rejects if the block atlas can't be loaded. Entities added after it resolves load their textures lazily, on their first render.
+
 ### Hosts
 
 A host is everything the viewer needs from its platform. The rendering code only talks to the host, so the same Viewer runs in a browser, in node under headless-gl or node-canvas-webgl, and in electron.
