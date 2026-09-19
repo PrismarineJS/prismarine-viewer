@@ -1,4 +1,4 @@
-/* global XMLHttpRequest */
+/* global XMLHttpRequest, document */
 const THREE = require('three')
 
 const textureCache = {}
@@ -10,6 +10,20 @@ function loadTexture (texture, cb) {
     textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(url, resolve, undefined, () => {}))
   }
   textureCache[texture].then(cb)
+}
+
+const pixelCache = {}
+function loadPixels (texture, cb) {
+  if (!pixelCache[texture]) {
+    pixelCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(texture, ({ image }) => {
+      const canvas = document.createElement('canvas')
+      canvas.width = image.width
+      canvas.height = image.height
+      canvas.getContext('2d').drawImage(image, 0, 0)
+      resolve(canvas.getContext('2d').getImageData(0, 0, image.width, image.height))
+    }))
+  }
+  pixelCache[texture].then(cb)
 }
 
 function loadJSON (url, callback) {
@@ -27,4 +41,4 @@ function loadJSON (url, callback) {
   xhr.send()
 }
 
-module.exports = { loadTexture, loadJSON }
+module.exports = { loadTexture, loadPixels, loadJSON }

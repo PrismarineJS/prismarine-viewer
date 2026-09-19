@@ -2,11 +2,15 @@ const THREE = require('three')
 const TWEEN = require('@tweenjs/tween.js')
 
 const Entity = require('./entity/Entity')
+const { getItemMesh, animateItem } = require('./entity/Item')
 const { dispose3 } = require('./dispose')
 
 const { createCanvas } = require('canvas')
 
-function getEntityMesh (entity, scene) {
+function getEntityMesh (entity, scene, version) {
+  // A dropped item is its own item's model, and the stack only arrives after the spawn.
+  if (entity.itemName) return getItemMesh(entity.itemName, version, () => missingModel(entity))
+  if (entity.name === 'item') return null
   if (entity.name) {
     try {
       const textures = {}
@@ -47,6 +51,10 @@ function getEntityMesh (entity, scene) {
     }
   }
 
+  return missingModel(entity)
+}
+
+function missingModel (entity) {
   const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
   geometry.translate(0, entity.height / 2, 0)
   const material = new THREE.MeshBasicMaterial({ color: 0xff00ff })
@@ -99,7 +107,14 @@ class Entities {
   constructor (scene) {
     this.scene = scene
     this.entities = {}
+    // What the spawn said about each dropped item, since later partial updates carry only the id
+    this.items = {}
     this.lastAnimate = performance.now()
+  }
+
+  setVersion (version) {
+    this.version = version
+    this.clear()
   }
 
   animate () {
@@ -109,6 +124,7 @@ class Entities {
     if (ticks === 0) return
     for (const mesh of Object.values(this.entities)) {
       if (mesh.walk) animateWalk(mesh, ticks)
+      if (mesh.item) animateItem(mesh, ticks)
     }
   }
 
@@ -118,13 +134,26 @@ class Entities {
       dispose3(mesh)
     }
     this.entities = {}
+    this.items = {}
   }
 
   update (entity) {
+    if (entity.name === 'item') this.items[entity.id] = { name: entity.name, width: entity.width, height: entity.height }
+    if (this.items[entity.id]) entity = { ...this.items[entity.id], ...entity }
+    if (entity.delete) delete this.items[entity.id]
+
+    // A dropped item's stack arrives after its spawn and can change; its mesh is that stack's model.
+    const known = this.entities[entity.id]
+    if (known && entity.itemName !== undefined && known.itemName !== entity.itemName) {
+      this.scene.remove(known)
+      dispose3(known)
+      delete this.entities[entity.id]
+    }
     if (!this.entities[entity.id]) {
       if (!entity.pos) return
-      const mesh = getEntityMesh(entity, this.scene)
+      const mesh = getEntityMesh(entity, this.scene, this.version)
       if (!mesh) return
+      mesh.itemName = entity.itemName
       this.entities[entity.id] = mesh
       this.scene.add(mesh)
       if (entity.pos) mesh.position.set(entity.pos.x, entity.pos.y, entity.pos.z)
