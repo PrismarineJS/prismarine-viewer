@@ -76,25 +76,46 @@ function spriteGeometry (pixels, size, depth) {
 
 /**
  * A dropped item of `itemName`. The mesh stays empty until the version's texture index and the texture
- * have loaded, and for an item the index has no texture for.
+ * have loaded; an item the index has no usable texture for gets `fallback()` instead. Disposing the group
+ * frees what it created and drops any load still in flight.
  */
-function getItemMesh (itemName, version) {
+function getItemMesh (itemName, version, fallback) {
   const group = new THREE.Object3D()
   const pivot = new THREE.Object3D()
   group.add(pivot)
   group.item = { pivot, size: 0, age: 0, bobOffset: Math.random() * Math.PI * 2 }
 
+  let disposed = false
+  const owned = []
+  group.dispose = () => {
+    disposed = true
+    // The map is shared through the texture cache, so only the geometry and material are ours.
+    for (const mesh of owned) {
+      mesh.geometry.dispose()
+      mesh.material.dispose()
+    }
+  }
+  const attach = (parent, mesh) => {
+    owned.push(mesh)
+    parent.add(mesh)
+  }
+
   itemTextures(version).then(byName => {
+    if (disposed) return
     const texture = byName[itemName]
-    if (!texture || !/^(minecraft:)?(items|block)\//.test(texture)) return
+    if (!texture || !/^(minecraft:)?(items|block)\//.test(texture)) {
+      attach(group, fallback())
+      return
+    }
     const isBlock = /^(minecraft:)?block\//.test(texture)
     const size = isBlock ? BLOCK_SCALE : FLAT_SCALE
     const path = texturePath(version, texture)
     loadPixels(path, pixels => loadTexture(path, map => {
+      if (disposed) return
       map.magFilter = THREE.NearestFilter
       map.minFilter = THREE.NearestFilter
       const geometry = isBlock ? new THREE.BoxGeometry(size, size, size) : spriteGeometry(pixels, size, size * FLAT_DEPTH)
-      pivot.add(new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ map, transparent: true, alphaTest: 0.1 })))
+      attach(pivot, new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ map, transparent: true, alphaTest: 0.1 })))
       group.item.size = size
     }))
   })

@@ -9,7 +9,7 @@ const { createCanvas } = require('canvas')
 
 function getEntityMesh (entity, scene, version) {
   // A dropped item is its own item's model, and the stack only arrives after the spawn.
-  if (entity.itemName) return getItemMesh(entity.itemName, version)
+  if (entity.itemName) return getItemMesh(entity.itemName, version, () => missingModel(entity))
   if (entity.name === 'item') return null
   if (entity.name) {
     try {
@@ -51,6 +51,10 @@ function getEntityMesh (entity, scene, version) {
     }
   }
 
+  return missingModel(entity)
+}
+
+function missingModel (entity) {
   const geometry = new THREE.BoxGeometry(entity.width, entity.height, entity.width)
   geometry.translate(0, entity.height / 2, 0)
   const material = new THREE.MeshBasicMaterial({ color: 0xff00ff })
@@ -103,6 +107,8 @@ class Entities {
   constructor (scene) {
     this.scene = scene
     this.entities = {}
+    // What the spawn said about each dropped item, since later partial updates carry only the id
+    this.items = {}
     this.lastAnimate = performance.now()
   }
 
@@ -128,9 +134,14 @@ class Entities {
       dispose3(mesh)
     }
     this.entities = {}
+    this.items = {}
   }
 
   update (entity) {
+    if (entity.name === 'item') this.items[entity.id] = { name: entity.name, width: entity.width, height: entity.height }
+    if (this.items[entity.id]) entity = { ...this.items[entity.id], ...entity }
+    if (entity.delete) delete this.items[entity.id]
+
     // A dropped item's stack arrives after its spawn and can change; its mesh is that stack's model.
     const known = this.entities[entity.id]
     if (known && entity.itemName !== undefined && known.itemName !== entity.itemName) {
