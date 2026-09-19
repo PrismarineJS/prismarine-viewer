@@ -1,17 +1,14 @@
 /* eslint-env jest */
 const THREE = require('three')
+const Chunks = require('prismarine-chunk')
 
-// worldBounds.json callbacks stay pending until a test invokes them.
-const mockBounds = { pending: [] }
 jest.mock('../viewer/lib/utils', () => ({
   loadTexture: () => {},
-  loadJSON: (name, cb) => {
-    if (name === 'worldBounds.json') mockBounds.pending.push(cb)
-  }
+  loadJSON: () => {}
 }))
 
-// Every dirty message must be answered with sectionFinished, as worker.js
-// does for sections it holds no chunk for.
+// Records messages instead of meshing, so tests read the sections the
+// renderer asked for.
 class FakeWorker {
   constructor () {
     this.messages = []
@@ -19,77 +16,48 @@ class FakeWorker {
 
   postMessage (data) {
     this.messages.push(data)
-    if (data.type === 'dirty') {
-      setImmediate(() => this.onmessage({ data: { type: 'sectionFinished', key: `${data.x},${data.y},${data.z}` } }))
-    }
   }
 }
 global.Worker = FakeWorker
 
 const { WorldRenderer } = require('../viewer/lib/worldrenderer')
 
-const BOUNDS = { '1.18.2': { minY: -64, worldHeight: 384 } }
-const flush = () => new Promise(resolve => setImmediate(resolve))
-
-function sectionGeometry (sx, sy, sz) {
-  return {
-    positions: new Float32Array(3),
-    normals: new Float32Array(3),
-    colors: new Float32Array(3),
-    uvs: new Float32Array(2),
-    animations: new Float32Array(3),
-    indices: [0, 0, 0],
-    sx,
-    sy,
-    sz
-  }
-}
-
-describe('WorldRenderer with a delayed world bounds load', () => {
+describe('WorldRenderer section range', () => {
   let renderer
   let worker
 
   beforeEach(() => {
-    mockBounds.pending = []
     renderer = new WorldRenderer(new THREE.Scene(), 1)
     worker = renderer.workers[0]
   })
 
-  test('waitForChunksToRender covers columns added before the bounds land', async () => {
-    renderer.setVersion('1.18.2')
-    renderer.addColumn(0, 0, {})
-    const rendered = jest.fn()
-    const wait = renderer.waitForChunksToRender().then(rendered)
-    await flush()
-    expect(rendered).not.toHaveBeenCalled()
+  function dirtyYs (value) {
+    return worker.messages
+      .filter(m => m.type === 'dirty' && m.x === 0 && m.z === 0 && m.value === value)
+      .map(m => m.y)
+  }
 
-    mockBounds.pending[0](BOUNDS)
-    await wait
+  test.each([
+    ['a 1.16.5 column', '1.16.5', undefined, 0, 240],
+    ['a 1.18.2 overworld column', '1.18.2', undefined, -64, 304],
+    ['a 1.18.2 column with a custom minY', '1.18.2', { minY: -128, worldHeight: 384 }, -128, 240]
+  ])('%s passed as addColumn(x, z, chunk) is meshed over its own range', (_, version, options, bottom, top) => {
+    const Chunk = Chunks(version)
+    renderer.addColumn(0, 0, new Chunk(options).toJson())
 
-    const ys = worker.messages.filter(m => m.type === 'dirty' && m.x === 0 && m.z === 0).map(m => m.y)
-    expect(Math.min(...ys)).toBe(-64)
-    expect(Math.max(...ys)).toBe(304)
-    expect(ys).toHaveLength(24)
-    expect(renderer.sectionsOutstanding.size).toBe(0)
+    const ys = dirtyYs(true)
+    expect(Math.min(...ys)).toBe(bottom)
+    expect(Math.max(...ys)).toBe(top)
+    expect(new Set(ys).size).toBe((top - bottom) / 16 + 1)
   })
 
-  test('a removal queued before the bounds land does not touch a replacement world', async () => {
-    renderer.setVersion('1.18.2')
-    renderer.addColumn(0, 0, {})
+  test('removeColumn clears the range the column was added with', () => {
+    const Chunk = Chunks('1.18.2')
+    renderer.addColumn(0, 0, new Chunk({ minY: -128, worldHeight: 384 }).toJson())
     renderer.removeColumn(0, 0)
 
-    renderer.setVersion('1.18.2')
-    renderer.addColumn(0, 0, {})
-    mockBounds.pending[1](BOUNDS)
-    await flush()
-    worker.onmessage({ data: { type: 'geometry', key: '0,0,0', geometry: sectionGeometry(0, 0, 0) } })
-    const mesh = renderer.sectionMeshs['0,0,0']
-    expect(mesh).toBeDefined()
-
-    mockBounds.pending[0](BOUNDS)
-    await flush()
-    expect(renderer.sectionMeshs['0,0,0']).toBe(mesh)
-    expect(renderer.scene.children).toContain(mesh)
-    expect(worker.messages.filter(m => m.type === 'dirty' && m.value === false)).toHaveLength(0)
+    const ys = dirtyYs(false)
+    expect(Math.min(...ys)).toBe(-128)
+    expect(Math.max(...ys)).toBe(240)
   })
 })

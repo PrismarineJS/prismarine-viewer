@@ -9,16 +9,19 @@ function mod (x, n) {
   return ((x % n) + n) % n
 }
 
+// Since 1.18 a column carries its own Y range, which a dimension can set, and
+// serializes it into its JSON. Older columns carry none and span 0..256.
+function columnBounds (chunk) {
+  const { minY = 0, worldHeight = 256 } = typeof chunk === 'string' ? JSON.parse(chunk) : chunk
+  return { minY, worldHeight }
+}
+
 class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
     this.active = false
     this.version = undefined
     this.assetsVersion = undefined
-    // World Y bounds, fetched per version in setVersion. Defaults match pre-1.18.
-    this.minY = 0
-    this.worldHeight = 256
-    this.boundsReady = Promise.resolve()
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
@@ -93,17 +96,6 @@ class WorldRenderer {
   setVersion (version, assetsVersion = version) {
     this.version = version
     this.assetsVersion = assetsVersion
-    this.boundsReady = new Promise(resolve => {
-      loadJSON('worldBounds.json', (bounds) => {
-        // worldBounds.json only has entries for supportedVersions, while
-        // version is the server's exact version, so fall back to the snapped
-        // assets version (same major, hence same bounds) when it is absent.
-        const { minY = 0, worldHeight = 256 } = bounds[version] ?? bounds[assetsVersion] ?? {}
-        this.minY = minY
-        this.worldHeight = worldHeight
-        resolve()
-      })
-    })
     this.resetWorld()
     this.active = true
     for (const worker of this.workers) {
@@ -141,49 +133,37 @@ class WorldRenderer {
   }
 
   addColumn (x, z, chunk) {
-    this.loadedChunks[`${x},${z}`] = true
+    // Kept so removeColumn clears the same range this column was meshed over
+    const { minY, worldHeight } = this.loadedChunks[`${x},${z}`] = columnBounds(chunk)
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    // The worker cannot mesh anything until blockStates lands, so waiting on the
-    // bounds fetch here costs no rendering latency.
-    this.whenBoundsReady(() => {
-      for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
-        const loc = new Vec3(x, y, z)
-        this.setSectionDirty(loc)
-        this.setSectionDirty(loc.offset(-16, 0, 0))
-        this.setSectionDirty(loc.offset(16, 0, 0))
-        this.setSectionDirty(loc.offset(0, 0, -16))
-        this.setSectionDirty(loc.offset(0, 0, 16))
-      }
-    })
+    for (let y = minY; y < minY + worldHeight; y += 16) {
+      const loc = new Vec3(x, y, z)
+      this.setSectionDirty(loc)
+      this.setSectionDirty(loc.offset(-16, 0, 0))
+      this.setSectionDirty(loc.offset(16, 0, 0))
+      this.setSectionDirty(loc.offset(0, 0, -16))
+      this.setSectionDirty(loc.offset(0, 0, 16))
+    }
   }
 
   removeColumn (x, z) {
+    const { minY, worldHeight } = this.loadedChunks[`${x},${z}`] ?? columnBounds({})
     delete this.loadedChunks[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    this.whenBoundsReady(() => {
-      for (let y = this.minY; y < this.minY + this.worldHeight; y += 16) {
-        this.setSectionDirty(new Vec3(x, y, z), false)
-        const key = `${x},${y},${z}`
-        const mesh = this.sectionMeshs[key]
-        if (mesh) {
-          this.scene.remove(mesh)
-          dispose3(mesh)
-        }
-        delete this.sectionMeshs[key]
+    for (let y = minY; y < minY + worldHeight; y += 16) {
+      this.setSectionDirty(new Vec3(x, y, z), false)
+      const key = `${x},${y},${z}`
+      const mesh = this.sectionMeshs[key]
+      if (mesh) {
+        this.scene.remove(mesh)
+        dispose3(mesh)
       }
-    })
-  }
-
-  // fn must not run once a later setVersion() has replaced boundsReady.
-  whenBoundsReady (fn) {
-    const boundsReady = this.boundsReady
-    boundsReady.then(() => {
-      if (this.boundsReady === boundsReady) fn()
-    })
+      delete this.sectionMeshs[key]
+    }
   }
 
   setBlockStateId (pos, stateId) {
@@ -211,10 +191,8 @@ class WorldRenderer {
   // Listen for chunk rendering updates emitted if a worker finished a render and resolve if the number
   // of sections not rendered are 0
   waitForChunksToRender () {
-    // Must chain on boundsReady so every earlier addColumn has registered
-    // its sections before the size check.
-    return this.boundsReady.then(() => new Promise((resolve, reject) => {
-      if (this.sectionsOutstanding.size === 0) {
+    return new Promise((resolve, reject) => {
+      if (Array.from(this.sectionsOutstanding).length === 0) {
         resolve()
         return
       }
@@ -226,7 +204,7 @@ class WorldRenderer {
         }
       }
       this.renderUpdateEmitter.on('update', updateHandler)
-    }))
+    })
   }
 }
 
