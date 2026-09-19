@@ -19,6 +19,7 @@ class WorldRenderer {
     this.minY = 0
     this.worldHeight = 256
     this.boundsReady = Promise.resolve()
+    this.boundsGeneration = 0
     this.scene = scene
     this.loadedChunks = {}
     this.sectionsOutstanding = new Set()
@@ -95,8 +96,13 @@ class WorldRenderer {
   setVersion (version, assetsVersion = version) {
     this.version = version
     this.assetsVersion = assetsVersion
+    // Counter rather than a boundsReady comparison: loadJSON may call back
+    // synchronously, before boundsReady is assigned.
+    const generation = ++this.boundsGeneration
     this.boundsReady = new Promise(resolve => {
       loadJSON('worldBounds.json', (bounds) => {
+        // A later setVersion() owns minY/worldHeight now.
+        if (generation !== this.boundsGeneration) return resolve()
         // worldBounds.json only has entries for supportedVersions, while
         // version is the server's exact version, so fall back to the snapped
         // assets version (same major, hence same bounds) when it is absent.

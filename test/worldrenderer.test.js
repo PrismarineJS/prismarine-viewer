@@ -28,7 +28,7 @@ global.Worker = FakeWorker
 
 const { WorldRenderer } = require('../viewer/lib/worldrenderer')
 
-const BOUNDS = { '1.18.2': { minY: -64, worldHeight: 384 } }
+const BOUNDS = { '1.16.4': { minY: 0, worldHeight: 256 }, '1.18.2': { minY: -64, worldHeight: 384 }, '1.21.4': { minY: -64, worldHeight: 384 } }
 const flush = () => new Promise(resolve => setImmediate(resolve))
 
 function sectionGeometry (sx, sy, sz) {
@@ -91,5 +91,21 @@ describe('WorldRenderer with a delayed world bounds load', () => {
     expect(renderer.sectionMeshs['0,0,0']).toBe(mesh)
     expect(renderer.scene.children).toContain(mesh)
     expect(worker.messages.filter(m => m.type === 'dirty' && m.value === false)).toHaveLength(0)
+  })
+
+  test('a superseded bounds load does not overwrite the current world bounds', async () => {
+    renderer.setVersion('1.16.4')
+    renderer.setVersion('1.21.4')
+    mockBounds.pending[1](BOUNDS)
+    mockBounds.pending[0](BOUNDS)
+    await flush()
+    expect(renderer.minY).toBe(-64)
+    expect(renderer.worldHeight).toBe(384)
+
+    renderer.addColumn(0, 0, {})
+    await renderer.waitForChunksToRender()
+    const ys = worker.messages.filter(m => m.type === 'dirty' && m.x === 0 && m.z === 0).map(m => m.y)
+    expect(Math.min(...ys)).toBe(-64)
+    expect(Math.max(...ys)).toBe(304)
   })
 })
