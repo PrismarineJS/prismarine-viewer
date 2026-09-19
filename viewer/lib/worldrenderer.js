@@ -9,6 +9,13 @@ function mod (x, n) {
   return ((x % n) + n) % n
 }
 
+// Since 1.18 a column carries its own Y range, which a dimension can set, and
+// serializes it into its JSON. Older columns carry none and span 0..256.
+function columnBounds (chunk) {
+  const { minY = 0, worldHeight = 256 } = typeof chunk === 'string' ? JSON.parse(chunk) : chunk
+  return { minY, worldHeight }
+}
+
 class WorldRenderer {
   constructor (scene, numWorkers = 4) {
     this.sectionMeshs = {}
@@ -126,11 +133,12 @@ class WorldRenderer {
   }
 
   addColumn (x, z, chunk) {
-    this.loadedChunks[`${x},${z}`] = true
+    // Kept so removeColumn clears the same range this column was meshed over
+    const { minY, worldHeight } = this.loadedChunks[`${x},${z}`] = columnBounds(chunk)
     for (const worker of this.workers) {
       worker.postMessage({ type: 'chunk', x, z, chunk })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = minY; y < minY + worldHeight; y += 16) {
       const loc = new Vec3(x, y, z)
       this.setSectionDirty(loc)
       this.setSectionDirty(loc.offset(-16, 0, 0))
@@ -141,11 +149,12 @@ class WorldRenderer {
   }
 
   removeColumn (x, z) {
+    const { minY, worldHeight } = this.loadedChunks[`${x},${z}`] ?? columnBounds({})
     delete this.loadedChunks[`${x},${z}`]
     for (const worker of this.workers) {
       worker.postMessage({ type: 'unloadChunk', x, z })
     }
-    for (let y = 0; y < 256; y += 16) {
+    for (let y = minY; y < minY + worldHeight; y += 16) {
       this.setSectionDirty(new Vec3(x, y, z), false)
       const key = `${x},${y},${z}`
       const mesh = this.sectionMeshs[key]

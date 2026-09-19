@@ -40,6 +40,13 @@ class World {
     return this.columns[columnKey(x, z)]
   }
 
+  // Bottom of the world at pos, read off the loaded column because a dimension
+  // can set its own. 0 before 1.18. Used by models.js to cull out-of-world faces.
+  getMinY (pos) {
+    const column = this.columns[columnKey(Math.floor(pos.x / 16) * 16, Math.floor(pos.z / 16) * 16)]
+    return column?.minY ?? 0
+  }
+
   setBlockStateId (pos, stateId) {
     const key = columnKey(Math.floor(pos.x / 16) * 16, Math.floor(pos.z / 16) * 16)
 
