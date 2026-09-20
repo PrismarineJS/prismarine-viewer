@@ -8,7 +8,9 @@ const { supportedVersions } = require('../viewer/lib/version')
 
 async function main () {
   const bundle = path.join(__dirname, '../public/worker.js')
-  assert(fs.statSync(bundle).size < 20 * 1024 * 1024, 'Worker exceeds 20 MiB; check for unused registry data')
+  // Allow normal Java registry growth across supported dependency releases.
+  // The accidental Bedrock payload alone used over 70 MiB.
+  assert(fs.statSync(bundle).size < 32 * 1024 * 1024, 'Worker exceeds 32 MiB; check for unused registry data')
   for (const version of supportedVersions) {
     const worker = new Worker(bundle)
     try {
