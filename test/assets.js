@@ -34,7 +34,7 @@ const previous = require('minecraft-data')('1.21.4')
 const added = data.blocksArray.filter(block => !previous.blocksByName[block.name])
 const Chunk = require('prismarine-chunk')(version)
 const pos = new Vec3(8, 72, 8)
-for (const block of added) {
+for (const block of [...added, data.blocksByName.oak_stairs, data.blocksByName.pale_oak_stairs, data.blocksByName.resin_brick_stairs]) {
   for (let id = block.minStateId; id <= block.maxStateId; id++) {
     const column = new Chunk()
     column.setBlockStateId(pos, id)
