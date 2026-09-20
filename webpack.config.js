@@ -84,7 +84,11 @@ const workerConfig = {
     function (req, cb) {
       if (req.context.includes('minecraft-data') && req.request.endsWith('.json')) {
         const fileName = req.request.split('/').pop().replace('.json', '')
-        if (!allowedWorkerFiles.includes(fileName)) {
+        // This viewer renders Java chunks. Bedrock blockStates alone add tens
+        // of MB to every worker; keep only its common version metadata, which
+        // minecraft-data initializes even when the caller requests Java data.
+        const bedrockData = req.request.includes('/data/bedrock/') && !req.request.includes('/common/')
+        if (bedrockData || !allowedWorkerFiles.includes(fileName)) {
           cb(null, [])
           return
         }

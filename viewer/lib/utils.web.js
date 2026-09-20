@@ -5,7 +5,7 @@ const textureCache = {}
 function loadTexture (texture, cb) {
   if (!textureCache[texture]) {
     // textures.minecraft.net sends no CORS headers: player skins go through the
-    // server's proxy route (lib/mineflayer.js)
+    // server's shared proxy route (lib/common.js)
     const url = texture.replace(/^https?:\/\/textures\.minecraft\.net\/texture\//, 'texture/')
     textureCache[texture] = new Promise(resolve => new THREE.TextureLoader().load(url, resolve, undefined, () => {}))
   }
