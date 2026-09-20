@@ -17,14 +17,14 @@ jobs:
         node-version: 24.x
     - name: Install native dependencies
       run: sudo apt-get update && sudo apt-get install -y libxi-dev libxext-dev libgl1-mesa-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-    - run: npm i && npm run lint
+    - run: npm i && npm run lint && npm run test:assets
   build:
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        mcVersion: ['1.8.8', '1.9.4', '1.10.2', '1.11.2', '1.12.2', '1.13.2', '1.14.4', '1.15.2', '1.16.1', '1.16.4', '1.17.1', '1.18.1', '1.19', '1.20.1', '1.21.1', '1.21.4']
+        mcVersion: ['1.8.8', '1.9.4', '1.10.2', '1.11.2', '1.12.2', '1.13.2', '1.14.4', '1.15.2', '1.16.1', '1.16.4', '1.17.1', '1.18.1', '1.19', '1.20.1', '1.21.1', '1.21.4', '1.21.8']
       fail-fast: false
 
     steps:
