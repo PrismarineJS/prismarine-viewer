@@ -17,7 +17,7 @@ jobs:
         node-version: 24.x
     - name: Install native dependencies
       run: sudo apt-get update && sudo apt-get install -y libxi-dev libxext-dev libgl1-mesa-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-    - run: npm i && npm run lint && npm run test:assets
+    - run: npm i && npm run lint && npm run test:assets && npm run test:worker
   build:
 
     runs-on: ubuntu-latest
