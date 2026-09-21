@@ -40,6 +40,12 @@ class WorldView extends EventEmitter {
     this.world = world
     this.viewDistance = viewDistance
     this.loadedChunks = {}
+    // loadChunk awaits the world, so a load can finish after its column was unloaded or the world
+    // was replaced. Each load records a token under its column key and the world generation it read
+    // from; it only emits if both are still current once the column arrives.
+    this.pendingLoads = {}
+    this.nextLoadToken = 0
+    this.worldGeneration = 0
     this.lastPos = new Vec3(0, 0, 0).update(position)
     this.emitter = emitter || this
 
@@ -82,6 +88,15 @@ class WorldView extends EventEmitter {
       },
       chunkColumnLoad: function (pos) {
         worldView.loadChunk(pos)
+      },
+      chunkColumnUnload: function (pos) {
+        worldView.unloadChunk(pos)
+      },
+      // A dimension change or server transfer unloads every column (each arrives above as a
+      // chunkColumnUnload) and may replace bot.world with a fresh object; follow it so chunks that
+      // load afterwards are read from the world the bot is now in, not the one it left.
+      login: function () {
+        worldView.setWorld(bot.world)
       },
       blockUpdate: function (oldBlock, newBlock) {
         const stateId = newBlock.stateId ? newBlock.stateId : ((newBlock.type << 4) | newBlock.metadata)
@@ -128,16 +143,27 @@ class WorldView extends EventEmitter {
     }
   }
 
+  setWorld (world) {
+    this.world = world
+    this.worldGeneration++
+  }
+
   async loadChunk (pos) {
     const [botX, botZ] = chunkPos(this.lastPos)
     const dx = Math.abs(botX - Math.floor(pos.x / 16))
     const dz = Math.abs(botZ - Math.floor(pos.z / 16))
     if (dx < this.viewDistance && dz < this.viewDistance) {
+      const key = `${pos.x},${pos.z}`
+      const token = ++this.nextLoadToken
+      const generation = this.worldGeneration
+      this.pendingLoads[key] = token
       const column = await this.world.getColumnAt(pos)
+      if (this.pendingLoads[key] !== token || this.worldGeneration !== generation) return
+      delete this.pendingLoads[key]
       if (column) {
         const chunk = column.toJson()
         this.emitter.emit('loadChunk', { x: pos.x, z: pos.z, chunk })
-        this.loadedChunks[`${pos.x},${pos.z}`] = true
+        this.loadedChunks[key] = true
       }
     }
   }
@@ -145,6 +171,7 @@ class WorldView extends EventEmitter {
   unloadChunk (pos) {
     this.emitter.emit('unloadChunk', { x: pos.x, z: pos.z })
     delete this.loadedChunks[`${pos.x},${pos.z}`]
+    delete this.pendingLoads[`${pos.x},${pos.z}`]
   }
 
   async updatePosition (pos, force = false) {
