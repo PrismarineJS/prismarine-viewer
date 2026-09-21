@@ -139,3 +139,47 @@ describe('mesher', () => {
     worker.terminate()
   })
 })
+
+describe('waitForReady', () => {
+  const { WorldRenderer } = require('../viewer/lib/worldrenderer')
+  const { Entities } = require('../viewer/lib/entities')
+  const THREE = require('three')
+  const nodeHost = createNodeHost({ assetsDir: path.join(__dirname, '../viewer/lib') })
+  const fakeHost = (loadImage) => ({
+    ...nodeHost,
+    loadImage,
+    loadJSON: async () => ({}),
+    loadText: async () => '{}',
+    createWorker: createInlineWorker
+  })
+
+  it('resolves once the block atlas is on the material', async () => {
+    const host = fakeHost(() => nodeHost.loadImage('missing_texture.png'))
+    const world = new WorldRenderer(new THREE.Scene(), { host, numWorkers: 1 })
+    world.setVersion(version)
+    await world.waitForReady()
+    expect(world.material.map).toBeInstanceOf(THREE.DataTexture)
+    world.dispose()
+  })
+
+  it('rejects when the block atlas cannot be loaded', async () => {
+    const host = fakeHost(async () => { throw new Error('offline') })
+    const world = new WorldRenderer(new THREE.Scene(), { host, numWorkers: 1 })
+    world.setVersion(version)
+    await expect(world.waitForReady()).rejects.toThrow('block atlas')
+    expect(world.material.map).toBeFalsy()
+    world.dispose()
+  })
+
+  it('applies the textures of entities that have not been drawn yet', async () => {
+    const host = fakeHost(() => nodeHost.loadImage('missing_texture.png'))
+    const entities = new Entities(new THREE.Scene(), host)
+    entities.update({ id: 1, name: 'zombie', pos: { x: 0, y: 0, z: 0 } })
+    const parts = []
+    entities.entities[1].traverse(part => { if (part.loadTextures) parts.push(part) })
+    expect(parts.length).toBeGreaterThan(0)
+    expect(parts.every(part => !part.material.map)).toBe(true)
+    await entities.loadTextures()
+    expect(parts.every(part => part.material.map)).toBe(true)
+  })
+})

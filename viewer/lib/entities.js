@@ -105,6 +105,16 @@ class Entities {
     }
   }
 
+  // Starts every entity's lazy texture load and resolves once they're applied.
+  // Skins that fail to load keep the default texture, as when drawn normally.
+  loadTextures () {
+    const loads = []
+    for (const mesh of Object.values(this.entities)) {
+      mesh.traverse(part => { if (part.loadTextures) loads.push(part.loadTextures()) })
+    }
+    return Promise.all(loads)
+  }
+
   clear () {
     for (const mesh of Object.values(this.entities)) {
       this.scene.remove(mesh)

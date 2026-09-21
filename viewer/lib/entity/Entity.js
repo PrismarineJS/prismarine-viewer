@@ -241,18 +241,26 @@ function getMesh (texture, jsonModel, override, host) {
   mesh.scale.set(-1 / 16, 1 / 16, 1 / 16)
 
   // Textures load the first time the mesh is drawn, so an entity the camera
-  // never sees (a player across the server) costs no fetch.
-  mesh.onBeforeRender = () => {
-    mesh.onBeforeRender = () => {}
+  // never sees (a player across the server) costs no fetch. loadTextures starts
+  // them early and resolves once they're applied, for callers that must not
+  // render an untextured frame (Viewer.waitForReady).
+  let loaded
+  mesh.loadTextures = () => {
+    if (loaded) return loaded
     const apply = texture => { if (texture) applyTexture(material, texture) }
     if (texture) {
-      loadTexture(host, texture).then(texture => {
+      loaded = loadTexture(host, texture).then(texture => {
         apply(texture)
-        if (override) loadPixels(host, override).then(pixels => { if (pixels) applyTexture(material, textureFromPixels(prepareSkin(pixels))) })
+        if (override) return loadPixels(host, override).then(pixels => { if (pixels) applyTexture(material, textureFromPixels(prepareSkin(pixels))) })
       })
     } else {
-      loadTexture(host, override).then(apply)
+      loaded = loadTexture(host, override).then(apply)
     }
+    return loaded
+  }
+  mesh.onBeforeRender = () => {
+    mesh.onBeforeRender = () => {}
+    mesh.loadTextures()
   }
 
   return mesh
