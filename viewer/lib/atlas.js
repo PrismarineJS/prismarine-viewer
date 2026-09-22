@@ -106,7 +106,7 @@ function makeTextureAtlas (mcAssets) {
 
   for (const tile of tiles) {
     const framestep = tile.frameHeight / height
-    texturesIndex[tile.name] = { u: tile.x / width, v: tile.y / height, su: tile.w / width, sv: framestep }
+    texturesIndex[tile.name] = { u: tile.x / width, v: tile.y / height, su: tile.w / width, sv: framestep, width: tile.w, height: tile.frameHeight }
     if (tile.animation) {
       texturesIndex[tile.name].frames = tile.frames.length
       texturesIndex[tile.name].frametime = tile.animation.frametime

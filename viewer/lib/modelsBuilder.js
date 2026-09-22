@@ -103,38 +103,46 @@ function resolveModel (name, blocksModels, texturesJson) {
   return model
 }
 
-function cuboid (from, to, texture, uv) {
+function cuboid (from, to, texture, textureOffset, textureScale, hiddenFaces = []) {
+  const [u, v] = textureOffset
+  const width = to[0] - from[0]
+  const height = to[1] - from[1]
+  const depth = to[2] - from[2]
+  const uv = {
+    down: [u + depth, v, u + depth + width, v + depth],
+    up: [u + depth + width, v + depth, u + depth + width * 2, v],
+    west: [u, v + depth, u + depth, v + depth + height],
+    north: [u + depth, v + depth, u + depth + width, v + depth + height],
+    east: [u + depth + width, v + depth, u + depth + width + depth, v + depth + height],
+    south: [u + depth + width + depth, v + depth, u + depth + width + depth + width, v + depth + height]
+  }
   const faces = {}
   for (const face of ['down', 'up', 'north', 'south', 'west', 'east']) {
-    faces[face] = { texture, uv: uv[face] || uv.default }
+    if (!hiddenFaces.includes(face)) {
+      faces[face] = { texture, uv: uv[face].map(value => value * textureScale) }
+    }
   }
   return { from, to, faces }
 }
 
-function buildChestModel (textureName) {
-  const body = {
-    north: [3.5, 4.75, 10.5, 8],
-    south: [3.5, 4.75, 10.5, 8],
-    west: [0, 4.75, 3.5, 8],
-    east: [0, 4.75, 3.5, 8],
-    up: [0, 8.25, 14, 10.75],
-    down: [0, 8.25, 14, 10.75]
-  }
-  const lid = {
-    north: [3.5, 0, 10.5, 3.5],
-    south: [3.5, 0, 10.5, 3.5],
-    west: [0, 0, 3.5, 3.5],
-    east: [0, 0, 3.5, 3.5],
-    up: [0, 3.5, 14, 4.5],
-    down: [0, 3.5, 14, 4.5]
-  }
+function buildChestModel (textureName, part = 'single', textureWidth = 64) {
+  const isLeft = part === 'left'
+  const isRight = part === 'right'
+  const hiddenFaces = isLeft ? ['west'] : isRight ? ['east'] : []
+  const bodyFrom = isLeft ? [0, 0, 1] : [1, 0, 1]
+  const bodyTo = isRight ? [16, 10, 15] : [15, 10, 15]
+  const lidFrom = isLeft ? [0, 9, 1] : [1, 9, 1]
+  const lidTo = isRight ? [16, 14, 15] : [15, 14, 15]
+  const lockFrom = isLeft ? [0, 7, 15] : isRight ? [15, 7, 15] : [7, 7, 15]
+  const lockTo = isLeft ? [1, 11, 16] : isRight ? [16, 11, 16] : [9, 11, 16]
+  const textureScale = 16 / textureWidth
 
   return {
     textures: { chest: textureName },
     elements: [
-      cuboid([0, 0, 0], [16, 10, 14], '#chest', body),
-      cuboid([0, 10, 0], [16, 14, 14], '#chest', lid),
-      cuboid([7, 10, 14], [9, 13, 15], '#chest', { default: [8.25, 5.25, 10.5, 7.5] })
+      cuboid(bodyFrom, bodyTo, '#chest', [0, 19], textureScale, hiddenFaces),
+      cuboid(lidFrom, lidTo, '#chest', [0, 0], textureScale, hiddenFaces),
+      cuboid(lockFrom, lockTo, '#chest', [0, 0], textureScale, hiddenFaces)
     ],
     ao: true
   }
@@ -155,7 +163,9 @@ function prepareChestModels (blocksStates, atlas) {
     const models = {}
     for (const part of ['single', 'left', 'right']) {
       const suffix = part === 'single' ? '' : part
-      const model = buildChestModel(chestTexture(atlas, family, suffix))
+      const textureName = chestTexture(atlas, family, suffix)
+      const texture = atlas.json.textures[textureName]
+      const model = buildChestModel(textureName, part, texture.width || 64)
       prepareModel(model, atlas.json.textures)
       models[part] = model
     }
