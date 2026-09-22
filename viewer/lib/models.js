@@ -262,7 +262,9 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
     let tint = [1, 1, 1]
     if (eFace.tintindex !== undefined) {
       if (eFace.tintindex === 0) {
-        if (block.name === 'redstone_wire') {
+        if (block.name === 'stonecutter') {
+          tint = [0.6, 0.6, 0.6]
+        } else if (block.name === 'redstone_wire') {
           tint = tints.redstone[`${block.getProperties().power}`]
         } else if (block.name === 'birch_leaves' ||
           block.name === 'spruce_leaves' ||
