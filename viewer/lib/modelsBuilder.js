@@ -119,7 +119,8 @@ function cuboid (from, to, texture, textureOffset, textureScale, hiddenFaces = [
   const faces = {}
   for (const face of ['down', 'up', 'north', 'south', 'west', 'east']) {
     if (!hiddenFaces.includes(face)) {
-      faces[face] = { texture, uv: uv[face].map(value => value * textureScale) }
+      const faceUv = face === 'up' ? uv[face] : [uv[face][2], uv[face][3], uv[face][0], uv[face][1]]
+      faces[face] = { texture, uv: faceUv.map(value => value * textureScale) }
     }
   }
   return { from, to, faces }

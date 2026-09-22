@@ -60,7 +60,11 @@ function makeTextureAtlas (mcAssets) {
   if (fs.existsSync(chestTexturePath)) {
     textureFiles.push(...fs.readdirSync(chestTexturePath)
       .filter(file => file.endsWith('.png'))
-      .map(file => ({ basePath: chestTexturePath, file, name: `entity/chest/${file.split('.')[0]}` })))
+      .map(file => ({
+        basePath: chestTexturePath,
+        file,
+        name: `entity/chest/${file.split('.')[0]}`
+      })))
   }
   textureFiles.unshift({ basePath: __dirname, file: 'missing_texture.png', name: 'missing_texture' })
 
