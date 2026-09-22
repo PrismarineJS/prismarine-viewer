@@ -103,6 +103,67 @@ function resolveModel (name, blocksModels, texturesJson) {
   return model
 }
 
+function cuboid (from, to, texture, uv) {
+  const faces = {}
+  for (const face of ['down', 'up', 'north', 'south', 'west', 'east']) {
+    faces[face] = { texture, uv: uv[face] || uv.default }
+  }
+  return { from, to, faces }
+}
+
+function buildChestModel (textureName) {
+  const body = {
+    north: [3.5, 4.75, 10.5, 8],
+    south: [3.5, 4.75, 10.5, 8],
+    west: [0, 4.75, 3.5, 8],
+    east: [0, 4.75, 3.5, 8],
+    up: [0, 8.25, 14, 10.75],
+    down: [0, 8.25, 14, 10.75]
+  }
+  const lid = {
+    north: [3.5, 0, 10.5, 3.5],
+    south: [3.5, 0, 10.5, 3.5],
+    west: [0, 0, 3.5, 3.5],
+    east: [0, 0, 3.5, 3.5],
+    up: [0, 3.5, 14, 4.5],
+    down: [0, 3.5, 14, 4.5]
+  }
+
+  return {
+    textures: { chest: textureName },
+    elements: [
+      cuboid([0, 0, 0], [16, 10, 14], '#chest', body),
+      cuboid([0, 10, 0], [16, 14, 14], '#chest', lid),
+      cuboid([7, 10, 14], [9, 13, 15], '#chest', { default: [8.25, 5.25, 10.5, 7.5] })
+    ],
+    ao: true
+  }
+}
+
+function chestTexture (atlas, family, suffix) {
+  const base = `entity/chest/${family}`
+  const variant = suffix ? `${base}_${suffix}` : base
+  if (atlas.json.textures[variant]) return variant
+  const legacyDouble = `${base}_double`
+  if (suffix && atlas.json.textures[legacyDouble]) return legacyDouble
+  return base
+}
+
+function prepareChestModels (blocksStates, atlas) {
+  const chestModels = {}
+  for (const family of ['normal', 'trapped', 'ender']) {
+    const models = {}
+    for (const part of ['single', 'left', 'right']) {
+      const suffix = part === 'single' ? '' : part
+      const model = buildChestModel(chestTexture(atlas, family, suffix))
+      prepareModel(model, atlas.json.textures)
+      models[part] = model
+    }
+    chestModels[family === 'normal' ? 'chest' : `${family}_chest`] = models
+  }
+  blocksStates.__chestModels = chestModels
+}
+
 function prepareBlocksStates (mcAssets, atlas) {
   const blocksStates = mcAssets.blocksStates
   mcAssets.blocksStates.missing_texture = {
@@ -143,7 +204,8 @@ function prepareBlocksStates (mcAssets, atlas) {
       }
     }
   }
+  prepareChestModels(blocksStates, atlas)
   return blocksStates
 }
 
-module.exports = { prepareBlocksStates }
+module.exports = { buildChestModel, prepareBlocksStates }
