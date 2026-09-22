@@ -485,8 +485,8 @@ function matchProperties (block, properties) {
 }
 
 function getModelVariants (block, blockStates) {
-  // air, cave_air, void_air and so on...
-  if (block.name.includes('air')) return []
+  // the air blocks render nothing. Enumerate them - a substring/suffix test also matches e.g. "*_stairs".
+  if (block.name === 'air' || block.name === 'cave_air' || block.name === 'void_air') return []
   const state = blockStates[block.name] ?? blockStates.missing_texture
   if (!state) return []
   if (state.variants) {
