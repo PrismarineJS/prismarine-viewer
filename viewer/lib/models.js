@@ -262,7 +262,9 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
     let tint = [1, 1, 1]
     if (eFace.tintindex !== undefined) {
       if (eFace.tintindex === 0) {
-        if (block.name === 'redstone_wire') {
+        if (block.name === 'stonecutter') {
+          tint = [0.6, 0.6, 0.6]
+        } else if (block.name === 'redstone_wire') {
           tint = tints.redstone[`${block.getProperties().power}`]
         } else if (block.name === 'birch_leaves' ||
           block.name === 'spruce_leaves' ||
@@ -388,7 +390,10 @@ function getSectionGeometry (sx, sy, sz, world, blocksStates) {
       for (cursor.x = sx; cursor.x < sx + 16; cursor.x++) {
         const block = world.getBlock(cursor)
         const biome = block.biome.name
-        if (block.variant === undefined) {
+        const chestVariant = getChestVariant(block, world, blocksStates)
+        if (chestVariant) {
+          block.variant = [chestVariant]
+        } else if (block.variant === undefined) {
           block.variant = getModelVariants(block, blocksStates)
         }
 
@@ -513,4 +518,31 @@ function getModelVariants (block, blockStates) {
   return []
 }
 
-module.exports = { getSectionGeometry }
+function getChestVariant (block, world, blockStates) {
+  const models = blockStates.__chestModels?.[block.name]
+  if (!models) return null
+
+  const properties = block.getProperties()
+  let part = 'single'
+  if (properties.type === 'left' || properties.type === 'right') {
+    const axis = properties.facing === 'north' || properties.facing === 'south' ? 'x' : 'z'
+    const offset = axis === 'x' ? [1, 0, 0] : [0, 0, 1]
+    const opposite = properties.type === 'left' ? 'right' : 'left'
+    const neighbors = [
+      world.getBlock(block.position.offset(...offset)),
+      world.getBlock(block.position.offset(...offset.map(value => -value)))
+    ]
+    const neighbor = neighbors.find(candidate => {
+      const neighborProperties = candidate && candidate.getProperties()
+      return candidate && candidate.name === block.name && neighborProperties.facing === properties.facing && neighborProperties.type === opposite
+    })
+    if (neighbor) {
+      part = properties.type
+    }
+  }
+
+  const y = { south: 0, west: 90, north: 180, east: 270 }[properties.facing] || 0
+  return { model: models[part], y }
+}
+
+module.exports = { getChestVariant, getSectionGeometry }
