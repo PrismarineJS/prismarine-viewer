@@ -109,6 +109,9 @@ class Entities {
     this.entities = {}
     // What the spawn said about each dropped item, since later partial updates carry only the id
     this.items = {}
+    // Ids of invisible entities. Only spawn and metadata updates say whether an entity is invisible,
+    // so the state is kept here for the partial updates (movement, riding, hurt) that follow.
+    this.invisible = new Set()
     this.lastAnimate = performance.now()
   }
 
@@ -135,12 +138,28 @@ class Entities {
     }
     this.entities = {}
     this.items = {}
+    this.invisible.clear()
   }
 
   update (entity) {
     if (entity.name === 'item') this.items[entity.id] = { name: entity.name, width: entity.width, height: entity.height }
     if (this.items[entity.id]) entity = { ...this.items[entity.id], ...entity }
     if (entity.delete) delete this.items[entity.id]
+
+    if (entity.delete) this.invisible.delete(entity.id)
+    else if (entity.invisible === true) this.invisible.add(entity.id)
+    else if (entity.invisible === false) this.invisible.delete(entity.id)
+    // An invisible entity has no model in the vanilla client, so it gets no mesh here; one that
+    // was visible when it spawned loses the mesh it already has.
+    if (this.invisible.has(entity.id)) {
+      const hidden = this.entities[entity.id]
+      if (hidden) {
+        this.scene.remove(hidden)
+        dispose3(hidden)
+        delete this.entities[entity.id]
+      }
+      return
+    }
 
     // A dropped item's stack arrives after its spawn and can change; its mesh is that stack's model.
     const known = this.entities[entity.id]
