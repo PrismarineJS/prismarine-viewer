@@ -103,6 +103,78 @@ function resolveModel (name, blocksModels, texturesJson) {
   return model
 }
 
+function cuboid (from, to, texture, textureOffset, textureScale, hiddenFaces = []) {
+  const [u, v] = textureOffset
+  const width = to[0] - from[0]
+  const height = to[1] - from[1]
+  const depth = to[2] - from[2]
+  const uv = {
+    down: [u + depth, v, u + depth + width, v + depth],
+    up: [u + depth + width, v + depth, u + depth + width * 2, v],
+    west: [u, v + depth, u + depth, v + depth + height],
+    north: [u + depth, v + depth, u + depth + width, v + depth + height],
+    east: [u + depth + width, v + depth, u + depth + width + depth, v + depth + height],
+    south: [u + depth + width + depth, v + depth, u + depth + width + depth + width, v + depth + height]
+  }
+  const faces = {}
+  for (const face of ['down', 'up', 'north', 'south', 'west', 'east']) {
+    if (!hiddenFaces.includes(face)) {
+      const faceUv = face === 'up' ? uv[face] : [uv[face][2], uv[face][3], uv[face][0], uv[face][1]]
+      faces[face] = { texture, uv: faceUv.map(value => value * textureScale) }
+    }
+  }
+  return { from, to, faces }
+}
+
+function buildChestModel (textureName, part = 'single', textureWidth = 64) {
+  const isLeft = part === 'left'
+  const isRight = part === 'right'
+  const hiddenFaces = isLeft ? ['west'] : isRight ? ['east'] : []
+  const bodyFrom = isLeft ? [0, 0, 1] : [1, 0, 1]
+  const bodyTo = isRight ? [16, 10, 15] : [15, 10, 15]
+  const lidFrom = isLeft ? [0, 9, 1] : [1, 9, 1]
+  const lidTo = isRight ? [16, 14, 15] : [15, 14, 15]
+  const lockFrom = isLeft ? [0, 7, 15] : isRight ? [15, 7, 15] : [7, 7, 15]
+  const lockTo = isLeft ? [1, 11, 16] : isRight ? [16, 11, 16] : [9, 11, 16]
+  const textureScale = 16 / textureWidth
+
+  return {
+    textures: { chest: textureName },
+    elements: [
+      cuboid(bodyFrom, bodyTo, '#chest', [0, 19], textureScale, hiddenFaces),
+      cuboid(lidFrom, lidTo, '#chest', [0, 0], textureScale, hiddenFaces),
+      cuboid(lockFrom, lockTo, '#chest', [0, 0], textureScale, hiddenFaces)
+    ],
+    ao: true
+  }
+}
+
+function chestTexture (atlas, family, suffix) {
+  const base = `entity/chest/${family}`
+  const variant = suffix ? `${base}_${suffix}` : base
+  if (atlas.json.textures[variant]) return variant
+  const legacyDouble = `${base}_double`
+  if (suffix && atlas.json.textures[legacyDouble]) return legacyDouble
+  return base
+}
+
+function prepareChestModels (blocksStates, atlas) {
+  const chestModels = {}
+  for (const family of ['normal', 'trapped', 'ender']) {
+    const models = {}
+    for (const part of ['single', 'left', 'right']) {
+      const suffix = part === 'single' ? '' : part
+      const textureName = chestTexture(atlas, family, suffix)
+      const texture = atlas.json.textures[textureName]
+      const model = buildChestModel(textureName, part, texture.width || 64)
+      prepareModel(model, atlas.json.textures)
+      models[part] = model
+    }
+    chestModels[family === 'normal' ? 'chest' : `${family}_chest`] = models
+  }
+  blocksStates.__chestModels = chestModels
+}
+
 function prepareBlocksStates (mcAssets, atlas) {
   const blocksStates = mcAssets.blocksStates
   mcAssets.blocksStates.missing_texture = {
@@ -143,7 +215,8 @@ function prepareBlocksStates (mcAssets, atlas) {
       }
     }
   }
+  prepareChestModels(blocksStates, atlas)
   return blocksStates
 }
 
-module.exports = { prepareBlocksStates }
+module.exports = { buildChestModel, prepareBlocksStates }

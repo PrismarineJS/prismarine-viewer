@@ -53,18 +53,30 @@ function readAnimation (basePath, name, img) {
 // texture rather than being uniform across the atlas.
 function makeTextureAtlas (mcAssets) {
   const blocksTexturePath = path.join(mcAssets.directory, '/blocks')
-  const textureFiles = fs.readdirSync(blocksTexturePath).filter(file => file.endsWith('.png'))
-  textureFiles.unshift('missing_texture.png')
+  const textureFiles = fs.readdirSync(blocksTexturePath)
+    .filter(file => file.endsWith('.png'))
+    .map(file => ({ basePath: blocksTexturePath, file, name: file.split('.')[0] }))
+  const chestTexturePath = path.join(mcAssets.directory, 'entity', 'chest')
+  if (fs.existsSync(chestTexturePath)) {
+    textureFiles.push(...fs.readdirSync(chestTexturePath)
+      .filter(file => file.endsWith('.png'))
+      .map(file => ({
+        basePath: chestTexturePath,
+        file,
+        name: `entity/chest/${file.split('.')[0]}`
+      })))
+  }
+  textureFiles.unshift({ basePath: __dirname, file: 'missing_texture.png', name: 'missing_texture' })
 
   // An animated texture reserves a vertical run of frames; a plain one that is
   // taller than wide contributes only its first frame, as model UV space maps
   // to a single frame either way.
-  const tiles = textureFiles.map(file => {
-    const img = loadImage(blocksTexturePath, file)
-    const animation = readAnimation(blocksTexturePath, file, img)
+  const tiles = textureFiles.map(({ basePath, file, name }) => {
+    const img = loadImage(basePath, file)
+    const animation = readAnimation(basePath, file, img)
     const frames = animation ? animation.frames : [0]
     const frameHeight = animation ? animation.frameHeight : Math.min(img.width, img.height)
-    return { name: file.split('.')[0], img, animation, frames, frameHeight, w: img.width, h: frameHeight * frames.length }
+    return { name, img, animation, frames, frameHeight, w: img.width, h: frameHeight * frames.length }
   })
 
   // shelf-pack: sort by height, lay out rows, then round the atlas up to a power of two
@@ -98,7 +110,7 @@ function makeTextureAtlas (mcAssets) {
 
   for (const tile of tiles) {
     const framestep = tile.frameHeight / height
-    texturesIndex[tile.name] = { u: tile.x / width, v: tile.y / height, su: tile.w / width, sv: framestep }
+    texturesIndex[tile.name] = { u: tile.x / width, v: tile.y / height, su: tile.w / width, sv: framestep, width: tile.w, height: tile.frameHeight }
     if (tile.animation) {
       texturesIndex[tile.name].frames = tile.frames.length
       texturesIndex[tile.name].frametime = tile.animation.frametime
