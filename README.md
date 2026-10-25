@@ -75,7 +75,7 @@ Check its [API](viewer/README.md)
 
 #### mineflayer
 
-Serve a webserver allowing to visualize the bot surrounding, in first or third person. Comes with drawing functionnalities.
+Serve a webserver allowing to visualize the bot surrounding, in first or third person. Comes with drawing functionalities.
 
 ```js
 const { mineflayer } = require('prismarine-viewer')
