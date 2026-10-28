@@ -49,6 +49,12 @@ More examples:
 
 * First person bot [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/firstperson_bot.js)
 * Record view as video file [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/headless.js)
+
+> **Native dependency.** The headless renderer needs [`node-canvas-webgl`](https://github.com/PrismarineJS/node-canvas-webgl), which pulls in `gl` (and `canvas@^2` for `node-canvas-webgl@0.3.0`). Both ship prebuilt binaries per Node ABI, and as of October 2026 the latest `gl` releases only carry `node-v108`, `node-v115`, `node-v127` and `node-v134` assets — no `node-v137` (Node 24). On a Node version without a prebuild the install falls back to compiling `gl` from source, which needs a C++ toolchain.
+
+If you would rather not compile, run the headless viewer process on a Node version that has prebuilds (Node 20 or 22, for example); it does not have to be the same Node that runs your bot.
+
+`canvas` is not the constraint here: 3.x publishes Node-API (`napi-v7`) binaries that are not tied to the Node ABI. `node-canvas-webgl@0.3.0` pins `canvas@^2`, which is ABI-specific.
 * Streaming video to a python script [example](https://github.com/PrismarineJS/prismarine-viewer/tree/master/examples/python)
 * Visualize a world, without a bot [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/standalone.js)
 * Visualize the world coming from a proxy [example](https://github.com/PrismarineJS/prismarine-viewer/blob/master/examples/proxy.js)
